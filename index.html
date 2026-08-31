@@ -44,7 +44,6 @@
     border: 1px dashed var(--accent); border-radius: 3px; opacity: 0.6;
   }
 
-  /* Stable, Non-Stretching Conversion Card Slot */
   .conversion-card {
     background: linear-gradient(135deg, #161214 0%, #1A1418 100%);
     border: 1px solid rgba(245, 158, 11, 0.4);
@@ -95,7 +94,7 @@
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Processor (CPU)</label>
         <div class="relative">
-          <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select CPU..." readonly>
+          <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select CPU..." readonly data-default="Select CPU...">
           <div id="cpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="cpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -106,7 +105,7 @@
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Motherboard & Chipset</label>
         <div class="relative">
-          <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Motherboard..." readonly>
+          <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Motherboard..." readonly data-default="Select Motherboard...">
           <div id="mbDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="mbInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -117,7 +116,7 @@
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Graphics Card (GPU)</label>
         <div class="relative">
-          <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select GPU..." readonly>
+          <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select GPU..." readonly data-default="Select GPU...">
           <div id="gpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="gpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -129,7 +128,7 @@
         <div class="space-y-1.5">
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Memory</label>
           <div class="relative">
-            <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select RAM..." readonly>
+            <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select RAM..." readonly data-default="Select RAM...">
             <div id="ramDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="ramInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -139,7 +138,7 @@
         <div class="space-y-1.5">
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Cooling</label>
           <div class="relative">
-            <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Cooler..." readonly>
+            <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Cooler..." readonly data-default="Select Cooler...">
             <div id="coolingDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="coolingInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -151,7 +150,7 @@
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Storage Drive</label>
         <div class="relative">
-          <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Storage..." readonly>
+          <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Storage..." readonly data-default="Select Storage...">
           <div id="storageDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="storageInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -578,7 +577,7 @@ function setupDropdown(id, data, key) {
   const insight = document.getElementById(id.replace('Search', 'Insight'));
   const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
   
-  // First click opens dropdown list and updates placeholder to indicate search mode, keeping keyboard closed initially
+  // 1st click: Opens menu without opening keyboard. Changes prompt to "Click to search..."
   input.addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelectorAll('.dropdown-results').forEach(el => { if(el !== dropdown) el.classList.add('hidden'); });
@@ -592,12 +591,12 @@ function setupDropdown(id, data, key) {
     }
 
     input.setAttribute('readonly', 'true');
-    input.placeholder = "Type to search component...";
+    input.placeholder = "Click to search component...";
     dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
     dropdown.classList.toggle('hidden');
   });
 
-  // If user wants to type/search, clicking again or typing unlocks the input and brings up keyboard
+  // 2nd click: If user clicks or taps again while the menu is open, remove readonly so keyboard opens for searching
   input.addEventListener('focus', () => {
     if (input.hasAttribute('readonly')) {
       input.removeAttribute('readonly');
@@ -640,6 +639,13 @@ function setupDropdown(id, data, key) {
 document.addEventListener('click', (e) => {
   if(!e.target.closest('.relative')) {
     document.querySelectorAll('.dropdown-results').forEach(el => el.classList.add('hidden'));
+    // Reset placeholders back to default if closed without selecting
+    document.querySelectorAll('.search-input').forEach(input => {
+      if(!input.value) {
+        input.setAttribute('readonly', 'true');
+        input.placeholder = input.dataset.default;
+      }
+    });
   }
 });
 
