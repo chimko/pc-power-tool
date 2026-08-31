@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wattbench Ultimate | PC Power, Bottleneck & Real-Time FPS Calculator</title>
+<title>Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator</title>
 <meta name="description" content="Accurate PC power supply calculator, ATX 3.1 transient spike analyzer, hardware bottleneck detector, and real-time gaming FPS calculator for modern custom rigs." />
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -13,8 +13,6 @@
     --line: #212438; --line-soft: #1A2230;
     --text-1: #E7ECF3; --text-2: #97A2B4; --text-3: #506880;
     --accent: #59E6C8; --accent-dim: #2C6E62;
-    --conversion: #F59E0B; /* High-converting Amber-Gold */
-    --conversion-glow: rgba(245, 158, 11, 0.25);
   }
   * { box-sizing: border-box; }
   body { background: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -46,20 +44,33 @@
     border: 1px dashed var(--accent); border-radius: 3px; opacity: 0.6;
   }
 
-  /* Captivating Warm/Reddish-Amber Conversion Glow */
+  /* Stable, Non-Stretching Conversion Card Slot */
   .conversion-card {
     background: linear-gradient(135deg, #161214 0%, #1A1418 100%);
     border: 1px solid rgba(245, 158, 11, 0.4);
     transition: all 0.3s ease;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    margin-top: 0;
+    padding: 0;
+    border: none;
+  }
+  .conversion-card.active {
+    opacity: 1;
+    max-height: 80px;
+    margin-top: 8px;
+    padding: 10px 12px;
+    border: 1px solid rgba(245, 158, 11, 0.4);
   }
   .conversion-card:hover {
     border-color: #F59E0B;
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
-    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    transform: translateY(-1px);
   }
   .conversion-text {
     color: #FBBF24;
-    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
   }
 </style>
 </head>
@@ -72,7 +83,7 @@
       <div>
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-2 rounded-full animate-pulse bg-teal-400"></div>
-          <span class="mono text-xs tracking-wide" style="color:var(--accent)">FULL DATASET ENGINE ACTIVE • ATX 3.1 READY</span>
+          <span class="mono text-xs tracking-wide" style="color:var(--accent)">ULTRA ENGINE ACTIVE • ATX 3.1 READY</span>
         </div>
         <h1 class="text-3xl font-[750] leading-[1.05] tracking-tight">The Complete Power & FPS Matrix.</h1>
         <p class="mt-2 text-[15px]" style="color:var(--text-2)">Loaded with official component parameters for precise PSU sizing, bottleneck analysis, and gaming frames.</p>
@@ -558,7 +569,7 @@ function calculate() {
 
   if (peak > 0) {
       let recsHTML = PSU_CATALOG.filter(p => p.watt >= rec).slice(0, 3).map(p => `
-        <a href="${p.link}" target="_blank" class="conversion-card flex justify-between items-center p-3 rounded-lg transition-colors">
+        <a href="${p.link}" target="_blank" class="conversion-card active flex justify-between items-center p-3 rounded-lg transition-colors" style="max-height:none; opacity:1; margin-top:0;">
           <div>
             <div class="text-sm font-medium text-white">${p.name}</div>
             <div class="text-[10px] text-gray-400">${p.watt}W Certified ATX 3.0/3.1</div>
@@ -613,8 +624,8 @@ function setupDropdown(id, data, key) {
 
     const searchQueryParam = encodeURIComponent(state[key].name);
     affiliateBox.innerHTML = `
-      <a href="https://www.amazon.com/s?k=${searchQueryParam}&tag=pcpower20-20" target="_blank" class="conversion-card flex justify-between items-center p-3 rounded-xl text-xs mt-2 transition-all">
-        <span class="text-gray-300 font-medium truncate max-w-[190px]">🛒 Check ${state[key].name.substring(0, 16)}...</span>
+      <a href="https://www.amazon.com/s?k=${searchQueryParam}&tag=pcpower20-20" target="_blank" class="conversion-card active flex justify-between items-center rounded-xl text-xs transition-all">
+        <span class="text-gray-300 font-medium truncate max-w-[170px]">🛒 Check ${state[key].name.substring(0, 15)}...</span>
         <span class="conversion-text font-bold tracking-wide">Buy on Amazon →</span>
       </a>
     `;
