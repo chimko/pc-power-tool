@@ -12,7 +12,318 @@
       "@type": "WebApplication",
       "@id": "https://wattbench.example.com/#webapp",
       "name": "Wattbench Ultimate PSU & Bottleneck Calculator",
-      "url": "https://wattbench.example.com/",
+      "url": "https://wattbench.ex<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wattbench Ultimate | PC Power Supply & Bottleneck Calculator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0E14; --bg-raised: #10151D; --bg-card: #131A24;
+    --line: #212438; --line-soft: #1A2230;
+    --text-1: #E7ECF3; --text-2: #97A2B4; --text-3: #506880;
+    --accent: #59E6C8; --accent-dim: #2C6E62;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .bg-grid {
+    background-image: linear-gradient(to right, var(--line-soft) 1px, transparent 1px), linear-gradient(to bottom, var(--line-soft) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; }
+  .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(89,230,200,0.14); }
+  .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 14px; }
+  .dropdown-results { background: var(--bg-raised); border: 1px solid var(--line); border-top: none; max-height: 220px; overflow-y: auto; position: absolute; width: 100%; border-radius: 0 0 8px 8px; }
+  .dropdown-item { padding: 9px 12px; font-size: 13px; cursor: pointer; color: var(--text-2); border-bottom: 1px solid var(--line-soft); }
+  .dropdown-item:hover { background: var(--line); color: var(--text-1); }
+  
+  .isometric-chip {
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, var(--line-soft) 0%, var(--bg-raised) 100%);
+    border: 2px solid var(--accent-dim);
+    border-radius: 8px;
+    transform: rotateX(60deg) rotateZ(45deg);
+    box-shadow: -5px 5px 15px rgba(89,230,200,0.2), inset 0 0 10px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .isometric-chip::after {
+    content: ''; position: absolute; inset: 4px;
+    border: 2px dashed var(--accent); border-radius: 4px; opacity: 0.5;
+  }
+</style>
+</head>
+<body class="min-h-screen">
+<div class="relative overflow-hidden border-b" style="border-color:var(--line)">
+  <div class="absolute inset-0 bg-grid pointer-events-none"></div>
+  <div class="relative max-w-6xl mx-auto px-6 pt-10 pb-8">
+    <div class="flex items-center gap-4 mb-4">
+      <div class="isometric-chip shrink-0"></div>
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-2 h-2 rounded-full animate-pulse bg-teal-400"></div>
+          <span class="mono text-xs tracking-wide" style="color:var(--accent)">ULTIMATE EDITION ENGINE</span>
+        </div>
+        <h1 class="text-3xl font-[750] leading-[1.05] tracking-tight">The Complete Power Matrix.</h1>
+        <p class="mt-2 text-[15px]" style="color:var(--text-2)">From 3rd-Gen Ivy Bridge to modern laptops and Threadrippers.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-5 gap-6">
+  <!-- CONFIGURATION -->
+  <section class="lg:col-span-2 space-y-5">
+    <div class="card p-5 space-y-4">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-semibold">Component Search</h2>
+        <label class="flex items-center gap-2 text-[11px] cursor-pointer">
+          <input type="checkbox" id="transientToggle" checked class="accent-teal-500 rounded">
+          <span style="color:var(--text-2)">Transient Guard (+25% GPU)</span>
+        </label>
+      </div>
+
+      <!-- z-50 forces this dropdown to sit above the MB search -->
+      <div class="relative z-50"><label class="text-xs mb-1 block" style="color:var(--text-2)">Processor (CPU)</label>
+        <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Type 13700H, FX-8350, 4770K...">
+        <div id="cpuDropdown" class="dropdown-results hidden shadow-xl"></div>
+      </div>
+      
+      <!-- z-40 forces this dropdown to sit above the GPU search -->
+      <div class="relative z-40"><label class="text-xs mb-1 block" style="color:var(--text-2)">Motherboard & Chipset</label>
+        <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Search H610, Z790, TRX50...">
+        <div id="mbDropdown" class="dropdown-results hidden shadow-xl"></div>
+      </div>
+
+      <!-- z-30 forces this to sit above RAM/Storage -->
+      <div class="relative z-30"><label class="text-xs mb-1 block" style="color:var(--text-2)">Graphics Card (GPU)</label>
+        <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Search RTX 4090, RX 580...">
+        <div id="gpuDropdown" class="dropdown-results hidden shadow-xl"></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 relative z-20">
+        <div class="relative"><label class="text-xs mb-1 block" style="color:var(--text-2)">Memory</label>
+          <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="DDR3, DDR5...">
+          <div id="ramDropdown" class="dropdown-results hidden shadow-xl"></div>
+        </div>
+        <div class="relative"><label class="text-xs mb-1 block" style="color:var(--text-2)">Storage</label>
+          <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="HDD, NVMe...">
+          <div id="storageDropdown" class="dropdown-results hidden shadow-xl"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE OUTPUT -->
+  <section class="lg:col-span-3 space-y-5">
+    <div class="card p-6">
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <div class="text-xs font-medium mb-2" style="color:var(--text-2)">Recommended PSU</div>
+          <div class="flex items-baseline gap-1.5">
+            <span id="recWattage" class="mono text-5xl font-bold" style="color:var(--accent)">0</span>
+            <span class="mono text-lg" style="color:var(--text-3)">W</span>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs font-medium mb-2" style="color:var(--text-2)">Estimated Peak Draw</div>
+          <div class="flex items-baseline gap-1.5">
+            <span id="peakPower" class="mono text-5xl font-bold">0</span>
+            <span class="mono text-lg" style="color:var(--text-3)">W</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 pt-6 border-t" style="border-color:var(--line)">
+        <p id="statusDetail" class="text-xs leading-relaxed" style="color:var(--text-3)">Select your components to calculate wattage.</p>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="text-sm font-semibold mb-3">Compatible Power Supplies <span class="text-[10px]" style="color:var(--text-3)">(Affiliate)</span></h2>
+      <div id="psuRecs" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="text-sm text-gray-500">Awaiting component selection...</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- GENUINE COMMUNITY REVIEWS -->
+<section class="max-w-6xl mx-auto px-6 pb-16">
+  <div class="card p-8">
+    <div class="flex justify-between items-end mb-6 border-b border-[#212438] pb-4">
+      <h2 class="text-xl font-bold">Community Field Reports</h2>
+    </div>
+    
+    <!-- Submission Form -->
+    <form id="reviewForm" class="mb-8 bg-[#10151D] p-5 rounded-xl border border-[#212438]">
+      <h3 class="text-sm font-medium mb-3 text-teal-400">Add Your Build Experience</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+        <input type="text" id="revName" placeholder="Display Name (e.g., TechBuilder99)" class="search-input rounded-lg px-3 py-2 text-sm" required>
+        <select id="revRating" class="search-input rounded-lg px-3 py-2 text-sm" required>
+          <option value="★★★★★">5 Stars - Extremely Accurate</option>
+          <option value="★★★★☆">4 Stars - Very Good</option>
+          <option value="★★★☆☆">3 Stars - Average</option>
+        </select>
+      </div>
+      <textarea id="revText" placeholder="Did the calculator match your actual wall draw? What's your setup?" class="search-input rounded-lg px-3 py-2 text-sm w-full mb-3" rows="2" required></textarea>
+      <button type="submit" class="bg-teal-500 text-[#0A0E14] font-bold py-2 px-5 rounded-lg hover:bg-teal-400 transition-colors text-sm">Post Report</button>
+    </form>
+
+    <!-- Dynamic Review Feed -->
+    <div id="reviewsFeed" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Empty by default; populated via JS -->
+    </div>
+  </div>
+</section>
+
+<script>
+const CPUS = [
+  { name: "Intel Core i7-3770K (3rd Gen Ivy Bridge)", boost: 95 },
+  { name: "Intel Core i5-4590 (4th Gen Legacy)", boost: 92 },
+  { name: "Intel Core i9-14900K (Desktop Enthusiast)", boost: 253 },
+  { name: "AMD Ryzen 5 1600 (1st Gen Zen)", boost: 78 },
+  { name: "AMD Ryzen 7 7800X3D (Desktop Gaming)", boost: 162 }
+];
+
+const MOTHERBOARDS = [
+  { name: "Office / Budget H610/A620", watt: 15 },
+  { name: "Standard Mid-Range B650/B760", watt: 25 },
+  { name: "Enthusiast Z790/X670E (Heavy VRM)", watt: 45 }
+];
+
+const GPUS = [
+  { name: "Integrated Graphics Only", watt: 0 },
+  { name: "NVIDIA RTX 4070 (Desktop)", watt: 220 },
+  { name: "NVIDIA RTX 4090 (Enthusiast)", watt: 450 },
+  { name: "AMD Radeon RX 7900 XTX", watt: 385 }
+];
+
+const RAM_OPTS = [
+  { name: "16GB Standard DDR4 Kit", watt: 8 },
+  { name: "32GB High-Speed DDR5", watt: 16 }
+];
+
+const STORAGE_OPTS = [
+  { name: "500GB Mechanical HDD", watt: 8 },
+  { name: "2TB PCIe 5.0 High-Draw NVMe", watt: 12 }
+];
+
+const PSU_CATALOG = [
+  { watt: 550, name: "Corsair RM550x Gold", link: "https://www.amazon.com/s?k=corsair+rm550x&tag=pcpower20-20" },
+  { watt: 750, name: "be quiet! Pure Power 12 M", link: "https://www.amazon.com/s?k=pure+power+750w&tag=pcpower20-20" },
+  { watt: 850, name: "Corsair RM850x Shift ATX 3.0", link: "https://www.amazon.com/s?k=corsair+rm850x&tag=pcpower20-20" },
+  { watt: 1000, name: "Seasonic Focus GX-1000", link: "https://www.amazon.com/s?k=seasonic+gx1000&tag=pcpower20-20" },
+  { watt: 1200, name: "Corsair HX1200 Platinum", link: "https://www.amazon.com/s?k=corsair+hx1200&tag=pcpower20-20" }
+];
+
+// Start completely empty
+let state = { cpu: null, mb: null, gpu: null, ram: null, storage: null };
+
+function calculate() {
+  // Gracefully handle null selections
+  let baseWatts = (state.cpu?.boost || 0) + (state.mb?.watt || 0) + (state.ram?.watt || 0) + (state.storage?.watt || 0);
+  let gpuWatts = state.gpu?.watt || 0;
+  
+  // Only add the 35W system fan/peripheral baseline if at least one core component is selected
+  if (baseWatts > 0 || gpuWatts > 0) {
+      baseWatts += 35; 
+  }
+  
+  if(document.getElementById('transientToggle').checked && gpuWatts > 150) {
+      gpuWatts *= 1.25; 
+  }
+  
+  let peak = Math.round(baseWatts + gpuWatts);
+  let rec = peak === 0 ? 0 : Math.ceil((peak / 0.8) / 50) * 50; 
+  if (rec > 0 && rec < 450) rec = 450;
+
+  document.getElementById('peakPower').innerText = peak;
+  document.getElementById('recWattage').innerText = rec;
+  
+  if (peak > 0) {
+      let statusText = document.getElementById('transientToggle').checked ? 
+        "Calculated with ATX 3.0 Transient Spike safety margins applied to the GPU." : 
+        "Calculated at standard peak load. High-end GPUs may cause system tripping without transient margins.";
+      document.getElementById('statusDetail').innerText = statusText;
+
+      let recsHTML = PSU_CATALOG.filter(p => p.watt >= rec).slice(0, 2).map(p => `
+        <a href="${p.link}" target="_blank" class="block p-3 rounded-lg border border-[#212438] hover:border-teal-500 transition-colors bg-[#10151D]">
+          <div class="text-sm font-medium">${p.name}</div>
+          <div class="text-xs text-teal-400 mt-2">Check Price on Amazon →</div>
+        </a>
+      `).join('');
+      document.getElementById('psuRecs').innerHTML = recsHTML || `<div class="text-sm text-gray-500">Requires server-grade PSU (1500W+)</div>`;
+  } else {
+      document.getElementById('statusDetail').innerText = "Select your components to calculate wattage.";
+      document.getElementById('psuRecs').innerHTML = `<div class="text-sm text-gray-500">Awaiting component selection...</div>`;
+  }
+}
+
+function setupDropdown(id, data, key) {
+  const input = document.getElementById(id);
+  const dropdown = document.getElementById(id.replace('Search', 'Dropdown'));
+  
+  input.addEventListener('input', (e) => {
+    const val = e.target.value.toLowerCase();
+    const matches = data.filter(i => i.name.toLowerCase().includes(val));
+    dropdown.innerHTML = matches.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
+    dropdown.classList.remove('hidden');
+  });
+
+  input.addEventListener('focus', () => { input.dispatchEvent(new Event('input')) });
+
+  dropdown.addEventListener('click', (e) => {
+    if(!e.target.dataset.name) return;
+    state[key] = data.find(i => i.name === e.target.dataset.name);
+    input.value = state[key].name;
+    dropdown.classList.add('hidden');
+    calculate();
+  });
+}
+
+document.addEventListener('click', (e) => {
+  if(!e.target.classList.contains('search-input')) {
+    document.querySelectorAll('.dropdown-results').forEach(el => el.classList.add('hidden'));
+  }
+});
+
+document.getElementById('transientToggle').addEventListener('change', calculate);
+
+setupDropdown('cpuSearch', CPUS, 'cpu');
+setupDropdown('mbSearch', MOTHERBOARDS, 'mb');
+setupDropdown('gpuSearch', GPUS, 'gpu');
+setupDropdown('ramSearch', RAM_OPTS, 'ram');
+setupDropdown('storageSearch', STORAGE_OPTS, 'storage');
+
+// Review Form Logic
+document.getElementById('reviewForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const name = document.getElementById('revName').value;
+  const rating = document.getElementById('revRating').value;
+  const text = document.getElementById('revText').value;
+  
+  const reviewCard = document.createElement('div');
+  reviewCard.className = 'p-4 rounded-xl bg-[#10151D] border border-[#212438] shadow-sm animate-[fadeIn_0.3s_ease-out]';
+  reviewCard.innerHTML = `
+    <div class="text-amber-400 text-xs mb-2">${rating}</div>
+    <p class="text-xs text-[#97A2B4]">"${text}"</p>
+    <div class="mt-3 text-[11px] font-semibold text-white">- ${name}</div>
+  `;
+  
+  const feed = document.getElementById('reviewsFeed');
+  feed.insertBefore(reviewCard, feed.firstChild);
+  
+  // Reset form
+  this.reset();
+});
+</script>
+</body>
+</html>ample.com/",
       "description": "An advanced hardware power calculator supporting legacy components, mobile/server chips, and transient spike protection.",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Any (Web Browser)"
