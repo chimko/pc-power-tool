@@ -22,12 +22,14 @@
     background-size: 40px 40px;
     mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
   }
-  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; cursor: pointer; padding-right: 90px; }
+  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; cursor: pointer; padding-right: 36px; }
   .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(89,230,200,0.14); cursor: text; }
   .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 14px; }
   .dropdown-results { background: var(--bg-raised); border: 1px solid var(--line); border-top: none; max-height: 240px; overflow-y: auto; position: absolute; width: 100%; border-radius: 0 0 8px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; }
   .dropdown-item { padding: 11px 14px; font-size: 13px; cursor: pointer; color: var(--text-2); border-bottom: 1px solid var(--line-soft); }
   .dropdown-item:hover { background: var(--line); color: var(--text-1); }
+  .dropdown-search-trigger { padding: 10px 14px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--accent); background: #16202B; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 6px; position: sticky; top: 0; z-index: 5; }
+  .dropdown-search-trigger:hover { background: #1C2B3A; }
   
   .isometric-chip {
     width: 36px; height: 36px;
@@ -58,13 +60,10 @@
     color: #FBBF24;
     text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
   }
-  .search-action-btn {
-    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-    background: #1A2230; border: 1px solid var(--accent-dim); color: var(--accent); 
-    cursor: pointer; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 6px; z-index: 10;
-    transition: all 0.2s;
+  .select-arrow {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    color: var(--text-3); pointer-events: none; font-size: 11px;
   }
-  .search-action-btn:hover { background: var(--accent); color: #000; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -102,7 +101,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Processor (CPU)</label>
         <div class="relative">
           <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select CPU..." readonly data-default="Select CPU...">
-          <button type="button" class="search-action-btn" title="Click to type and search" data-target="cpuSearch">🔍 Search</button>
+          <span class="select-arrow">▼</span>
           <div id="cpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="cpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -114,7 +113,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Motherboard & Chipset</label>
         <div class="relative">
           <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Motherboard..." readonly data-default="Select Motherboard...">
-          <button type="button" class="search-action-btn" title="Click to type and search" data-target="mbSearch">🔍 Search</button>
+          <span class="select-arrow">▼</span>
           <div id="mbDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="mbInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -126,7 +125,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Graphics Card (GPU)</label>
         <div class="relative">
           <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select GPU..." readonly data-default="Select GPU...">
-          <button type="button" class="search-action-btn" title="Click to type and search" data-target="gpuSearch">🔍 Search</button>
+          <span class="select-arrow">▼</span>
           <div id="gpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="gpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -139,7 +138,7 @@
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Memory</label>
           <div class="relative">
             <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select RAM..." readonly data-default="Select RAM...">
-            <button type="button" class="search-action-btn" title="Click to type and search" data-target="ramSearch">🔍 Search</button>
+            <span class="select-arrow">▼</span>
             <div id="ramDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="ramInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -150,7 +149,7 @@
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Cooling</label>
           <div class="relative">
             <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Cooler..." readonly data-default="Select Cooler...">
-            <button type="button" class="search-action-btn" title="Click to type and search" data-target="coolingSearch">🔍 Search</button>
+            <span class="select-arrow">▼</span>
             <div id="coolingDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="coolingInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -163,7 +162,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Storage Drive</label>
         <div class="relative">
           <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Storage..." readonly data-default="Select Storage...">
-          <button type="button" class="search-action-btn" title="Click to type and search" data-target="storageSearch">🔍 Search</button>
+          <span class="select-arrow">▼</span>
           <div id="storageDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="storageInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -584,14 +583,21 @@ function calculate() {
   renderFPS();
 }
 
+function buildDropdownContent(data, searchId) {
+  return `
+    <div class="dropdown-search-trigger" data-action="search" data-target="${searchId}">
+      <span>🔍 Click here to type & search instead...</span>
+    </div>
+  ` + data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
+}
+
 function setupDropdown(id, data, key) {
   const input = document.getElementById(id);
   const dropdown = document.getElementById(id.replace('Search', 'Dropdown'));
   const insight = document.getElementById(id.replace('Search', 'Insight'));
   const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
-  const searchBtn = input.nextElementSibling;
   
-  // 1st click: Opens menu without opening keyboard. Changes placeholder text to guide user.
+  // 1st click: Opens the full selection list without opening the mobile keyboard
   input.addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelectorAll('.dropdown-results').forEach(el => { if(el !== dropdown) el.classList.add('hidden'); });
@@ -605,31 +611,29 @@ function setupDropdown(id, data, key) {
     }
 
     input.setAttribute('readonly', 'true');
-    input.placeholder = "Select from list below...";
-    dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
+    dropdown.innerHTML = buildDropdownContent(data, id);
     dropdown.classList.toggle('hidden');
   });
 
-  // Explicit '🔍 Search' button click unlocks the keyboard immediately
-  searchBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    input.removeAttribute('readonly');
-    input.placeholder = "Type to search...";
-    input.focus();
-    dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
-    dropdown.classList.remove('hidden');
-  });
-
-  input.addEventListener('input', (e) => {
-    const val = e.target.value.toLowerCase();
-    const matches = data.filter(i => i.name.toLowerCase().includes(val));
-    dropdown.innerHTML = matches.length > 0 ? matches.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('') : `<div class="dropdown-item text-gray-500">No matching components</div>`;
-    dropdown.classList.remove('hidden');
-  });
-
+  // Handle clicks inside the dropdown menu (either selecting an item or clicking the search trigger)
   dropdown.addEventListener('click', (e) => {
-    if(!e.target.dataset.name) return;
-    state[key] = data.find(i => i.name === e.target.dataset.name);
+    e.stopPropagation();
+    
+    // If user clicked the "Type to search" prompt inside the list
+    const trigger = e.target.closest('[data-action="search"]');
+    if (trigger) {
+      input.removeAttribute('readonly');
+      input.placeholder = "Type to filter...";
+      input.focus();
+      dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
+      return;
+    }
+
+    // If user clicked a component item
+    const item = e.target.closest('.dropdown-item');
+    if (!item || !item.dataset.name) return;
+    
+    state[key] = data.find(i => i.name === item.dataset.name);
     input.value = state[key].name;
     input.setAttribute('readonly', 'true');
     dropdown.classList.add('hidden');
@@ -650,6 +654,13 @@ function setupDropdown(id, data, key) {
     `;
 
     calculate();
+  });
+
+  input.addEventListener('input', (e) => {
+    const val = e.target.value.toLowerCase();
+    const matches = data.filter(i => i.name.toLowerCase().includes(val));
+    dropdown.innerHTML = matches.length > 0 ? matches.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('') : `<div class="dropdown-item text-gray-500">No matching components</div>`;
+    dropdown.classList.remove('hidden');
   });
 }
 
