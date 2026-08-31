@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wattbench — Power Supply & Bottleneck Estimator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0E14;
+    --bg-raised: #10151D;
+    --bg-card: #131A24;
+    --line: #212A38;
+    --line-soft: #1A2230;
+    --text-1: #E7ECF3;
+    --text-2: #97A2B4;
+    --text-3: #5D6B80;
+    --accent: #59E6C8;
+    --accent-dim: #2C6E62;
+    --amber: #F4A93B;
+    --rose: #F2596B;
+    --violet: #8C8CF0;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ background: var(--bg); }
+  body{
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    color: var(--text-1);
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono{ font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .bg-grid{
+    background-image:
+      linear-gradient(to right, var(--line-soft) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line-soft) 1px, transparent 1px);
+    background-size: 40px 40px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+  select.field{
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--bg-raised);
+    border: 1px solid var(--line);
+    color: var(--text-1);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2397A2B4' stroke-width='1.6'><path d='M5 7l5 5 5-5'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+  }
+  select.field:focus{
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(89,230,200,0.14);
+  }
+  select.field:focus-visible{ outline: none; }
+  .card{
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .label-row{
+    display:flex; align-items:baseline; justify-content:space-between;
+  }
+  .readout-num{
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .divider{ border-color: var(--line); }
+  .pulse-dot{
+    box-shadow: 0 0 0 0 rgba(89,230,200,0.55);
+    animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(89,230,200,0.45); }
+    70%{ box-shadow: 0 0 0 9px rgba(89,230,200,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(89,230,200,0); }
+  }
+  .gauge-track{ stroke: var(--line); }
+  .gauge-fill{ transition: stroke-dashoffset 500ms cubic-bezier(.2,.8,.2,1), stroke 500ms ease; }
+  .fade-in{ animation: fadeIn 420ms ease both; }
+  @keyframes fadeIn{ from{ opacity:0; transform: translateY(4px);} to{ opacity:1; transform: translateY(0);} }
+  .chip{
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+  ::selection{ background: rgba(89,230,200,0.25); }
+  .scroll-hide::-webkit-scrollbar{ display:none; }
+  .scroll-hide{ -ms-overflow-style:none; scrollbar-width:none; }
+  @media (prefers-reduced-motion: reduce){
+    .pulse-dot{ animation: none; }
+    .fade-in{ animation: none; }
+    .gauge-fill{ transition: none; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="relative overflow-hidden border-b" style="border-color:var(--line)">
+  <div class="absolute inset-0 bg-grid pointer-events-none"></div>
+  <div class="relative max-w-6xl mx-auto px-6 pt-10 pb-8">
+    <div class="flex items-center gap-2 mb-6">
+      <div class="w-2 h-2 rounded-full pulse-dot" style="background:var(--accent)"></div>
+      <span class="mono text-xs tracking-wide" style="color:var(--text-3)">LIVE ESTIMATE · LOCAL CALCULATION</span>
+    </div>
+    <h1 class="text-3xl sm:text-[2.6rem] font-[750] leading-[1.05] max-w-2xl" style="letter-spacing:-0.02em">
+      How much power does your build actually need?
+    </h1>
+    <p class="mt-4 max-w-lg text-[15px] leading-relaxed" style="color:var(--text-2)">
+      Pick your parts. Wattbench works out draw under load, checks your CPU and GPU are pulling their weight together, and tells you what to change first.
+    </p>
+  </div>
+</div>
+
+<main class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+  <!-- LEFT: Configuration -->
+  <section class="lg:col-span-2 space-y-5">
+
+    <div class="card p-5">
+      <h2 class="text-sm font-semibold mb-4" style="color:var(--text-1)">Your components</h2>
+
+      <div class="space-y-4">
+        <div>
+          <label class="label-row mb-1.5">
+            <span class="text-xs font-medium" style="color:var(--text-2)">Processor (CPU)</span>
+            <span id="cpuTdpTag" class="mono text-[11px]" style="color:var(--text-3)"></span>
+          </label>
+          <select id="cpu" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
+        </div>
+
+        <div>
+          <label class="label-row mb-1.5">
+            <span class="text-xs font-medium" style="color:var(--text-2)">Graphics card (GPU)</span>
+            <span id="gpuTdpTag" class="mono text-[11px]" style="color:var(--text-3)"></span>
+          </label>
+          <select id="gpu" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="mb-1.5 block text-xs font-medium" style="color:var(--text-2)">Memory (RAM)</label>
+            <select id="ram" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
+          </div>
+          <div>
+            <label class="mb-1.5 block text-xs font-medium" style="color:var(--text-2)">Cooling</label>
+            <select id="cooling" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
+          </div>
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-xs font-medium" style="color:var(--text-2)">Storage drives</label>
+          <select id="storage" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-semibold">Recommended upgrades</h2>
+        <span id="upgradeCount" class="mono text-[11px] chip rounded-full px-2 py-0.5" style="color:var(--text-2)">0</span>
+      </div>
+      <div id="upgradesList" class="space-y-2.5"></div>
+    </div>
+
+  </section>
+
+  <!-- RIGHT: Live output -->
+  <section class="lg:col-span-3 space-y-5">
+
+    <div class="card p-6">
+      <div class="grid grid-cols-2 gap-6">
+
+        <div>
+          <div class="text-xs font-medium mb-2" style="color:var(--text-2)">Recommended PSU wattage</div>
+          <div class="flex items-baseline gap-1.5">
+            <span id="recWattage" class="readout-num mono text-5xl font-bold" style="color:var(--accent)">0</span>
+            <span class="mono text-lg" style="color:var(--text-3)">W</span>
+          </div>
+          <div id="recWattageNote" class="mt-2 text-xs" style="color:var(--text-3)"></div>
+        </div>
+
+        <div>
+          <div class="text-xs font-medium mb-2" style="color:var(--text-2)">Estimated peak draw</div>
+          <div class="flex items-baseline gap-1.5">
+            <span id="peakPower" class="readout-num mono text-5xl font-bold">0</span>
+            <span class="mono text-lg" style="color:var(--text-3)">W</span>
+          </div>
+          <div id="peakPowerNote" class="mt-2 text-xs" style="color:var(--text-3)"></div>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-6 border-t divider grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+        <div class="flex items-center gap-5">
+          <svg width="92" height="92" viewBox="0 0 92 92" class="-rotate-90 shrink-0">
+            <circle cx="46" cy="46" r="38" fill="none" stroke-width="8" class="gauge-track"></circle>
+            <circle id="gaugeArc" cx="46" cy="46" r="38" fill="none" stroke-width="8" stroke-linecap="round"
+              class="gauge-fill" style="stroke:var(--amber)" stroke-dasharray="238.76" stroke-dashoffset="238.76"></circle>
+          </svg>
+          <div>
+            <div class="text-xs font-medium mb-1" style="color:var(--text-2)">Bottleneck</div>
+            <div class="flex items-baseline gap-1">
+              <span id="bottleneckPct" class="readout-num mono text-3xl font-bold">0</span>
+              <span class="mono text-sm" style="color:var(--text-3)">%</span>
+            </div>
+            <div id="bottleneckSource" class="text-xs mt-0.5" style="color:var(--text-3)"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-xs font-medium mb-2" style="color:var(--text-2)">System status</div>
+          <div id="statusPill" class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium chip">
+            <span id="statusDot" class="w-1.5 h-1.5 rounded-full"></span>
+            <span id="statusText">Calculating…</span>
+          </div>
+          <p id="statusDetail" class="mt-2 text-xs leading-relaxed max-w-sm" style="color:var(--text-3)"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="text-sm font-semibold mb-1">Where the wattage goes</h2>
+      <p class="text-xs mb-4" style="color:var(--text-3)">Estimated draw per component under sustained load, boost included.</p>
+      <div id="breakdown" class="space-y-3"></div>
+    </div>
+
+    <div class="card p-5">
+      <div class="flex items-baseline justify-between mb-1">
+        <h2 class="text-sm font-semibold">PSUs that fit this build</h2>
+        <span class="text-[11px]" style="color:var(--text-3)">Affiliate links — Wattbench may earn a commission</span>
+      </div>
+      <div id="psuRecs" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4"></div>
+    </div>
+
+  </section>
+</main>
+
+<footer class="max-w-6xl mx-auto px-6 pb-10">
+  <p class="text-[11px]" style="color:var(--text-3)">
+    Estimates are based on published TDP figures and typical boost behavior. Real-world draw varies by silicon, undervolting, and case airflow. Add headroom for overclocking.
+  </p>
+</footer>
+
+<script>
+/* ---------------- Component data ---------------- */
+const CPUS = [
+  { name: "Intel Core i3-13100F",     tdp: 58,  boost: 89,  tier: 2.5, platform: "Intel" },
+  { name: "Intel Core i5-12400F",     tdp: 65,  boost: 117, tier: 4.0, platform: "Intel" },
+  { name: "Intel Core i5-13600K",     tdp: 125, boost: 181, tier: 6.5, platform: "Intel" },
+  { name: "Intel Core i7-13700K",     tdp: 125, boost: 253, tier: 8.0, platform: "Intel" },
+  { name: "Intel Core i9-14900K",     tdp: 125, boost: 253, tier: 9.5, platform: "Intel" },
+  { name: "AMD Ryzen 5 5600",         tdp: 65,  boost: 88,  tier: 3.8, platform: "AMD" },
+  { name: "AMD Ryzen 5 7600X",        tdp: 105, boost: 142, tier: 6.0, platform: "AMD" },
+  { name: "AMD Ryzen 7 5800X3D",      tdp: 105, boost: 142, tier: 6.8, platform: "AMD" },
+  { name: "AMD Ryzen 7 7800X3D",      tdp: 120, boost: 162, tier: 8.2, platform: "AMD" },
+  { name: "AMD Ryzen 9 7950X",        tdp: 170, boost: 230, tier: 9.6, platform: "AMD" },
+];
+
+const GPUS = [
+  { name: "NVIDIA RTX 3050",     tdp: 130, boost: 145, tier: 2.8 },
+  { name: "NVIDIA RTX 4060",     tdp: 115, boost: 130, tier: 3.6 },
+  { name: "NVIDIA RTX 4060 Ti",  tdp: 165, boost: 180, tier: 4.6 },
+  { name: "NVIDIA RTX 4070",     tdp: 200, boost: 220, tier: 6.0 },
+  { name: "NVIDIA RTX 4070 Ti Super", tdp: 285, boost: 310, tier: 7.6 },
+  { name: "NVIDIA RTX 4080 Super", tdp: 320, boost: 345, tier: 8.6 },
+  { name: "NVIDIA RTX 4090",     tdp: 450, boost: 480, tier: 10.0 },
+  { name: "AMD Radeon RX 6600",  tdp: 132, boost: 145, tier: 3.2 },
+  { name: "AMD Radeon RX 7600",  tdp: 165, boost: 180, tier: 3.8 },
+  { name: "AMD Radeon RX 7800 XT", tdp: 263, boost: 285, tier: 6.4 },
+  { name: "AMD Radeon RX 7900 XTX", tdp: 355, boost: 385, tier: 8.8 },
+];
+
+const RAM_OPTS = [
+  { name: "8GB DDR4 (single stick)",   watt: 5 },
+  { name: "16GB DDR4 (dual channel)",  watt: 8 },
+  { name: "32GB DDR4 (dual channel)",  watt: 11 },
+  { name: "16GB DDR5 (dual channel)",  watt: 10 },
+  { name: "32GB DDR5 (dual channel)",  watt: 14 },
+  { name: "64GB DDR5 (dual channel)",  watt: 20 },
+];
+
+const STORAGE_OPTS = [
+  { name: "1× NVMe SSD",                    watt: 6 },
+  { name: "1× NVMe SSD + 1× SATA SSD",      watt: 10 },
+  { name: "2× NVMe SSD",                    watt: 11 },
+  { name: "1× NVMe SSD + 1× HDD",           watt: 15 },
+  { name: "2× NVMe SSD + 1× HDD",           watt: 20 },
+];
+
+const COOLING_OPTS = [
+  { name: "Stock cooler (bundled)",   watt: 4,  headroom: 0.90 },
+  { name: "Aftermarket air cooler",   watt: 6,  headroom: 1.00 },
+  { name: "240mm AIO liquid cooler",  watt: 10, headroom: 1.06 },
+  { name: "360mm AIO liquid cooler",  watt: 14, headroom: 1.10 },
+  { name: "Custom loop",              watt: 20, headroom: 1.14 },
+];
+
+const BASE_SYSTEM_DRAW = 45; // motherboard, fans, RGB, USB peripherals
+
+/* ---------------- Populate selects ---------------- */
+function fillSelect(el, items, defaultIndex){
+  el.innerHTML = items.map((it,i) => `<option value="${i}">${it.name}</option>`).join("");
+  el.selectedIndex = defaultIndex;
+}
+fillSelect(document.getElementById("cpu"), CPUS, 3);
+fillSelect(document.getElementById("gpu"), GPUS, 6);
+fillSelect(document.getElementById("ram"), RAM_OPTS, 4);
+fillSelect(document.getElementById("storage"), STORAGE_OPTS, 1);
+fillSelect(document.getElementById("cooling"), COOLING_OPTS, 1);
+
+/* ---------------- PSU catalog for recommendations ---------------- */
+const PSU_CATALOG = [
+  { watt: 550, name: "Corsair RM550x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm550x&tag=YOURTAG-20" },
+  { watt: 650, name: "Corsair RM650x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm650x&tag=YOURTAG-20" },
+  { watt: 750, name: "be quiet! Straight Power 750", eff: "80+ Platinum, fully modular", href: "https://www.amazon.com/s?k=be+quiet+straight+power+750&tag=YOURTAG-20" },
+  { watt: 850, name: "Corsair RM850x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm850x&tag=YOURTAG-20" },
+  { watt: 1000, name: "Seasonic Focus GX-1000", eff: "80+ Gold, fully modular", href: "https://www.amazon.com/s?k=seasonic+focus+gx+1000&tag=YOURTAG-20" },
+  { watt: 1200, name: "Corsair HX1200",       eff: "80+ Platinum, fully modular", href: "https://www.amazon.com/s?k=corsair+hx1200&tag=YOURTAG-20" },
+];
+
+function roundToPsuStep(w){
+  const steps = [450, 550, 650, 750, 850, 1000, 1200, 1500];
+  for(const s of steps){ if(w <= s) return s; }
+  return 1500;
+}
+
+/* ---------------- Core calculation ---------------- */
+function calculate(){
+  const cpu = CPUS[document.getElementById("cpu").value];
+  const gpu = GPUS[document.getElementById("gpu").value];
+  const ram = RAM_OPTS[document.getElementById("ram").value];
+  const storage = STORAGE_OPTS[document.getElementById("storage").value];
+  const cooling = COOLING_OPTS[document.getElementById("cooling").value];
+
+  document.getElementById("cpuTdpTag").textContent = `${cpu.tdp}W TDP`;
+  document.getElementById("gpuTdpTag").textContent = `${gpu.tdp}W TDP`;
+
+  const peak = cpu.boost + gpu.boost + ram.watt + storage.watt + cooling.watt + BASE_SYSTEM_DRAW;
+  const rawRecommended = peak / 0.8; // keep sustained load near 80% of PSU capacity
+  const recommended = roundToPsuStep(Math.ceil(rawRecommended / 10) * 10);
+
+  /* Bottleneck: compare normalized CPU/GPU tiers (0-10 scale) */
+  const gap = gpu.tier - cpu.tier;
+  let bottleneckPct, bottleneckSource;
+  if (Math.abs(gap) < 0.6) {
+    bottleneckPct = Math.round(Math.abs(gap) * 6);
+    bottleneckSource = "Well matched — neither part is holding the other back";
+  } else if (gap > 0) {
+    bottleneckPct = Math.min(60, Math.round(gap * 11));
+    bottleneckSource = `CPU-limited — the ${cpu.name.split(" ").slice(-1)} is under-feeding this GPU`;
+  } else {
+    bottleneckPct = Math.min(60, Math.round(Math.abs(gap) * 11));
+    bottleneckSource = `GPU-limited — the graphics card is the ceiling on this build`;
+  }
+
+  /* Status */
+  const wattageMargin = recommended - peak;
+  let status, statusColor, statusDetail;
+  if (bottleneckPct >= 40) {
+    status = "Imbalanced";
+    statusColor = "var(--rose)";
+    statusDetail = "One component is significantly outpacing the other. You'll leave performance on the table until they're closer in tier.";
+  } else if (wattageMargin < 60) {
+    status = "Tight headroom";
+    statusColor = "var(--amber)";
+    statusDetail = "The recommended PSU covers peak draw but leaves little margin for transient spikes or future upgrades.";
+  } else if (bottleneckPct >= 20) {
+    status = "Balanced";
+    statusColor = "var(--accent)";
+    statusDetail = "A mild gap between CPU and GPU tiers, but nothing that meaningfully limits this build.";
+  } else {
+    status = "Optimal";
+    statusColor = "var(--accent)";
+    statusDetail = "CPU and GPU are well matched and the power budget has comfortable headroom.";
+  }
+
+  return { cpu, gpu, ram, storage, cooling, peak, recommended, bottleneckPct, bottleneckSource, status, statusColor, statusDetail, wattageMargin };
+}
+
+/* ---------------- Render ---------------- */
+function animateNumber(el, to){
+  const from = parseInt(el.textContent.replace(/,/g,"")) || 0;
+  const duration = 420;
+  const start = performance.now();
+  function step(now){
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const val = Math.round(from + (to - from) * eased);
+    el.textContent = val.toLocaleString();
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function render(){
+  const r = calculate();
+
+  animateNumber(document.getElementById("recWattage"), r.recommended);
+  animateNumber(document.getElementById("peakPower"), Math.round(r.peak));
+  animateNumber(document.getElementById("bottleneckPct"), r.bottleneckPct);
+
+  document.getElementById("recWattageNote").textContent = `${Math.round(r.wattageMargin)}W of margin above estimated peak draw`;
+  document.getElementById("peakPowerNote").textContent = `Sustained load across all components, boost clocks included`;
+  document.getElementById("bottleneckSource").textContent = r.bottleneckSource;
+
+  const circumference = 238.76;
+  const offset = circumference * (1 - Math.min(r.bottleneckPct, 100) / 100);
+  const arc = document.getElementById("gaugeArc");
+  arc.style.strokeDashoffset = offset;
+  arc.style.stroke = r.bottleneckPct >= 40 ? "var(--rose)" : (r.bottleneckPct >= 20 ? "var(--amber)" : "var(--accent)");
+
+  const dot = document.getElementById("statusDot");
+  const text = document.getElementById("statusText");
+  dot.style.background = r.statusColor;
+  text.textContent = r.status;
+  text.style.color = r.statusColor;
+  document.getElementById("statusDetail").textContent = r.statusDetail;
+
+  /* Breakdown bars */
+  const parts = [
+    { label: r.cpu.name, watt: r.cpu.boost, color: "var(--accent)" },
+    { label: r.gpu.name, watt: r.gpu.boost, color: "var(--violet)" },
+    { label: "Memory", watt: r.ram.watt, color: "var(--amber)" },
+    { label: "Storage", watt: r.storage.watt, color: "var(--text-3)" },
+    { label: "Cooling", watt: r.cooling.watt, color: "var(--text-3)" },
+    { label: "Board & fans", watt: BASE_SYSTEM_DRAW, color: "var(--text-3)" },
+  ];
+  const maxWatt = Math.max(...parts.map(p => p.watt));
+  document.getElementById("breakdown").innerHTML = parts.map(p => `
+    <div class="fade-in">
+      <div class="flex justify-between text-xs mb-1">
+        <span style="color:var(--text-2)">${p.label}</span>
+        <span class="mono" style="color:var(--text-1)">${p.watt}W</span>
+      </div>
+      <div class="h-1.5 rounded-full" style="background:var(--line-soft)">
+        <div class="h-1.5 rounded-full" style="width:${(p.watt/maxWatt*100).toFixed(0)}%; background:${p.color}"></div>
+      </div>
+    </div>
+  `).join("");
+
+  /* Upgrades */
+  const upgrades = [];
+  if (r.bottleneckPct >= 40 && r.gpu.tier - r.cpu.tier > 0) {
+    upgrades.push({ title: "Move up a CPU tier", detail: `Your GPU has headroom your CPU isn't feeding it. A faster CPU on the same platform would unlock more of the ${r.gpu.name.replace('NVIDIA ','').replace('AMD ','')}.` });
+  }
+  if (r.bottleneckPct >= 40 && r.cpu.tier - r.gpu.tier > 0) {
+    upgrades.push({ title: "Move up a GPU tier", detail: `Your CPU is well ahead of your graphics card. Upgrading the GPU would use the CPU headroom you already have.` });
+  }
+  if (r.wattageMargin < 60) {
+    upgrades.push({ title: "Size up your PSU", detail: `Peak draw is close to the recommended wattage. Going one size up gives quieter fan curves and room for a future GPU.` });
+  }
+  if (r.ram.watt <= 10 && r.gpu.tier >= 6) {
+    upgrades.push({ title: "Consider more memory", detail: `A GPU this capable is often paired with 32GB+ so texture-heavy games and background tasks don't compete for RAM.` });
+  }
+  if (r.cooling.headroom < 1.0 && (r.cpu.boost + r.gpu.boost) > 350) {
+    upgrades.push({ title: "Upgrade your cooling", detail: `Combined CPU and GPU draw is high for a stock cooler. Sustained boost clocks will throttle sooner under thermal load.` });
+  }
+  if (upgrades.length === 0) {
+    upgrades.push({ title: "No changes needed", detail: "This configuration is balanced and within a comfortable power budget." });
+  }
+  document.getElementById("upgradeCount").textContent = upgrades.length;
+  document.getElementById("upgradesList").innerHTML = upgrades.map(u => `
+    <div class="fade-in rounded-lg p-3" style="background:var(--bg-raised); border:1px solid var(--line)">
+      <div class="text-sm font-medium mb-0.5">${u.title}</div>
+      <div class="text-xs leading-relaxed" style="color:var(--text-3)">${u.detail}</div>
+    </div>
+  `).join("");
+
+  /* PSU recommendations: recommended size + one below + one above */
+  const idx = PSU_CATALOG.findIndex(p => p.watt === r.recommended);
+  const centerIdx = idx === -1 ? PSU_CATALOG.findIndex(p => p.watt >= r.recommended) : idx;
+  const picks = [
+    PSU_CATALOG[Math.max(0, centerIdx - 1)],
+    PSU_CATALOG[centerIdx] || PSU_CATALOG[PSU_CATALOG.length - 1],
+    PSU_CATALOG[Math.min(PSU_CATALOG.length - 1, centerIdx + 1)],
+  ];
+  const seen = new Set();
+  const uniquePicks = picks.filter(p => { if(seen.has(p.watt)) return false; seen.add(p.watt); return true; });
+
+  document.getElementById("psuRecs").innerHTML = uniquePicks.map((p,i) => `
+    <a href="${p.href}" target="_blank" rel="nofollow sponsored noopener" class="block rounded-lg p-3.5 transition-colors hover:border-[var(--accent)]" style="background:var(--bg-raised); border:1px solid ${p.watt === r.recommended ? 'var(--accent)' : 'var(--line)'}">
+      ${p.watt === r.recommended ? `<div class="mono text-[10px] mb-1.5" style="color:var(--accent)">BEST MATCH</div>` : ''}
+      <div class="text-sm font-medium leading-snug">${p.name}</div>
+      <div class="mono text-xs mt-1" style="color:var(--text-2)">${p.watt}W · ${p.eff}</div>
+      <div class="mt-3 pt-3 border-t" style="border-color:var(--line)">
+        <span class="inline-flex items-center gap-1.5 text-xs font-medium" style="color:var(--accent)">
+          Check Price on Amazon ➔
+        </span>
+      </div>
+    </a>
+  `).join("");
+}
+
+["cpu","gpu","ram","storage","cooling"].forEach(id => {
+  document.getElementById(id).addEventListener("change", render);
+});
+
+render();
+</script>
+</body>
+</html>
