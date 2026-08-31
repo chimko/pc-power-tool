@@ -22,7 +22,7 @@
     background-size: 40px 40px;
     mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
   }
-  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; cursor: pointer; }
+  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; cursor: pointer; padding-right: 36px; }
   .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(89,230,200,0.14); cursor: text; }
   .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 14px; }
   .dropdown-results { background: var(--bg-raised); border: 1px solid var(--line); border-top: none; max-height: 240px; overflow-y: auto; position: absolute; width: 100%; border-radius: 0 0 8px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; }
@@ -58,6 +58,11 @@
     color: #FBBF24;
     text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
   }
+  .search-icon-btn {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--text-2); cursor: pointer; font-size: 14px; padding: 4px; z-index: 10;
+  }
+  .search-icon-btn:hover { color: var(--accent); }
 </style>
 </head>
 <body class="min-h-screen">
@@ -95,6 +100,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Processor (CPU)</label>
         <div class="relative">
           <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select CPU..." readonly data-default="Select CPU...">
+          <button type="button" class="search-icon-btn" title="Click to search" data-target="cpuSearch">🔍</button>
           <div id="cpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="cpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -106,6 +112,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Motherboard & Chipset</label>
         <div class="relative">
           <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Motherboard..." readonly data-default="Select Motherboard...">
+          <button type="button" class="search-icon-btn" title="Click to search" data-target="mbSearch">🔍</button>
           <div id="mbDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="mbInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -117,6 +124,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Graphics Card (GPU)</label>
         <div class="relative">
           <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select GPU..." readonly data-default="Select GPU...">
+          <button type="button" class="search-icon-btn" title="Click to search" data-target="gpuSearch">🔍</button>
           <div id="gpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="gpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -129,6 +137,7 @@
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Memory</label>
           <div class="relative">
             <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select RAM..." readonly data-default="Select RAM...">
+            <button type="button" class="search-icon-btn" title="Click to search" data-target="ramSearch">🔍</button>
             <div id="ramDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="ramInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -139,6 +148,7 @@
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Cooling</label>
           <div class="relative">
             <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Cooler..." readonly data-default="Select Cooler...">
+            <button type="button" class="search-icon-btn" title="Click to search" data-target="coolingSearch">🔍</button>
             <div id="coolingDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="coolingInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -151,6 +161,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Storage Drive</label>
         <div class="relative">
           <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Storage..." readonly data-default="Select Storage...">
+          <button type="button" class="search-icon-btn" title="Click to search" data-target="storageSearch">🔍</button>
           <div id="storageDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="storageInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -218,14 +229,14 @@
     
     <form id="reviewForm" class="mb-8 bg-[#10151D] p-5 rounded-xl border border-[#212438]">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
-        <input type="text" id="revName" placeholder="Display Name" class="search-input rounded-lg px-3 py-2 text-sm !cursor-text" required>
-        <select id="revRating" class="search-input rounded-lg px-3 py-2 text-sm !cursor-text" required>
+        <input type="text" id="revName" placeholder="Display Name" class="search-input rounded-lg px-3 py-2 text-sm !cursor-text" style="padding-right:12px;" required>
+        <select id="revRating" class="search-input rounded-lg px-3 py-2 text-sm !cursor-text" style="padding-right:12px;" required>
           <option value="★★★★★">5 Stars - Extremely Accurate</option>
           <option value="★★★★☆">4 Stars - Very Good</option>
           <option value="★★★☆☆">3 Stars - Average</option>
         </select>
       </div>
-      <textarea id="revText" placeholder="Did the calculator match your actual wall draw?" class="search-input rounded-lg px-3 py-2 w-full mb-3 !cursor-text" rows="2" required></textarea>
+      <textarea id="revText" placeholder="Did the calculator match your actual wall draw?" class="search-input rounded-lg px-3 py-2 w-full mb-3 !cursor-text" style="padding-right:12px;" rows="2" required></textarea>
       <button type="submit" class="bg-teal-500 text-black font-bold py-2 px-5 rounded-lg hover:bg-teal-400 text-sm cursor-pointer">Post Report</button>
     </form>
 
@@ -576,8 +587,9 @@ function setupDropdown(id, data, key) {
   const dropdown = document.getElementById(id.replace('Search', 'Dropdown'));
   const insight = document.getElementById(id.replace('Search', 'Insight'));
   const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
+  const searchBtn = input.nextElementSibling;
   
-  // 1st click: Opens menu without opening keyboard. Changes prompt to "Click to search..."
+  // 1st click: Opens menu without opening keyboard. Changes placeholder to "Click to search..."
   input.addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelectorAll('.dropdown-results').forEach(el => { if(el !== dropdown) el.classList.add('hidden'); });
@@ -596,11 +608,13 @@ function setupDropdown(id, data, key) {
     dropdown.classList.toggle('hidden');
   });
 
-  // 2nd click: If user clicks or taps again while the menu is open, remove readonly so keyboard opens for searching
-  input.addEventListener('focus', () => {
-    if (input.hasAttribute('readonly')) {
-      input.removeAttribute('readonly');
-    }
+  // Clicking the magnifying glass icon unlocks keyboard and focuses input for searching
+  searchBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    input.removeAttribute('readonly');
+    input.focus();
+    dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
+    dropdown.classList.remove('hidden');
   });
 
   input.addEventListener('input', (e) => {
@@ -639,7 +653,6 @@ function setupDropdown(id, data, key) {
 document.addEventListener('click', (e) => {
   if(!e.target.closest('.relative')) {
     document.querySelectorAll('.dropdown-results').forEach(el => el.classList.add('hidden'));
-    // Reset placeholders back to default if closed without selecting
     document.querySelectorAll('.search-input').forEach(input => {
       if(!input.value) {
         input.setAttribute('readonly', 'true');
