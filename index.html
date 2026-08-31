@@ -25,11 +25,35 @@
   .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; cursor: pointer; padding-right: 36px; }
   .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(89,230,200,0.14); cursor: text; }
   .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 14px; }
-  .dropdown-results { background: var(--bg-raised); border: 1px solid var(--line); border-top: none; max-height: 240px; overflow-y: auto; position: absolute; width: 100%; border-radius: 0 0 8px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; }
-  .dropdown-item { padding: 11px 14px; font-size: 13px; cursor: pointer; color: var(--text-2); border-bottom: 1px solid var(--line-soft); }
+  .dropdown-results { background: var(--bg-raised); border: 1px solid var(--line); border-top: none; max-height: 255px; overflow-y: auto; position: absolute; width: 100%; border-radius: 0 0 8px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; padding: 6px; }
+  .dropdown-item { padding: 11px 14px; font-size: 13px; cursor: pointer; color: var(--text-2); border-bottom: 1px solid var(--line-soft); border-radius: 6px; }
   .dropdown-item:hover { background: var(--line); color: var(--text-1); }
-  .dropdown-search-trigger { padding: 10px 14px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--accent); background: #16202B; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 6px; position: sticky; top: 0; z-index: 5; }
-  .dropdown-search-trigger:hover { background: #1C2B3A; }
+  
+  /* Unique Glowing Border for Search Option to stand out from normal list items */
+  .dropdown-search-trigger {
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--accent);
+    background: linear-gradient(135deg, #13222B 0%, #172B38 100%);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    margin-bottom: 8px;
+    box-shadow: 0 0 12px rgba(89, 230, 200, 0.25);
+    transition: all 0.2s ease;
+  }
+  .dropdown-search-trigger:hover {
+    background: linear-gradient(135deg, #182C38 0%, #1F3748 100%);
+    box-shadow: 0 0 16px rgba(89, 230, 200, 0.4);
+    transform: translateY(-1px);
+  }
   
   .isometric-chip {
     width: 36px; height: 36px;
@@ -583,10 +607,10 @@ function calculate() {
   renderFPS();
 }
 
-function buildDropdownContent(data, searchId) {
+function buildDropdownContent(data) {
   return `
-    <div class="dropdown-search-trigger" data-action="search" data-target="${searchId}">
-      <span>🔍 Click here to type & search instead...</span>
+    <div class="dropdown-search-trigger" data-action="search">
+      <span>🔍 Type to search / filter components...</span>
     </div>
   ` + data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
 }
@@ -611,15 +635,14 @@ function setupDropdown(id, data, key) {
     }
 
     input.setAttribute('readonly', 'true');
-    dropdown.innerHTML = buildDropdownContent(data, id);
+    dropdown.innerHTML = buildDropdownContent(data);
     dropdown.classList.toggle('hidden');
   });
 
-  // Handle clicks inside the dropdown menu (either selecting an item or clicking the search trigger)
+  // Handle clicks inside the dropdown menu (either selecting an item or clicking the distinct glowing search box)
   dropdown.addEventListener('click', (e) => {
     e.stopPropagation();
     
-    // If user clicked the "Type to search" prompt inside the list
     const trigger = e.target.closest('[data-action="search"]');
     if (trigger) {
       input.removeAttribute('readonly');
@@ -629,7 +652,6 @@ function setupDropdown(id, data, key) {
       return;
     }
 
-    // If user clicked a component item
     const item = e.target.closest('.dropdown-item');
     if (!item || !item.dataset.name) return;
     
