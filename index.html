@@ -4,6 +4,82 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Wattbench — Power Supply & Bottleneck Estimator</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://www.example.com/#webapp",
+      "name": "Wattbench — PSU Wattage & Bottleneck Estimator",
+      "url": "https://www.example.com/",
+      "description": "A free browser-based calculator that estimates recommended PSU wattage, peak system power draw, and CPU/GPU bottleneck percentage based on your selected components.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (Web Browser)",
+      "browserRequirements": "Requires JavaScript",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.example.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is ATX 3.0 / 3.1 transient power spike, and how do I size a PSU for it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Modern GPUs draw well above their rated power for microseconds at a time as the VRM responds to sudden load. The ATX 3.0/3.1 design guide requires a compliant PSU to absorb these excursions in graduated brackets: roughly 120% of rated power for tens of milliseconds, 150% for about 10ms, and up to 200% of total rated power for about 100 microseconds, with the GPU connector itself allowed up to 300% for that same window. An older ATX 2.x PSU without this tolerance can trip over-power protection and reboot the system even if its average wattage looked sufficient. For high-draw GPUs, prioritize formal ATX 3.0/3.1 certification over simply buying extra wattage."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I size a UPS for a gaming PC? (Converting VA to real watts)",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "UPS units are labeled in VA, which is not the same as usable watts; the two relate through the power factor (PF), typically around 0.6 for consumer line-interactive units, so Watts is approximately VA multiplied by PF. Always size against the printed watt rating, not the VA figure. Take your PC's estimated peak draw, add roughly 20-30% headroom for power-on inrush current, and choose a UPS whose watt rating clears that number. If your PSU has active PFC, use a pure sine wave UPS rather than a stepped/simulated sine wave unit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is an 80 Plus Titanium PSU worth it over Gold?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Titanium certification requires roughly 90%+ efficiency at 10% load, 94%+ at 20% load, and 96%+ at 50% load, versus roughly 87%/90%/87% for Gold at those same points. At typical gaming loads this gap saves only a small amount of electricity per year, usually far less than the price premium. Titanium pays off mainly for systems running near-continuously at partial load, such as workstations, home servers, or 24/7 rigs, or in regions with high electricity prices. For a typical gaming build, a quality Gold unit is generally the better value."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it safe to daisy-chain PCIe power cables, or should each 8-pin be separate?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A single 8-pin PCIe connector is conventionally rated up to 150W. A daisy-chained cable routes the combined current of two GPU connectors back through one shared wire gauge to the PSU, which can approach or exceed safe current capacity on GPUs pulling close to or above 300W combined, particularly during transient spikes. For any GPU with two or more 8-pin connectors and board power near or above roughly 225-300W, run a separate individual cable from a separate modular PSU port to each connector rather than a single daisy-chained cable."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Should my cooler be sized for base TDP, or Intel's PL2 / Maximum Turbo Power?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Intel publishes PL1, equal to base TDP and reflecting sustained power, and PL2 (Maximum Turbo Power, MTP), a higher short-term boost ceiling. Most Z-series motherboards enable Multi-Core Enhancement by default, removing the PL2 time limit, so the CPU can run near its PL2 wattage indefinitely under sustained load. A chip with a 125W base TDP but a 253W PL2/MTP figure can pull close to 253W continuously in this common configuration. Size the cooler for the PL2/MTP figure, not the base TDP, to avoid thermal throttling."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is a GPU/CPU bottleneck actually calculated in modern game engines?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A bottleneck diagnosis compares GPU utilization, per-core CPU utilization, and frame-time consistency (including 1% lows) while a game runs, typically using tools like MSI Afterburner/RivaTuner Statistics Server or HWInfo. A GPU-bound system shows GPU usage pinned near 100% with frame rate scaling directly with resolution or settings. A CPU-bound system shows GPU usage below 100% with one or two CPU threads maxed out, and frame rate stays roughly flat when resolution drops. Lowering resolution significantly is a quick practical test: a large FPS increase indicates the GPU was the limiter, while little change indicates the CPU or engine's single-threaded critical path is the limiter."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>  
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -500,5 +576,83 @@ function render(){
 
 render();
 </script>
+<section id="faq" class="bg-gray-900 text-gray-200 py-16 px-4 sm:px-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-10 text-center">
+      <h2 class="text-2xl sm:text-3xl font-bold text-white">Power Supply & Bottleneck FAQ</h2>
+      <p class="mt-2 text-sm text-gray-400">Answers to the questions builders search for most before sizing a PSU or diagnosing a bottleneck.</p>
+    </div>
+
+    <div class="space-y-4">
+
+      <!-- Q1 -->
+      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
+        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
+          <span>What is ATX 3.0 / 3.1 transient power spike, and how do I size a PSU for it?</span>
+          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+        </summary>
+        <p class="mt-4 text-sm leading-relaxed text-gray-300">
+          Modern GPUs don't draw a flat wattage — they spike well above their rated power for microseconds at a time as the VRM responds to sudden compute load. The ATX 3.0/3.1 design guide requires a compliant PSU to absorb these excursions in graduated brackets: roughly 120% of rated power for tens of milliseconds, 150% for about 10ms, and a peak of 200% of the PSU's total rated power for around 100 microseconds. At the GPU's 12VHPWR/12V-2x6 connector specifically, the allowance is even higher — up to 300% for that same ~100µs window. An older ATX 2.x unit without this transient tolerance can trip its over-power protection and reboot the system even though its average wattage rating looked sufficient on paper. Practical takeaway: for an RTX 40/50-series or equivalent high-draw card, prioritize a PSU that is formally ATX 3.0 or 3.1 certified over simply buying extra wattage headroom — the certification is what guarantees the spike tolerance, not the number on the box.
+        </p>
+      </details>
+
+      <!-- Q2 -->
+      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
+        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
+          <span>How do I size a UPS for a gaming PC? (Converting VA to real watts)</span>
+          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+        </summary>
+        <p class="mt-4 text-sm leading-relaxed text-gray-300">
+          UPS units are commonly labeled with a VA (volt-amp) rating, but VA is not the same as usable watts — the two are related by the unit's power factor (PF), typically around 0.6 for consumer line-interactive UPS models: <span class="font-mono text-teal-300">Watts ≈ VA × PF</span>. A "1000VA" UPS at 0.6 PF is really only good for about 600W continuous, which is why most UPS units also print a separate, lower watt rating on the label — always size against that watt figure, not the VA figure. To size correctly: take your PC's estimated peak draw (PSU wattage estimators are useful here), add roughly 20–30% headroom for the inrush current at power-on, and pick a UPS whose watt rating clears that number. If your PSU has active PFC (nearly all modern ATX units do), use a pure sine wave UPS — a stepped/simulated sine wave unit can cause the PSU to buzz, run inefficiently, or shut down on battery power.
+        </p>
+      </details>
+
+      <!-- Q3 -->
+      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
+        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
+          <span>Is an 80 Plus Titanium PSU worth it over Gold?</span>
+          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+        </summary>
+        <p class="mt-4 text-sm leading-relaxed text-gray-300">
+          Titanium certification requires roughly 90%+ efficiency at 10% load, 94%+ at 20% load, and 96%+ at 50% load; Gold requires roughly 87% / 90% / 87% at those same points. In practice, that gap translates to only a few extra watts of wasted heat at typical gaming loads — for a system averaging 300–500W a few hours a day, the real-world electricity savings from Titanium over Gold usually amount to a small amount per year, far less than the price premium. Titanium becomes worth it for systems that run near-continuously at partial load — workstations, home servers, or 24/7 rigs — where the efficiency gap compounds over thousands of hours, or in regions with high electricity prices. For a typical gaming build, a quality Gold-rated unit is the better value; the main secondary benefit of Titanium (lower heat, quieter fan curve) is real but usually not decisive on its own.
+        </p>
+      </details>
+
+      <!-- Q4 -->
+      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
+        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
+          <span>Is it safe to daisy-chain PCIe power cables, or should each 8-pin be separate?</span>
+          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+        </summary>
+        <p class="mt-4 text-sm leading-relaxed text-gray-300">
+          A single 8-pin PCIe connector is conventionally treated as safe up to 150W. A daisy-chained cable — one lead from the PSU splitting into two 8-pin GPU connectors — routes the combined current of both connectors back through one shared wire gauge to the PSU. For older, lower-draw GPUs that's usually fine, but on a card pulling close to or above 300W combined across its connectors, that shared cable run can be pushed near or past its safe current capacity, especially during the transient spikes described above. The safer practice for any GPU with two or more 8-pin connectors and a board power near or above ~225–300W is to run a separate, individual cable from a separate modular port on the PSU to each connector, rather than a single daisy-chained cable — this keeps each connector's current on its own dedicated wire run back to the PSU.
+        </p>
+      </details>
+
+      <!-- Q5 -->
+      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
+        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
+          <span>Should my cooler be sized for base TDP, or Intel's PL2 / Maximum Turbo Power?</span>
+          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+        </summary>
+        <p class="mt-4 text-sm leading-relaxed text-gray-300">
+          Intel publishes two relevant power figures: PL1, which equals the base TDP and reflects sustained long-term power, and PL2 (also called Maximum Turbo Power, MTP), a higher short-term boost ceiling. On paper PL2 is meant to be time-limited, but most Z-series motherboards ship with Multi-Core Enhancement enabled by default, which removes that time limit — meaning the CPU can run at or near its PL2 wattage indefinitely under sustained all-core load. For example, a chip with a 125W base TDP but a 253W PL2/MTP figure will actually pull close to 253W continuously in this common default configuration. Sizing a cooler for the 125W base number will result in thermal throttling; size for the PL2/MTP figure instead — in practice that means a strong dual-tower air cooler or a 240–360mm AIO for unlocked K-series parts with PL2 unlimited.
+        </p>
+      </details>
+
+      <!-- Q6 -->
+      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
+        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
+          <span>How is a GPU/CPU bottleneck actually calculated in modern game engines?</span>
+          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+        </summary>
+        <p class="mt-4 text-sm leading-relaxed text-gray-300">
+          Rather than a single fixed number, a real bottleneck diagnosis compares GPU utilization, per-core CPU utilization, and frame-time consistency (including 1% low frame times) while a game is running, typically using tools like MSI Afterburner/RivaTuner Statistics Server or HWInfo. A GPU-bound system shows GPU usage pinned near 100% while frame rate scales directly with resolution or graphics settings. A CPU-bound system shows GPU usage sitting noticeably below 100% with one or two CPU threads maxed out (often the render/submission thread, physics, or AI logic), and frame rate stays roughly flat even when you lower resolution. A quick practical test: drop resolution significantly with everything else unchanged — if FPS rises substantially, the GPU was the limiter; if FPS barely moves, the CPU (or engine's single-threaded critical path) is the limiter. This estimator's tier-based comparison approximates that same relationship without needing a benchmark run.
+        </p>
+      </details>
+
+    </div>
+  </div>
+</section>
 </body>
 </html>
