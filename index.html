@@ -22,11 +22,11 @@
     background-size: 40px 40px;
     mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
   }
-  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; }
-  .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(89,230,200,0.14); }
+  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; cursor: pointer; }
+  .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(89,230,200,0.14); cursor: text; }
   .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 14px; }
   .dropdown-results { background: var(--bg-raised); border: 1px solid var(--line); border-top: none; max-height: 240px; overflow-y: auto; position: absolute; width: 100%; border-radius: 0 0 8px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; }
-  .dropdown-item { padding: 9px 12px; font-size: 13px; cursor: pointer; color: var(--text-2); border-bottom: 1px solid var(--line-soft); }
+  .dropdown-item { padding: 11px 14px; font-size: 13px; cursor: pointer; color: var(--text-2); border-bottom: 1px solid var(--line-soft); }
   .dropdown-item:hover { background: var(--line); color: var(--text-1); }
   
   .isometric-chip {
@@ -49,19 +49,6 @@
     background: linear-gradient(135deg, #161214 0%, #1A1418 100%);
     border: 1px solid rgba(245, 158, 11, 0.4);
     transition: all 0.3s ease;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    margin-top: 0;
-    padding: 0;
-    border: none;
-  }
-  .conversion-card.active {
-    opacity: 1;
-    max-height: 80px;
-    margin-top: 8px;
-    padding: 10px 12px;
-    border: 1px solid rgba(245, 158, 11, 0.4);
   }
   .conversion-card:hover {
     border-color: #F59E0B;
@@ -108,7 +95,7 @@
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Processor (CPU)</label>
         <div class="relative">
-          <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Search 9800X3D, Core Ultra, 4790K...">
+          <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Tap to select CPU..." readonly>
           <div id="cpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="cpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -119,7 +106,7 @@
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Motherboard & Chipset</label>
         <div class="relative">
-          <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Search Z890, X870, B550, Z97...">
+          <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Tap to select Motherboard..." readonly>
           <div id="mbDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="mbInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -130,7 +117,7 @@
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Graphics Card (GPU)</label>
         <div class="relative">
-          <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Search RTX 5090, RX 7900 XTX, GTX 970...">
+          <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Tap to select GPU..." readonly>
           <div id="gpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="gpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -142,7 +129,7 @@
         <div class="space-y-1.5">
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Memory</label>
           <div class="relative">
-            <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="DDR5, DDR4...">
+            <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select RAM..." readonly>
             <div id="ramDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="ramInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -152,7 +139,7 @@
         <div class="space-y-1.5">
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Cooling</label>
           <div class="relative">
-            <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="360mm AIO...">
+            <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Cooler..." readonly>
             <div id="coolingDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="coolingInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -164,7 +151,7 @@
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Storage Drive</label>
         <div class="relative">
-          <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="PCIe 5.0 NVMe, HDD...">
+          <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Storage..." readonly>
           <div id="storageDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="storageInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -232,15 +219,15 @@
     
     <form id="reviewForm" class="mb-8 bg-[#10151D] p-5 rounded-xl border border-[#212438]">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
-        <input type="text" id="revName" placeholder="Display Name" class="search-input rounded-lg px-3 py-2 text-sm" required>
-        <select id="revRating" class="search-input rounded-lg px-3 py-2 text-sm" required>
+        <input type="text" id="revName" placeholder="Display Name" class="search-input rounded-lg px-3 py-2 text-sm !cursor-text" required>
+        <select id="revRating" class="search-input rounded-lg px-3 py-2 text-sm !cursor-text" required>
           <option value="★★★★★">5 Stars - Extremely Accurate</option>
           <option value="★★★★☆">4 Stars - Very Good</option>
           <option value="★★★☆☆">3 Stars - Average</option>
         </select>
       </div>
-      <textarea id="revText" placeholder="Did the calculator match your actual wall draw?" class="search-input rounded-lg px-3 py-2 w-full mb-3" rows="2" required></textarea>
-      <button type="submit" class="bg-teal-500 text-black font-bold py-2 px-5 rounded-lg hover:bg-teal-400 text-sm">Post Report</button>
+      <textarea id="revText" placeholder="Did the calculator match your actual wall draw?" class="search-input rounded-lg px-3 py-2 w-full mb-3 !cursor-text" rows="2" required></textarea>
+      <button type="submit" class="bg-teal-500 text-black font-bold py-2 px-5 rounded-lg hover:bg-teal-400 text-sm cursor-pointer">Post Report</button>
     </form>
 
     <div id="reviewsFeed" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -569,7 +556,7 @@ function calculate() {
 
   if (peak > 0) {
       let recsHTML = PSU_CATALOG.filter(p => p.watt >= rec).slice(0, 3).map(p => `
-        <a href="${p.link}" target="_blank" class="conversion-card active flex justify-between items-center p-3 rounded-lg transition-colors" style="max-height:none; opacity:1; margin-top:0;">
+        <a href="${p.link}" target="_blank" class="conversion-card flex justify-between items-center p-3 rounded-lg transition-colors">
           <div>
             <div class="text-sm font-medium text-white">${p.name}</div>
             <div class="text-[10px] text-gray-400">${p.watt}W Certified ATX 3.0/3.1</div>
@@ -591,21 +578,32 @@ function setupDropdown(id, data, key) {
   const insight = document.getElementById(id.replace('Search', 'Insight'));
   const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
   
+  // Toggle dropdown on click without forcing mobile keyboard open immediately
+  input.addEventListener('click', (e) => {
+    e.stopPropagation();
+    // Close other dropdowns
+    document.querySelectorAll('.dropdown-results').forEach(el => { if(el !== dropdown) el.classList.add('hidden'); });
+    
+    // If already selected, reset on click to allow re-choosing
+    if (state[key]) {
+      state[key] = null;
+      input.value = '';
+      input.setAttribute('readonly', true);
+      insight.classList.add('hidden');
+      affiliateBox.innerHTML = '';
+      calculate();
+    }
+
+    dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
+    dropdown.classList.toggle('hidden');
+  });
+
+  // Enable typing search filter if user focuses with keyboard / types
   input.addEventListener('input', (e) => {
+    input.removeAttribute('readonly');
     const val = e.target.value.toLowerCase();
     const matches = data.filter(i => i.name.toLowerCase().includes(val));
     dropdown.innerHTML = matches.length > 0 ? matches.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('') : `<div class="dropdown-item text-gray-500">No matching components</div>`;
-    dropdown.classList.remove('hidden');
-  });
-
-  input.addEventListener('focus', () => {
-    state[key] = null;
-    input.value = '';
-    insight.classList.add('hidden');
-    affiliateBox.innerHTML = '';
-    calculate();
-    
-    dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
     dropdown.classList.remove('hidden');
   });
 
@@ -613,6 +611,7 @@ function setupDropdown(id, data, key) {
     if(!e.target.dataset.name) return;
     state[key] = data.find(i => i.name === e.target.dataset.name);
     input.value = state[key].name;
+    input.setAttribute('readonly', true);
     dropdown.classList.add('hidden');
     
     if (state[key].desc) {
@@ -624,7 +623,7 @@ function setupDropdown(id, data, key) {
 
     const searchQueryParam = encodeURIComponent(state[key].name);
     affiliateBox.innerHTML = `
-      <a href="https://www.amazon.com/s?k=${searchQueryParam}&tag=pcpower20-20" target="_blank" class="conversion-card active flex justify-between items-center rounded-xl text-xs transition-all">
+      <a href="https://www.amazon.com/s?k=${searchQueryParam}&tag=pcpower20-20" target="_blank" class="conversion-card flex justify-between items-center p-3 rounded-xl text-xs mt-2 transition-all">
         <span class="text-gray-300 font-medium truncate max-w-[170px]">🛒 Check ${state[key].name.substring(0, 15)}...</span>
         <span class="conversion-text font-bold tracking-wide">Buy on Amazon →</span>
       </a>
