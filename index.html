@@ -1,658 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wattbench — Power Supply & Bottleneck Estimator</title>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebApplication",
-      "@id": "https://www.example.com/#webapp",
-      "name": "Wattbench — PSU Wattage & Bottleneck Estimator",
-      "url": "https://www.example.com/",
-      "description": "A free browser-based calculator that estimates recommended PSU wattage, peak system power draw, and CPU/GPU bottleneck percentage based on your selected components.",
-      "applicationCategory": "UtilitiesApplication",
-      "operatingSystem": "Any (Web Browser)",
-      "browserRequirements": "Requires JavaScript",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://www.example.com/#faq",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is ATX 3.0 / 3.1 transient power spike, and how do I size a PSU for it?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Modern GPUs draw well above their rated power for microseconds at a time as the VRM responds to sudden load. The ATX 3.0/3.1 design guide requires a compliant PSU to absorb these excursions in graduated brackets: roughly 120% of rated power for tens of milliseconds, 150% for about 10ms, and up to 200% of total rated power for about 100 microseconds, with the GPU connector itself allowed up to 300% for that same window. An older ATX 2.x PSU without this tolerance can trip over-power protection and reboot the system even if its average wattage looked sufficient. For high-draw GPUs, prioritize formal ATX 3.0/3.1 certification over simply buying extra wattage."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I size a UPS for a gaming PC? (Converting VA to real watts)",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "UPS units are labeled in VA, which is not the same as usable watts; the two relate through the power factor (PF), typically around 0.6 for consumer line-interactive units, so Watts is approximately VA multiplied by PF. Always size against the printed watt rating, not the VA figure. Take your PC's estimated peak draw, add roughly 20-30% headroom for power-on inrush current, and choose a UPS whose watt rating clears that number. If your PSU has active PFC, use a pure sine wave UPS rather than a stepped/simulated sine wave unit."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is an 80 Plus Titanium PSU worth it over Gold?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Titanium certification requires roughly 90%+ efficiency at 10% load, 94%+ at 20% load, and 96%+ at 50% load, versus roughly 87%/90%/87% for Gold at those same points. At typical gaming loads this gap saves only a small amount of electricity per year, usually far less than the price premium. Titanium pays off mainly for systems running near-continuously at partial load, such as workstations, home servers, or 24/7 rigs, or in regions with high electricity prices. For a typical gaming build, a quality Gold unit is generally the better value."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is it safe to daisy-chain PCIe power cables, or should each 8-pin be separate?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A single 8-pin PCIe connector is conventionally rated up to 150W. A daisy-chained cable routes the combined current of two GPU connectors back through one shared wire gauge to the PSU, which can approach or exceed safe current capacity on GPUs pulling close to or above 300W combined, particularly during transient spikes. For any GPU with two or more 8-pin connectors and board power near or above roughly 225-300W, run a separate individual cable from a separate modular PSU port to each connector rather than a single daisy-chained cable."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Should my cooler be sized for base TDP, or Intel's PL2 / Maximum Turbo Power?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Intel publishes PL1, equal to base TDP and reflecting sustained power, and PL2 (Maximum Turbo Power, MTP), a higher short-term boost ceiling. Most Z-series motherboards enable Multi-Core Enhancement by default, removing the PL2 time limit, so the CPU can run near its PL2 wattage indefinitely under sustained load. A chip with a 125W base TDP but a 253W PL2/MTP figure can pull close to 253W continuously in this common configuration. Size the cooler for the PL2/MTP figure, not the base TDP, to avoid thermal throttling."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How is a GPU/CPU bottleneck actually calculated in modern game engines?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A bottleneck diagnosis compares GPU utilization, per-core CPU utilization, and frame-time consistency (including 1% lows) while a game runs, typically using tools like MSI Afterburner/RivaTuner Statistics Server or HWInfo. A GPU-bound system shows GPU usage pinned near 100% with frame rate scaling directly with resolution or settings. A CPU-bound system shows GPU usage below 100% with one or two CPU threads maxed out, and frame rate stays roughly flat when resolution drops. Lowering resolution significantly is a quick practical test: a large FPS increase indicates the GPU was the limiter, while little change indicates the CPU or engine's single-threaded critical path is the limiter."
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced PC Power Supply & Wattage Calculator</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --border-color: #334155;
         }
-      ]
-    }
-  ]
-}
-</script>  
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg: #0A0E14;
-    --bg-raised: #10151D;
-    --bg-card: #131A24;
-    --line: #212A38;
-    --line-soft: #1A2230;
-    --text-1: #E7ECF3;
-    --text-2: #97A2B4;
-    --text-3: #5D6B80;
-    --accent: #59E6C8;
-    --accent-dim: #2C6E62;
-    --amber: #F4A93B;
-    --rose: #F2596B;
-    --violet: #8C8CF0;
-  }
-  *{ box-sizing: border-box; }
-  html,body{ background: var(--bg); }
-  body{
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    color: var(--text-1);
-    -webkit-font-smoothing: antialiased;
-  }
-  .mono{ font-family: 'JetBrains Mono', ui-monospace, monospace; }
-  .bg-grid{
-    background-image:
-      linear-gradient(to right, var(--line-soft) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--line-soft) 1px, transparent 1px);
-    background-size: 40px 40px;
-    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
-            mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
-  }
-  select.field{
-    appearance: none;
-    -webkit-appearance: none;
-    background-color: var(--bg-raised);
-    border: 1px solid var(--line);
-    color: var(--text-1);
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2397A2B4' stroke-width='1.6'><path d='M5 7l5 5 5-5'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-size: 16px;
-  }
-  select.field:focus{
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(89,230,200,0.14);
-  }
-  select.field:focus-visible{ outline: none; }
-  .card{
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-  }
-  .label-row{
-    display:flex; align-items:baseline; justify-content:space-between;
-  }
-  .readout-num{
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-  }
-  .divider{ border-color: var(--line); }
-  .pulse-dot{
-    box-shadow: 0 0 0 0 rgba(89,230,200,0.55);
-    animation: pulse 2.4s ease-out infinite;
-  }
-  @keyframes pulse{
-    0%{ box-shadow: 0 0 0 0 rgba(89,230,200,0.45); }
-    70%{ box-shadow: 0 0 0 9px rgba(89,230,200,0); }
-    100%{ box-shadow: 0 0 0 0 rgba(89,230,200,0); }
-  }
-  .gauge-track{ stroke: var(--line); }
-  .gauge-fill{ transition: stroke-dashoffset 500ms cubic-bezier(.2,.8,.2,1), stroke 500ms ease; }
-  .fade-in{ animation: fadeIn 420ms ease both; }
-  @keyframes fadeIn{ from{ opacity:0; transform: translateY(4px);} to{ opacity:1; transform: translateY(0);} }
-  .chip{
-    border: 1px solid var(--line);
-    background: var(--bg-raised);
-  }
-  ::selection{ background: rgba(89,230,200,0.25); }
-  .scroll-hide::-webkit-scrollbar{ display:none; }
-  .scroll-hide{ -ms-overflow-style:none; scrollbar-width:none; }
-  @media (prefers-reduced-motion: reduce){
-    .pulse-dot{ animation: none; }
-    .fade-in{ animation: none; }
-    .gauge-fill{ transition: none; }
-  }
-</style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .checkbox-group input {
+            width: auto;
+        }
+        .results-box {
+            margin-top: 30px;
+            background: #090d16;
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .results-box h2 {
+            margin: 0 0 10px 0;
+            color: var(--accent-color);
+        }
+        .wattage-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4ade80;
+        }
+        .recommendation {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            color: #cbd5e1;
+        }
+    </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-<div class="relative overflow-hidden border-b" style="border-color:var(--line)">
-  <div class="absolute inset-0 bg-grid pointer-events-none"></div>
-  <div class="relative max-w-6xl mx-auto px-6 pt-10 pb-8">
-    <div class="flex items-center gap-2 mb-6">
-      <div class="w-2 h-2 rounded-full pulse-dot" style="background:var(--accent)"></div>
-      <span class="mono text-xs tracking-wide" style="color:var(--text-3)">LIVE ESTIMATE · LOCAL CALCULATION</span>
+<div class="container">
+    <h1>Advanced PC Wattage Calculator</h1>
+    <p class="subtitle">Granular hardware database featuring U, H, HX, and Desktop series with transient spike safety.</p>
+
+    <!-- Processor Selection -->
+    <div class="section-title">1. Processor (CPU)</div>
+    <div class="form-group">
+        <label for="cpuSelect">Select CPU Series & Model:</label>
+        <select id="cpuSelect" onchange="calculatePower()">
+            <option value="65">Intel Core i5 (Desktop - 65W TDP)</option>
+            <option value="125" selected>Intel Core i7 / i9 (Desktop K/KF Series - 125W+ TDP)</option>
+            <option value="28">Intel Core Ultra / Core i7 (U-Series Ultra Low Power - 28W)</option>
+            <option value="45">Intel Core i7 / i9 (H-Series High Performance Laptop - 45W)</option>
+            <option value="55">Intel Core i9 (HX-Series Enthusiast Mobile - 55W+)</option>
+            <option value="65">AMD Ryzen 5 / 7 (Desktop Non-X - 65W TDP)</option>
+            <option value="105">AMD Ryzen 7 / 9 (Desktop X/XT Series - 105W+ TDP)</option>
+            <option value="15">AMD Ryzen (U-Series Mobile - 15W)</option>
+            <option value="54">AMD Ryzen (HS / HX Series High Performance - 54W)</option>
+        </select>
     </div>
-    <h1 class="text-3xl sm:text-[2.6rem] font-[750] leading-[1.05] max-w-2xl" style="letter-spacing:-0.02em">
-      How much power does your build actually need?
-    </h1>
-    <p class="mt-4 max-w-lg text-[15px] leading-relaxed" style="color:var(--text-2)">
-      Pick your parts. Wattbench works out draw under load, checks your CPU and GPU are pulling their weight together, and tells you what to change first.
-    </p>
-  </div>
+
+    <!-- Graphics Card Selection -->
+    <div class="section-title">2. Graphics Card (GPU)</div>
+    <div class="form-group">
+        <label for="gpuSelect">Select GPU Model:</label>
+        <select id="gpuSelect" onchange="calculatePower()">
+            <option value="200">NVIDIA GeForce RTX 4070 / 5070 Series (~200W)</option>
+            <option value="285" selected>NVIDIA GeForce RTX 4080 / 5080 Series (~320W)</option>
+            <option value="450">NVIDIA GeForce RTX 4090 / 5090 Enthusiast (~450W+)</option>
+            <option value="150">NVIDIA GeForce RTX 4060 / Laptop Variant (~140W)</option>
+            <option value="250">AMD Radeon RX 7800 XT / 7900 GRE (~260W)</option>
+            <option value="315">AMD Radeon RX 7900 XTX (~355W)</option>
+            <option value="0">Integrated Graphics Only (0W)</option>
+        </select>
+    </div>
+
+    <!-- System Components -->
+    <div class="section-title">3. Motherboard, RAM & Storage</div>
+    <div class="form-group">
+        <label for="baseSystem">System Base Load (Motherboard, Fans, RGB, SSDs, RAM):</label>
+        <select id="baseSystem" onchange="calculatePower()">
+            <option value="50" selected>Standard Build (1x Motherboard, 2x M.2 NVMe, 32GB RAM, 4 Fans)</option>
+            <option value="80">Heavy Enthusiast Build (Extended ATX Board, Water Cooling Pump, 6+ Fans, RGB Hub)</option>
+            <option value="30">Minimalist / Mini-ITX Build</option>
+        </select>
+    </div>
+
+    <!-- Advanced Safety Toggles -->
+    <div class="section-title">4. Advanced Safety & Headroom</div>
+    <div class="checkbox-group">
+        <input type="checkbox" id="transientSpike" checked onchange="calculatePower()">
+        <label for="transientSpike">Enable Transient Spike Safety Margin (+25% Headroom for High-End GPUs)</label>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="results-box">
+        <h2>Estimated Power Consumption</h2>
+        <div class="wattage-display" id="totalWatts">0 W</div>
+        <div class="recommendation" id="psuRecommendation">Recommended PSU: Calculating...</div>
+    </div>
 </div>
 
-<main class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-5 gap-6">
-
-  <!-- LEFT: Configuration -->
-  <section class="lg:col-span-2 space-y-5">
-
-    <div class="card p-5">
-      <h2 class="text-sm font-semibold mb-4" style="color:var(--text-1)">Your components</h2>
-
-      <div class="space-y-4">
-        <div>
-          <label class="label-row mb-1.5">
-            <span class="text-xs font-medium" style="color:var(--text-2)">Processor (CPU)</span>
-            <span id="cpuTdpTag" class="mono text-[11px]" style="color:var(--text-3)"></span>
-          </label>
-          <select id="cpu" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
-        </div>
-
-        <div>
-          <label class="label-row mb-1.5">
-            <span class="text-xs font-medium" style="color:var(--text-2)">Graphics card (GPU)</span>
-            <span id="gpuTdpTag" class="mono text-[11px]" style="color:var(--text-3)"></span>
-          </label>
-          <select id="gpu" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="mb-1.5 block text-xs font-medium" style="color:var(--text-2)">Memory (RAM)</label>
-            <select id="ram" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
-          </div>
-          <div>
-            <label class="mb-1.5 block text-xs font-medium" style="color:var(--text-2)">Cooling</label>
-            <select id="cooling" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
-          </div>
-        </div>
-
-        <div>
-          <label class="mb-1.5 block text-xs font-medium" style="color:var(--text-2)">Storage drives</label>
-          <select id="storage" class="field w-full rounded-lg px-3 py-2.5 text-sm"></select>
-        </div>
-      </div>
-    </div>
-
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-sm font-semibold">Recommended upgrades</h2>
-        <span id="upgradeCount" class="mono text-[11px] chip rounded-full px-2 py-0.5" style="color:var(--text-2)">0</span>
-      </div>
-      <div id="upgradesList" class="space-y-2.5"></div>
-    </div>
-
-  </section>
-
-  <!-- RIGHT: Live output -->
-  <section class="lg:col-span-3 space-y-5">
-
-    <div class="card p-6">
-      <div class="grid grid-cols-2 gap-6">
-
-        <div>
-          <div class="text-xs font-medium mb-2" style="color:var(--text-2)">Recommended PSU wattage</div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="recWattage" class="readout-num mono text-5xl font-bold" style="color:var(--accent)">0</span>
-            <span class="mono text-lg" style="color:var(--text-3)">W</span>
-          </div>
-          <div id="recWattageNote" class="mt-2 text-xs" style="color:var(--text-3)"></div>
-        </div>
-
-        <div>
-          <div class="text-xs font-medium mb-2" style="color:var(--text-2)">Estimated peak draw</div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="peakPower" class="readout-num mono text-5xl font-bold">0</span>
-            <span class="mono text-lg" style="color:var(--text-3)">W</span>
-          </div>
-          <div id="peakPowerNote" class="mt-2 text-xs" style="color:var(--text-3)"></div>
-        </div>
-      </div>
-
-      <div class="mt-6 pt-6 border-t divider grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
-        <div class="flex items-center gap-5">
-          <svg width="92" height="92" viewBox="0 0 92 92" class="-rotate-90 shrink-0">
-            <circle cx="46" cy="46" r="38" fill="none" stroke-width="8" class="gauge-track"></circle>
-            <circle id="gaugeArc" cx="46" cy="46" r="38" fill="none" stroke-width="8" stroke-linecap="round"
-              class="gauge-fill" style="stroke:var(--amber)" stroke-dasharray="238.76" stroke-dashoffset="238.76"></circle>
-          </svg>
-          <div>
-            <div class="text-xs font-medium mb-1" style="color:var(--text-2)">Bottleneck</div>
-            <div class="flex items-baseline gap-1">
-              <span id="bottleneckPct" class="readout-num mono text-3xl font-bold">0</span>
-              <span class="mono text-sm" style="color:var(--text-3)">%</span>
-            </div>
-            <div id="bottleneckSource" class="text-xs mt-0.5" style="color:var(--text-3)"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="text-xs font-medium mb-2" style="color:var(--text-2)">System status</div>
-          <div id="statusPill" class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium chip">
-            <span id="statusDot" class="w-1.5 h-1.5 rounded-full"></span>
-            <span id="statusText">Calculating…</span>
-          </div>
-          <p id="statusDetail" class="mt-2 text-xs leading-relaxed max-w-sm" style="color:var(--text-3)"></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="card p-5">
-      <h2 class="text-sm font-semibold mb-1">Where the wattage goes</h2>
-      <p class="text-xs mb-4" style="color:var(--text-3)">Estimated draw per component under sustained load, boost included.</p>
-      <div id="breakdown" class="space-y-3"></div>
-    </div>
-
-    <div class="card p-5">
-      <div class="flex items-baseline justify-between mb-1">
-        <h2 class="text-sm font-semibold">PSUs that fit this build</h2>
-        <span class="text-[11px]" style="color:var(--text-3)">Affiliate links — Wattbench may earn a commission</span>
-      </div>
-      <div id="psuRecs" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4"></div>
-    </div>
-
-  </section>
-</main>
-
-<footer class="max-w-6xl mx-auto px-6 pb-10">
-  <p class="text-[11px]" style="color:var(--text-3)">
-    Estimates are based on published TDP figures and typical boost behavior. Real-world draw varies by silicon, undervolting, and case airflow. Add headroom for overclocking.
-  </p>
-</footer>
-
 <script>
-/* ---------------- Component data with branded hardware ---------------- */
-const CPUS = [
-  { name: "Intel Core i3-13100F",     tdp: 58,  boost: 89,  tier: 2.5, platform: "Intel" },
-  { name: "Intel Core i5-12400F",     tdp: 65,  boost: 117, tier: 4.0, platform: "Intel" },
-  { name: "Intel Core i5-13600K",     tdp: 125, boost: 181, tier: 6.5, platform: "Intel" },
-  { name: "Intel Core i7-13700K",     tdp: 125, boost: 253, tier: 8.0, platform: "Intel" },
-  { name: "Intel Core i9-14900K",     tdp: 125, boost: 253, tier: 9.5, platform: "Intel" },
-  { name: "AMD Ryzen 5 5600",         tdp: 65,  boost: 88,  tier: 3.8, platform: "AMD" },
-  { name: "AMD Ryzen 5 7600X",        tdp: 105, boost: 142, tier: 6.0, platform: "AMD" },
-  { name: "AMD Ryzen 7 5800X3D",      tdp: 105, boost: 142, tier: 6.8, platform: "AMD" },
-  { name: "AMD Ryzen 7 7800X3D",      tdp: 120, boost: 162, tier: 8.2, platform: "AMD" },
-  { name: "AMD Ryzen 9 7950X",        tdp: 170, boost: 230, tier: 9.6, platform: "AMD" },
-];
+function calculatePower() {
+    const cpuWatts = parseInt(document.getElementById('cpuSelect').value);
+    const gpuWatts = parseInt(document.getElementById('gpuSelect').value);
+    const baseWatts = parseInt(document.getElementById('baseSystem').value);
+    const useTransient = document.getElementById('transientSpike').checked;
 
-const GPUS = [
-  { name: "NVIDIA RTX 3050",     tdp: 130, boost: 145, tier: 2.8 },
-  { name: "NVIDIA RTX 4060",     tdp: 115, boost: 130, tier: 3.6 },
-  { name: "NVIDIA RTX 4060 Ti",  tdp: 165, boost: 180, tier: 4.6 },
-  { name: "NVIDIA RTX 4070",     tdp: 200, boost: 220, tier: 6.0 },
-  { name: "NVIDIA RTX 4070 Ti Super", tdp: 285, boost: 310, tier: 7.6 },
-  { name: "NVIDIA RTX 4080 Super", tdp: 320, boost: 345, tier: 8.6 },
-  { name: "NVIDIA RTX 4090",     tdp: 450, boost: 480, tier: 10.0 },
-  { name: "AMD Radeon RX 6600",  tdp: 132, boost: 145, tier: 3.2 },
-  { name: "AMD Radeon RX 7600",  tdp: 165, boost: 180, tier: 3.8 },
-  { name: "AMD Radeon RX 7800 XT", tdp: 263, boost: 285, tier: 6.4 },
-  { name: "AMD Radeon RX 7900 XTX", tdp: 355, boost: 385, tier: 8.8 },
-];
+    let subtotal = cpuWatts + gpuWatts + baseWatts;
+    
+    // Apply transient spike cushion if checked (modern high-end GPUs spike significantly)
+    if (useTransient && gpuWatts > 150) {
+        subtotal *= 1.25; 
+    }
 
-const RAM_OPTS = [
-  { name: "8GB Corsair Vengeance DDR4 (single stick)",   watt: 5 },
-  { name: "16GB Corsair Vengeance DDR4 (dual channel)",  watt: 8 },
-  { name: "32GB G.Skill Trident Z DDR4 (dual channel)",  watt: 11 },
-  { name: "16GB Kingston Fury DDR5 (dual channel)",  watt: 10 },
-  { name: "32GB G.Skill Trident Z5 RGB DDR5 (dual channel)",  watt: 14 },
-  { name: "64GB Corsair Vengeance RGB DDR5 (dual channel)",  watt: 20 },
-];
+    const calculatedWatts = Math.round(subtotal);
 
-const STORAGE_OPTS = [
-  { name: "1× Samsung 990 PRO NVMe SSD",                    watt: 6 },
-  { name: "1× Samsung 990 PRO + 1× Crucial SATA SSD",      watt: 10 },
-  { name: "2× WD Black SN850X NVMe SSD",                    watt: 11 },
-  { name: "1× Samsung 990 PRO NVMe SSD + 1× Seagate HDD",   watt: 15 },
-  { name: "2× WD Black SN850X NVMe SSD + 1× Seagate HDD",   watt: 20 },
-];
+    // Find a comfortable PSU tier (rounding up to standard commercial PSU wattage blocks: 500, 650, 750, 850, 1000, 1200, 1500)
+    let recommendedPSU = 500;
+    const psuTiers = [450, 550, 650, 750, 850, 1000, 1200, 1500];
+    
+    for (let tier of psuTiers) {
+        if (calculatedWatts <= tier - 100) { // Keep a healthy buffer
+            recommendedPSU = tier;
+            break;
+        }
+        recommendedPSU = 1500; // Fallback for massive rigs
+    }
 
-const COOLING_OPTS = [
-  { name: "Stock cooler (bundled)",   watt: 4,  headroom: 0.90 },
-  { name: "Thermalright Peerless Assassin 120 SE",   watt: 6,  headroom: 1.00 },
-  { name: "Corsair H100i RGB 240mm AIO",  watt: 10, headroom: 1.06 },
-  { name: "NZXT Kraken 360mm AIO liquid cooler",  watt: 14, headroom: 1.10 },
-  { name: "Custom loop (EKWB / Corsair)",              watt: 20, headroom: 1.14 },
-];
-
-const BASE_SYSTEM_DRAW = 45; // motherboard, fans, RGB, USB peripherals
-
-/* ---------------- Populate selects ---------------- */
-function fillSelect(el, items, defaultIndex){
-  el.innerHTML = items.map((it,i) => `<option value="${i}">${it.name}</option>`).join("");
-  el.selectedIndex = defaultIndex;
-}
-fillSelect(document.getElementById("cpu"), CPUS, 3);
-fillSelect(document.getElementById("gpu"), GPUS, 6);
-fillSelect(document.getElementById("ram"), RAM_OPTS, 4);
-fillSelect(document.getElementById("storage"), STORAGE_OPTS, 1);
-fillSelect(document.getElementById("cooling"), COOLING_OPTS, 1);
-
-/* ---------------- PSU catalog with updated affiliate tag ---------------- */
-const PSU_CATALOG = [
-  { watt: 550, name: "Corsair RM550x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm550x&tag=pcpower20-20" },
-  { watt: 650, name: "Corsair RM650x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm650x&tag=pcpower20-20" },
-  { watt: 750, name: "be quiet! Straight Power 750", eff: "80+ Platinum, fully modular", href: "https://www.amazon.com/s?k=be+quiet+straight+power+750&tag=pcpower20-20" },
-  { watt: 850, name: "Corsair RM850x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm850x&tag=pcpower20-20" },
-  { watt: 1000, name: "Seasonic Focus GX-1000", eff: "80+ Gold, fully modular", href: "https://www.amazon.com/s?k=seasonic+focus+gx+1000&tag=pcpower20-20" },
-  { watt: 1200, name: "Corsair HX1200",       eff: "80+ Platinum, fully modular", href: "https://www.amazon.com/s?k=corsair+hx1200&tag=pcpower20-20" },
-];
-
-function roundToPsuStep(w){
-  const steps = [450, 550, 650, 750, 850, 1000, 1200, 1500];
-  for(const s of steps){ if(w <= s) return s; }
-  return 1500;
+    document.getElementById('totalWatts').innerText = calculatedWatts + " W";
+    document.getElementById('psuRecommendation').innerText = `Recommended Power Supply Unit (PSU): ${recommendedPSU}W (80+ Gold Certified)`;
 }
 
-/* ---------------- Core calculation ---------------- */
-function calculate(){
-  const cpu = CPUS[document.getElementById("cpu").value];
-  const gpu = GPUS[document.getElementById("gpu").value];
-  const ram = RAM_OPTS[document.getElementById("ram").value];
-  const storage = STORAGE_OPTS[document.getElementById("storage").value];
-  const cooling = COOLING_OPTS[document.getElementById("cooling").value];
-
-  document.getElementById("cpuTdpTag").textContent = `${cpu.tdp}W TDP`;
-  document.getElementById("gpuTdpTag").textContent = `${gpu.tdp}W TDP`;
-
-  const peak = cpu.boost + gpu.boost + ram.watt + storage.watt + cooling.watt + BASE_SYSTEM_DRAW;
-  const rawRecommended = peak / 0.8; // keep sustained load near 80% of PSU capacity
-  const recommended = roundToPsuStep(Math.ceil(rawRecommended / 10) * 10);
-
-  /* Bottleneck: compare normalized CPU/GPU tiers (0-10 scale) */
-  const gap = gpu.tier - cpu.tier;
-  let bottleneckPct, bottleneckSource;
-  if (Math.abs(gap) < 0.6) {
-    bottleneckPct = Math.round(Math.abs(gap) * 6);
-    bottleneckSource = "Well matched — neither part is holding the other back";
-  } else if (gap > 0) {
-    bottleneckPct = Math.min(60, Math.round(gap * 11));
-    bottleneckSource = `CPU-limited — the ${cpu.name.split(" ").slice(-1)} is under-feeding this GPU`;
-  } else {
-    bottleneckPct = Math.min(60, Math.round(Math.abs(gap) * 11));
-    bottleneckSource = `GPU-limited — the graphics card is the ceiling on this build`;
-  }
-
-  /* Status */
-  const wattageMargin = recommended - peak;
-  let status, statusColor, statusDetail;
-  if (bottleneckPct >= 40) {
-    status = "Imbalanced";
-    statusColor = "var(--rose)";
-    statusDetail = "One component is significantly outpacing the other. You'll leave performance on the table until they're closer in tier.";
-  } else if (wattageMargin < 60) {
-    status = "Tight headroom";
-    statusColor = "var(--amber)";
-    statusDetail = "The recommended PSU covers peak draw but leaves little margin for transient spikes or future upgrades.";
-  } else if (bottleneckPct >= 20) {
-    status = "Balanced";
-    statusColor = "var(--accent)";
-    statusDetail = "A mild gap between CPU and GPU tiers, but nothing that meaningfully limits this build.";
-  } else {
-    status = "Optimal";
-    statusColor = "var(--accent)";
-    statusDetail = "CPU and GPU are well matched and the power budget has comfortable headroom.";
-  }
-
-  return { cpu, gpu, ram, storage, cooling, peak, recommended, bottleneckPct, bottleneckSource, status, statusColor, statusDetail, wattageMargin };
-}
-
-/* ---------------- Render ---------------- */
-function animateNumber(el, to){
-  const from = parseInt(el.textContent.replace(/,/g,"")) || 0;
-  const duration = 420;
-  const start = performance.now();
-  function step(now){
-    const t = Math.min(1, (now - start) / duration);
-    const eased = 1 - Math.pow(1 - t, 3);
-    const val = Math.round(from + (to - from) * eased);
-    el.textContent = val.toLocaleString();
-    if (t < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-function render(){
-  const r = calculate();
-
-  animateNumber(document.getElementById("recWattage"), r.recommended);
-  animateNumber(document.getElementById("peakPower"), Math.round(r.peak));
-  animateNumber(document.getElementById("bottleneckPct"), r.bottleneckPct);
-
-  document.getElementById("recWattageNote").textContent = `${Math.round(r.wattageMargin)}W of margin above estimated peak draw`;
-  document.getElementById("peakPowerNote").textContent = `Sustained load across all components, boost clocks included`;
-  document.getElementById("bottleneckSource").textContent = r.bottleneckSource;
-
-  const circumference = 238.76;
-  const offset = circumference * (1 - Math.min(r.bottleneckPct, 100) / 100);
-  const arc = document.getElementById("gaugeArc");
-  arc.style.strokeDashoffset = offset;
-  arc.style.stroke = r.bottleneckPct >= 40 ? "var(--rose)" : (r.bottleneckPct >= 20 ? "var(--amber)" : "var(--accent)");
-
-  const dot = document.getElementById("statusDot");
-  const text = document.getElementById("statusText");
-  dot.style.background = r.statusColor;
-  text.textContent = r.status;
-  text.style.color = r.statusColor;
-  document.getElementById("statusDetail").textContent = r.statusDetail;
-
-  /* Breakdown bars */
-  const parts = [
-    { label: r.cpu.name, watt: r.cpu.boost, color: "var(--accent)" },
-    { label: r.gpu.name, watt: r.gpu.boost, color: "var(--violet)" },
-    { label: "Memory", watt: r.ram.watt, color: "var(--amber)" },
-    { label: "Storage", watt: r.storage.watt, color: "var(--text-3)" },
-    { label: "Cooling", watt: r.cooling.watt, color: "var(--text-3)" },
-    { label: "Board & fans", watt: BASE_SYSTEM_DRAW, color: "var(--text-3)" },
-  ];
-  const maxWatt = Math.max(...parts.map(p => p.watt));
-  document.getElementById("breakdown").innerHTML = parts.map(p => `
-    <div class="fade-in">
-      <div class="flex justify-between text-xs mb-1">
-        <span style="color:var(--text-2)">${p.label}</span>
-        <span class="mono" style="color:var(--text-1)">${p.watt}W</span>
-      </div>
-      <div class="h-1.5 rounded-full" style="background:var(--line-soft)">
-        <div class="h-1.5 rounded-full" style="width:${(p.watt/maxWatt*100).toFixed(0)}%; background:${p.color}"></div>
-      </div>
-    </div>
-  `).join("");
-
-  /* Upgrades */
-  const upgrades = [];
-  if (r.bottleneckPct >= 40 && r.gpu.tier - r.cpu.tier > 0) {
-    upgrades.push({ title: "Move up a CPU tier", detail: `Your GPU has headroom your CPU isn't feeding it. A faster CPU on the same platform would unlock more of the ${r.gpu.name.replace('NVIDIA ','').replace('AMD ','')}.` });
-  }
-  if (r.bottleneckPct >= 40 && r.cpu.tier - r.gpu.tier > 0) {
-    upgrades.push({ title: "Move up a GPU tier", detail: `Your CPU is well ahead of your graphics card. Upgrading the GPU would use the CPU headroom you already have.` });
-  }
-  if (r.wattageMargin < 60) {
-    upgrades.push({ title: "Size up your PSU", detail: `Peak draw is close to the recommended wattage. Going one size up gives quieter fan curves and room for a future GPU.` });
-  }
-  if (r.ram.watt <= 10 && r.gpu.tier >= 6) {
-    upgrades.push({ title: "Consider more memory", detail: `A GPU this capable is often paired with 32GB+ so texture-heavy games and background tasks don't compete for RAM.` });
-  }
-  if (r.cooling.headroom < 1.0 && (r.cpu.boost + r.gpu.boost) > 350) {
-    upgrades.push({ title: "Upgrade your cooling", detail: `Combined CPU and GPU draw is high for a stock cooler. Sustained boost clocks will throttle sooner under thermal load.` });
-  }
-  if (upgrades.length === 0) {
-    upgrades.push({ title: "No changes needed", detail: "This configuration is balanced and within a comfortable power budget." });
-  }
-  document.getElementById("upgradeCount").textContent = upgrades.length;
-  document.getElementById("upgradesList").innerHTML = upgrades.map(u => `
-    <div class="fade-in rounded-lg p-3" style="background:var(--bg-raised); border:1px solid var(--line)">
-      <div class="text-sm font-medium mb-0.5">${u.title}</div>
-      <div class="text-xs leading-relaxed" style="color:var(--text-3)">${u.detail}</div>
-    </div>
-  `).join("");
-
-  /* PSU recommendations: recommended size + one below + one above */
-  const idx = PSU_CATALOG.findIndex(p => p.watt === r.recommended);
-  const centerIdx = idx === -1 ? PSU_CATALOG.findIndex(p => p.watt >= r.recommended) : idx;
-  const picks = [
-    PSU_CATALOG[Math.max(0, centerIdx - 1)],
-    PSU_CATALOG[centerIdx] || PSU_CATALOG[PSU_CATALOG.length - 1],
-    PSU_CATALOG[Math.min(PSU_CATALOG.length - 1, centerIdx + 1)],
-  ];
-  const seen = new Set();
-  const uniquePicks = picks.filter(p => { if(seen.has(p.watt)) return false; seen.add(p.watt); return true; });
-
-  document.getElementById("psuRecs").innerHTML = uniquePicks.map((p,i) => `
-    <a href="${p.href}" target="_blank" rel="nofollow sponsored noopener" class="block rounded-lg p-3.5 transition-colors hover:border-[var(--accent)]" style="background:var(--bg-raised); border:1px solid ${p.watt === r.recommended ? 'var(--accent)' : 'var(--line)'}">
-      ${p.watt === r.recommended ? `<div class="mono text-[10px] mb-1.5" style="color:var(--accent)">BEST MATCH</div>` : ''}
-      <div class="text-sm font-medium leading-snug">${p.name}</div>
-      <div class="mono text-xs mt-1" style="color:var(--text-2)">${p.watt}W · ${p.eff}</div>
-      <div class="mt-3 pt-3 border-t" style="border-color:var(--line)">
-        <span class="inline-flex items-center gap-1.5 text-xs font-medium" style="color:var(--accent)">
-          Check Price on Amazon ➔
-        </span>
-      </div>
-    </a>
-  `).join("");
-}
-
-["cpu","gpu","ram","storage","cooling"].forEach(id => {
-  document.getElementById(id).addEventListener("change", render);
-});
-
-render();
+// Run on initial load
+calculatePower();
 </script>
-<section id="faq" class="bg-gray-900 text-gray-200 py-16 px-4 sm:px-6">
-  <div class="max-w-3xl mx-auto">
-    <div class="mb-10 text-center">
-      <h2 class="text-2xl sm:text-3xl font-bold text-white">Power Supply & Bottleneck FAQ</h2>
-      <p class="mt-2 text-sm text-gray-400">Answers to the questions builders search for most before sizing a PSU or diagnosing a bottleneck.</p>
-    </div>
 
-    <div class="space-y-4">
-
-      <!-- Q1 -->
-      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
-        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
-          <span>What is ATX 3.0 / 3.1 transient power spike, and how do I size a PSU for it?</span>
-          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
-        </summary>
-        <p class="mt-4 text-sm leading-relaxed text-gray-300">
-          Modern GPUs don't draw a flat wattage — they spike well above their rated power for microseconds at a time as the VRM responds to sudden compute load. The ATX 3.0/3.1 design guide requires a compliant PSU to absorb these excursions in graduated brackets: roughly 120% of rated power for tens of milliseconds, 150% for about 10ms, and a peak of 200% of the PSU's total rated power for around 100 microseconds. At the GPU's 12VHPWR/12V-2x6 connector specifically, the allowance is even higher — up to 300% for that same ~100µs window. An older ATX 2.x unit without this transient tolerance can trip its over-power protection and reboot the system even though its average wattage rating looked sufficient on paper. Practical takeaway: for an RTX 40/50-series or equivalent high-draw card, prioritize a PSU that is formally ATX 3.0 or 3.1 certified over simply buying extra wattage headroom — the certification is what guarantees the spike tolerance, not the number on the box.
-        </p>
-      </details>
-
-      <!-- Q2 -->
-      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
-        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
-          <span>How do I size a UPS for a gaming PC? (Converting VA to real watts)</span>
-          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
-        </summary>
-        <p class="mt-4 text-sm leading-relaxed text-gray-300">
-          UPS units are commonly labeled with a VA (volt-amp) rating, but VA is not the same as usable watts — the two are related by the unit's power factor (PF), typically around 0.6 for consumer line-interactive UPS models: <span class="font-mono text-teal-300">Watts ≈ VA × PF</span>. A "1000VA" UPS at 0.6 PF is really only good for about 600W continuous, which is why most UPS units also print a separate, lower watt rating on the label — always size against that watt figure, not the VA figure. To size correctly: take your PC's estimated peak draw (PSU wattage estimators are useful here), add roughly 20–30% headroom for the inrush current at power-on, and pick a UPS whose watt rating clears that number. If your PSU has active PFC (nearly all modern ATX units do), use a pure sine wave UPS — a stepped/simulated sine wave unit can cause the PSU to buzz, run inefficiently, or shut down on battery power.
-        </p>
-      </details>
-
-      <!-- Q3 -->
-      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
-        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
-          <span>Is an 80 Plus Titanium PSU worth it over Gold?</span>
-          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
-        </summary>
-        <p class="mt-4 text-sm leading-relaxed text-gray-300">
-          Titanium certification requires roughly 90%+ efficiency at 10% load, 94%+ at 20% load, and 96%+ at 50% load; Gold requires roughly 87% / 90% / 87% at those same points. In practice, that gap translates to only a few extra watts of wasted heat at typical gaming loads — for a system averaging 300–500W a few hours a day, the real-world electricity savings from Titanium over Gold usually amount to a small amount per year, far less than the price premium. Titanium becomes worth it for systems that run near-continuously at partial load — workstations, home servers, or 24/7 rigs — where the efficiency gap compounds over thousands of hours, or in regions with high electricity prices. For a typical gaming build, a quality Gold-rated unit is the better value; the main secondary benefit of Titanium (lower heat, quieter fan curve) is real but usually not decisive on its own.
-        </p>
-      </details>
-
-      <!-- Q4 -->
-      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
-        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
-          <span>Is it safe to daisy-chain PCIe power cables, or should each 8-pin be separate?</span>
-          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
-        </summary>
-        <p class="mt-4 text-sm leading-relaxed text-gray-300">
-          A single 8-pin PCIe connector is conventionally treated as safe up to 150W. A daisy-chained cable — one lead from the PSU splitting into two 8-pin GPU connectors — routes the combined current of both connectors back through one shared wire gauge to the PSU. For older, lower-draw GPUs that's usually fine, but on a card pulling close to or above 300W combined across its connectors, that shared cable run can be pushed near or past its safe current capacity, especially during the transient spikes described above. The safer practice for any GPU with two or more 8-pin connectors and a board power near or above ~225–300W is to run a separate, individual cable from a separate modular port on the PSU to each connector, rather than a single daisy-chained cable — this keeps each connector's current on its own dedicated wire run back to the PSU.
-        </p>
-      </details>
-
-      <!-- Q5 -->
-      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
-        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
-          <span>Should my cooler be sized for base TDP, or Intel's PL2 / Maximum Turbo Power?</span>
-          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
-        </summary>
-        <p class="mt-4 text-sm leading-relaxed text-gray-300">
-          Intel publishes two relevant power figures: PL1, which equals the base TDP and reflects sustained long-term power, and PL2 (also called Maximum Turbo Power, MTP), a higher short-term boost ceiling. On paper PL2 is meant to be time-limited, but most Z-series motherboards ship with Multi-Core Enhancement enabled by default, which removes that time limit — meaning the CPU can run at or near its PL2 wattage indefinitely under sustained all-core load. For example, a chip with a 125W base TDP but a 253W PL2/MTP figure will actually pull close to 253W continuously in this common default configuration. Sizing a cooler for the 125W base number will result in thermal throttling; size for the PL2/MTP figure instead — in practice that means a strong dual-tower air cooler or a 240–360mm AIO for unlocked K-series parts with PL2 unlimited.
-        </p>
-      </details>
-
-      <!-- Q6 -->
-      <details class="group bg-gray-800/60 border border-gray-700 rounded-xl p-6 open:border-teal-500/40 transition-colors">
-        <summary class="flex items-start justify-between gap-4 cursor-pointer list-none font-semibold text-white">
-          <span>How is a GPU/CPU bottleneck actually calculated in modern game engines?</span>
-          <span class="shrink-0 text-teal-400 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
-        </summary>
-        <p class="mt-4 text-sm leading-relaxed text-gray-300">
-          Rather than a single fixed number, a real bottleneck diagnosis compares GPU utilization, per-core CPU utilization, and frame-time consistency (including 1% low frame times) while a game is running, typically using tools like MSI Afterburner/RivaTuner Statistics Server or HWInfo. A GPU-bound system shows GPU usage pinned near 100% while frame rate scales directly with resolution or graphics settings. A CPU-bound system shows GPU usage sitting noticeably below 100% with one or two CPU threads maxed out (often the render/submission thread, physics, or AI logic), and frame rate stays roughly flat even when you lower resolution. A quick practical test: drop resolution significantly with everything else unchanged — if FPS rises substantially, the GPU was the limiter; if FPS barely moves, the CPU (or engine's single-threaded critical path) is the limiter. This estimator's tier-based comparison approximates that same relationship without needing a benchmark run.
-        </p>
-      </details>
-
-    </div>
-  </div>
-</section>
 </body>
 </html>
