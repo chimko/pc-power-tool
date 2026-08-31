@@ -13,6 +13,8 @@
     --line: #212438; --line-soft: #1A2230;
     --text-1: #E7ECF3; --text-2: #97A2B4; --text-3: #506880;
     --accent: #59E6C8; --accent-dim: #2C6E62;
+    --conversion: #F59E0B; /* High-converting Amber-Gold */
+    --conversion-glow: rgba(245, 158, 11, 0.25);
   }
   * { box-sizing: border-box; }
   body { background: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -44,20 +46,20 @@
     border: 1px dashed var(--accent); border-radius: 3px; opacity: 0.6;
   }
 
-  /* Glowing Amazon Button Effect */
-  .glow-btn {
-    background: linear-gradient(135deg, #131A24 0%, #1A2230 100%);
-    border: 1px solid #2C6E62;
+  /* Captivating Warm/Reddish-Amber Conversion Glow */
+  .conversion-card {
+    background: linear-gradient(135deg, #161214 0%, #1A1418 100%);
+    border: 1px solid rgba(245, 158, 11, 0.4);
     transition: all 0.3s ease;
   }
-  .glow-btn:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 15px rgba(89, 230, 200, 0.35);
-    transform: translateY(-1px);
+  .conversion-card:hover {
+    border-color: #F59E0B;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+    transform: translateY(-2px);
   }
-  .glow-text {
-    color: #59E6C8;
-    text-shadow: 0 0 8px rgba(89, 230, 200, 0.4);
+  .conversion-text {
+    color: #FBBF24;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
   }
 </style>
 </head>
@@ -556,12 +558,12 @@ function calculate() {
 
   if (peak > 0) {
       let recsHTML = PSU_CATALOG.filter(p => p.watt >= rec).slice(0, 3).map(p => `
-        <a href="${p.link}" target="_blank" class="glow-btn flex justify-between items-center p-3 rounded-lg border border-[#212438] transition-colors">
+        <a href="${p.link}" target="_blank" class="conversion-card flex justify-between items-center p-3 rounded-lg transition-colors">
           <div>
             <div class="text-sm font-medium text-white">${p.name}</div>
             <div class="text-[10px] text-gray-400">${p.watt}W Certified ATX 3.0/3.1</div>
           </div>
-          <span class="text-xs glow-text font-bold">Buy on Amazon →</span>
+          <span class="text-xs conversion-text font-bold">Buy on Amazon →</span>
         </a>
       `).join('');
       document.getElementById('psuRecs').innerHTML = recsHTML || `<div class="text-sm text-gray-500">Requires server-grade PSU (1600W+)</div>`;
@@ -585,7 +587,6 @@ function setupDropdown(id, data, key) {
     dropdown.classList.remove('hidden');
   });
 
-  // Clicking back into the input clears selection and re-opens full list instantly
   input.addEventListener('focus', () => {
     state[key] = null;
     input.value = '';
@@ -593,7 +594,6 @@ function setupDropdown(id, data, key) {
     affiliateBox.innerHTML = '';
     calculate();
     
-    // Show full list
     dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
     dropdown.classList.remove('hidden');
   });
@@ -604,7 +604,6 @@ function setupDropdown(id, data, key) {
     input.value = state[key].name;
     dropdown.classList.add('hidden');
     
-    // Display individual insight description
     if (state[key].desc) {
       insight.innerText = state[key].desc;
       insight.classList.remove('hidden');
@@ -612,12 +611,11 @@ function setupDropdown(id, data, key) {
       insight.classList.add('hidden');
     }
 
-    // Display prominent glowing individual Amazon button card
     const searchQueryParam = encodeURIComponent(state[key].name);
     affiliateBox.innerHTML = `
-      <a href="https://www.amazon.com/s?k=${searchQueryParam}&tag=pcpower20-20" target="_blank" class="glow-btn flex justify-between items-center p-2.5 rounded-lg text-xs mt-1 transition-all">
-        <span class="text-gray-300 truncate max-w-[190px]">Best deals for ${state[key].name.substring(0, 18)}...</span>
-        <span class="glow-text font-bold">Buy on Amazon →</span>
+      <a href="https://www.amazon.com/s?k=${searchQueryParam}&tag=pcpower20-20" target="_blank" class="conversion-card flex justify-between items-center p-3 rounded-xl text-xs mt-2 transition-all">
+        <span class="text-gray-300 font-medium truncate max-w-[190px]">🛒 Check ${state[key].name.substring(0, 16)}...</span>
+        <span class="conversion-text font-bold tracking-wide">Buy on Amazon →</span>
       </a>
     `;
 
@@ -625,7 +623,6 @@ function setupDropdown(id, data, key) {
   });
 }
 
-// Global click handler to close dropdowns when clicking outside
 document.addEventListener('click', (e) => {
   if(!e.target.closest('.relative')) {
     document.querySelectorAll('.dropdown-results').forEach(el => el.classList.add('hidden'));
