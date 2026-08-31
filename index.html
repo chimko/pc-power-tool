@@ -321,7 +321,7 @@
 </footer>
 
 <script>
-/* ---------------- Component data ---------------- */
+/* ---------------- Component data with branded hardware ---------------- */
 const CPUS = [
   { name: "Intel Core i3-13100F",     tdp: 58,  boost: 89,  tier: 2.5, platform: "Intel" },
   { name: "Intel Core i5-12400F",     tdp: 65,  boost: 117, tier: 4.0, platform: "Intel" },
@@ -350,28 +350,28 @@ const GPUS = [
 ];
 
 const RAM_OPTS = [
-  { name: "8GB DDR4 (single stick)",   watt: 5 },
-  { name: "16GB DDR4 (dual channel)",  watt: 8 },
-  { name: "32GB DDR4 (dual channel)",  watt: 11 },
-  { name: "16GB DDR5 (dual channel)",  watt: 10 },
-  { name: "32GB DDR5 (dual channel)",  watt: 14 },
-  { name: "64GB DDR5 (dual channel)",  watt: 20 },
+  { name: "8GB Corsair Vengeance DDR4 (single stick)",   watt: 5 },
+  { name: "16GB Corsair Vengeance DDR4 (dual channel)",  watt: 8 },
+  { name: "32GB G.Skill Trident Z DDR4 (dual channel)",  watt: 11 },
+  { name: "16GB Kingston Fury DDR5 (dual channel)",  watt: 10 },
+  { name: "32GB G.Skill Trident Z5 RGB DDR5 (dual channel)",  watt: 14 },
+  { name: "64GB Corsair Vengeance RGB DDR5 (dual channel)",  watt: 20 },
 ];
 
 const STORAGE_OPTS = [
-  { name: "1× NVMe SSD",                    watt: 6 },
-  { name: "1× NVMe SSD + 1× SATA SSD",      watt: 10 },
-  { name: "2× NVMe SSD",                    watt: 11 },
-  { name: "1× NVMe SSD + 1× HDD",           watt: 15 },
-  { name: "2× NVMe SSD + 1× HDD",           watt: 20 },
+  { name: "1× Samsung 990 PRO NVMe SSD",                    watt: 6 },
+  { name: "1× Samsung 990 PRO + 1× Crucial SATA SSD",      watt: 10 },
+  { name: "2× WD Black SN850X NVMe SSD",                    watt: 11 },
+  { name: "1× Samsung 990 PRO NVMe SSD + 1× Seagate HDD",   watt: 15 },
+  { name: "2× WD Black SN850X NVMe SSD + 1× Seagate HDD",   watt: 20 },
 ];
 
 const COOLING_OPTS = [
   { name: "Stock cooler (bundled)",   watt: 4,  headroom: 0.90 },
-  { name: "Aftermarket air cooler",   watt: 6,  headroom: 1.00 },
-  { name: "240mm AIO liquid cooler",  watt: 10, headroom: 1.06 },
-  { name: "360mm AIO liquid cooler",  watt: 14, headroom: 1.10 },
-  { name: "Custom loop",              watt: 20, headroom: 1.14 },
+  { name: "Thermalright Peerless Assassin 120 SE",   watt: 6,  headroom: 1.00 },
+  { name: "Corsair H100i RGB 240mm AIO",  watt: 10, headroom: 1.06 },
+  { name: "NZXT Kraken 360mm AIO liquid cooler",  watt: 14, headroom: 1.10 },
+  { name: "Custom loop (EKWB / Corsair)",              watt: 20, headroom: 1.14 },
 ];
 
 const BASE_SYSTEM_DRAW = 45; // motherboard, fans, RGB, USB peripherals
@@ -387,14 +387,14 @@ fillSelect(document.getElementById("ram"), RAM_OPTS, 4);
 fillSelect(document.getElementById("storage"), STORAGE_OPTS, 1);
 fillSelect(document.getElementById("cooling"), COOLING_OPTS, 1);
 
-/* ---------------- PSU catalog for recommendations ---------------- */
+/* ---------------- PSU catalog with updated affiliate tag ---------------- */
 const PSU_CATALOG = [
-  { watt: 550, name: "Corsair RM550x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm550x&tag=YOURTAG-20" },
-  { watt: 650, name: "Corsair RM650x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm650x&tag=YOURTAG-20" },
-  { watt: 750, name: "be quiet! Straight Power 750", eff: "80+ Platinum, fully modular", href: "https://www.amazon.com/s?k=be+quiet+straight+power+750&tag=YOURTAG-20" },
-  { watt: 850, name: "Corsair RM850x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm850x&tag=YOURTAG-20" },
-  { watt: 1000, name: "Seasonic Focus GX-1000", eff: "80+ Gold, fully modular", href: "https://www.amazon.com/s?k=seasonic+focus+gx+1000&tag=YOURTAG-20" },
-  { watt: 1200, name: "Corsair HX1200",       eff: "80+ Platinum, fully modular", href: "https://www.amazon.com/s?k=corsair+hx1200&tag=YOURTAG-20" },
+  { watt: 550, name: "Corsair RM550x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm550x&tag=pcpower20-20" },
+  { watt: 650, name: "Corsair RM650x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm650x&tag=pcpower20-20" },
+  { watt: 750, name: "be quiet! Straight Power 750", eff: "80+ Platinum, fully modular", href: "https://www.amazon.com/s?k=be+quiet+straight+power+750&tag=pcpower20-20" },
+  { watt: 850, name: "Corsair RM850x",        eff: "80+ Gold, fully modular",   href: "https://www.amazon.com/s?k=corsair+rm850x&tag=pcpower20-20" },
+  { watt: 1000, name: "Seasonic Focus GX-1000", eff: "80+ Gold, fully modular", href: "https://www.amazon.com/s?k=seasonic+focus+gx+1000&tag=pcpower20-20" },
+  { watt: 1200, name: "Corsair HX1200",       eff: "80+ Platinum, fully modular", href: "https://www.amazon.com/s?k=corsair+hx1200&tag=pcpower20-20" },
 ];
 
 function roundToPsuStep(w){
