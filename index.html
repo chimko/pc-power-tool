@@ -43,7 +43,6 @@
     content: ''; position: absolute; inset: 3px;
     border: 1px dashed var(--accent); border-radius: 3px; opacity: 0.6;
   }
-  .mini-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #1A2230; color: #59E6C8; border: 1px solid #2C6E62; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -80,6 +79,7 @@
       <div class="relative">
         <div class="flex justify-between items-center mb-1">
           <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Processor (CPU)</label>
+          <div id="cpuAffiliate" class="text-[11px]"></div>
         </div>
         <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Search 9800X3D, Core Ultra, 4790K...">
         <div id="cpuDropdown" class="dropdown-results hidden"></div>
@@ -90,6 +90,7 @@
       <div class="relative">
         <div class="flex justify-between items-center mb-1">
           <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Motherboard & Chipset</label>
+          <div id="mbAffiliate" class="text-[11px]"></div>
         </div>
         <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Search Z890, X870, B550, Z97...">
         <div id="mbDropdown" class="dropdown-results hidden"></div>
@@ -100,6 +101,7 @@
       <div class="relative">
         <div class="flex justify-between items-center mb-1">
           <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Graphics Card (GPU)</label>
+          <div id="gpuAffiliate" class="text-[11px]"></div>
         </div>
         <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Search RTX 5090, RX 7900 XTX, GTX 970...">
         <div id="gpuDropdown" class="dropdown-results hidden"></div>
@@ -109,14 +111,20 @@
       <div class="grid grid-cols-2 gap-3">
         <!-- RAM -->
         <div class="relative">
-          <label class="text-xs mb-1 block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Memory</label>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Memory</label>
+            <div id="ramAffiliate" class="text-[10px]"></div>
+          </div>
           <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="DDR5, DDR4...">
           <div id="ramDropdown" class="dropdown-results hidden"></div>
           <div id="ramInsight" class="text-[10px] text-teal-400 mt-1 italic hidden"></div>
         </div>
         <!-- Cooling -->
         <div class="relative">
-          <label class="text-xs mb-1 block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Cooling</label>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Cooling</label>
+            <div id="coolingAffiliate" class="text-[10px]"></div>
+          </div>
           <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="360mm AIO...">
           <div id="coolingDropdown" class="dropdown-results hidden"></div>
           <div id="coolingInsight" class="text-[10px] text-teal-400 mt-1 italic hidden"></div>
@@ -125,18 +133,13 @@
 
       <!-- Storage -->
       <div class="relative">
-        <label class="text-xs mb-1 block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Storage Drive</label>
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Storage Drive</label>
+          <div id="storageAffiliate" class="text-[11px]"></div>
+        </div>
         <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="PCIe 5.0 NVMe, HDD...">
         <div id="storageDropdown" class="dropdown-results hidden"></div>
         <div id="storageInsight" class="text-[11px] text-teal-400 mt-1 italic hidden"></div>
-      </div>
-
-      <!-- SELECTED BUILD INVENTORY PANEL -->
-      <div class="pt-3 border-t border-[#212438]">
-        <h3 class="text-xs font-semibold mb-2 text-gray-300">Selected Build Inventory</h3>
-        <div id="inventorySummary" class="flex flex-wrap gap-1.5">
-          <span class="text-[11px] text-gray-500 italic">No items selected yet. Choose hardware above.</span>
-        </div>
       </div>
     </div>
   </section>
@@ -183,7 +186,7 @@
         <p class="text-xs mb-4 text-gray-400">Estimated average FPS at High/Ultra settings based on GPU & CPU tier synergy.</p>
         
         <div id="fpsContainer" class="space-y-3">
-          <div class="text-sm text-gray-500">Awaiting CPU & GPU...</div>
+          <div class="text-sm text-gray-500">Awaiting CPU & GPU selection...</div>
         </div>
       </div>
       <div class="mt-6 text-[11px] text-gray-500 border-t border-[#212438] pt-3">
@@ -193,8 +196,30 @@
   </section>
 </main>
 
-<!-- RICH CONTENT / FAQ SECTION -->
+<!-- COMMUNITY REVIEWS -->
 <section class="max-w-7xl mx-auto px-6 pb-12">
+  <div class="card p-8">
+    <h2 class="text-xl font-bold mb-6 border-b border-[#212438] pb-4">Community Field Reports</h2>
+    
+    <form id="reviewForm" class="mb-8 bg-[#10151D] p-5 rounded-xl border border-[#212438]">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+        <input type="text" id="revName" placeholder="Display Name" class="search-input rounded-lg px-3 py-2 text-sm" required>
+        <select id="revRating" class="search-input rounded-lg px-3 py-2 text-sm" required>
+          <option value="★★★★★">5 Stars - Extremely Accurate</option>
+          <option value="★★★★☆">4 Stars - Very Good</option>
+          <option value="★★★☆☆">3 Stars - Average</option>
+        </select>
+      </div>
+      <textarea id="revText" placeholder="Did the calculator match your actual wall draw?" class="search-input rounded-lg px-3 py-2 w-full mb-3" rows="2" required></textarea>
+      <button type="submit" class="bg-teal-500 text-black font-bold py-2 px-5 rounded-lg hover:bg-teal-400 text-sm">Post Report</button>
+    </form>
+
+    <div id="reviewsFeed" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+</section>
+
+<!-- RICH CONTENT / FAQ SECTION (MOVED TO BOTTOM) -->
+<section class="max-w-7xl mx-auto px-6 pb-16">
   <div class="card p-8">
     <h2 class="text-xl font-bold mb-4 border-b border-[#212438] pb-4 text-teal-400">PC Power Supply & FPS Calculation Guide</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-gray-300 leading-relaxed">
@@ -213,28 +238,6 @@
         <p class="text-gray-400">Our component database is audited and updated bi-monthly to include newly released desktop components, mobile chipsets, and modern power supply revisions.</p>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- COMMUNITY REVIEWS -->
-<section class="max-w-7xl mx-auto px-6 pb-16">
-  <div class="card p-8">
-    <h2 class="text-xl font-bold mb-6 border-b border-[#212438] pb-4">Community Field Reports</h2>
-    
-    <form id="reviewForm" class="mb-8 bg-[#10151D] p-5 rounded-xl border border-[#212438]">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
-        <input type="text" id="revName" placeholder="Display Name" class="search-input rounded-lg px-3 py-2 text-sm" required>
-        <select id="revRating" class="search-input rounded-lg px-3 py-2 text-sm" required>
-          <option value="★★★★★">5 Stars - Extremely Accurate</option>
-          <option value="★★★★☆">4 Stars - Very Good</option>
-          <option value="★★★☆☆">3 Stars - Average</option>
-        </select>
-      </div>
-      <textarea id="revText" placeholder="Did the calculator match your actual wall draw?" class="search-input rounded-lg px-3 py-2 w-full mb-3" rows="2" required></textarea>
-      <button type="submit" class="bg-teal-500 text-black font-bold py-2 px-5 rounded-lg hover:bg-teal-400 text-sm">Post Report</button>
-    </form>
-
-    <div id="reviewsFeed" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
   </div>
 </section>
 
@@ -479,29 +482,6 @@ const PSU_CATALOG = [
 
 let state = { cpu: null, mb: null, gpu: null, ram: null, cooling: null, storage: null };
 
-function updateInventoryDisplay() {
-  const container = document.getElementById('inventorySummary');
-  const items = [
-    { label: 'CPU', val: state.cpu?.name },
-    { label: 'MB', val: state.mb?.name },
-    { label: 'GPU', val: state.gpu?.name },
-    { label: 'RAM', val: state.ram?.name },
-    { label: 'Cooler', val: state.cooling?.name },
-    { label: 'Storage', val: state.storage?.name }
-  ].filter(i => i.val);
-
-  if (items.length === 0) {
-    container.innerHTML = `<span class="text-[11px] text-gray-500 italic">No items selected yet. Choose hardware above.</span>`;
-    return;
-  }
-
-  container.innerHTML = items.map(i => `
-    <span class="mini-badge" title="${i.val}">
-      <span class="text-gray-400 font-semibold">${i.label}:</span> ${i.val.length > 22 ? i.val.substring(0, 20) + '...' : i.val}
-    </span>
-  `).join('');
-}
-
 function renderFPS() {
   const container = document.getElementById('fpsContainer');
   if (!state.cpu || !state.gpu) {
@@ -574,13 +554,13 @@ function calculate() {
   }
   
   renderFPS();
-  updateInventoryDisplay();
 }
 
 function setupDropdown(id, data, key) {
   const input = document.getElementById(id);
   const dropdown = document.getElementById(id.replace('Search', 'Dropdown'));
   const insight = document.getElementById(id.replace('Search', 'Insight'));
+  const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
   
   input.addEventListener('input', (e) => {
     const val = e.target.value.toLowerCase();
@@ -590,7 +570,6 @@ function setupDropdown(id, data, key) {
   });
 
   input.addEventListener('focus', () => { 
-    // Toggle dropdown closed if user clicks active input, otherwise open it
     if (!dropdown.classList.contains('hidden') && input.value === (state[key]?.name || '')) {
       dropdown.classList.add('hidden');
     } else {
@@ -604,13 +583,17 @@ function setupDropdown(id, data, key) {
     input.value = state[key].name;
     dropdown.classList.add('hidden');
     
-    // Display captivating insight description
+    // Display individual insight
     if (state[key].desc) {
       insight.innerText = state[key].desc;
       insight.classList.remove('hidden');
     } else {
       insight.classList.add('hidden');
     }
+
+    // Display individual direct Amazon affiliate link next to component header
+    const searchQueryParam = encodeURIComponent(state[key].name);
+    affiliateBox.innerHTML = `<a href="https://www.amazon.com/s?k=${searchQueryParam}&tag=pcpower20-20" target="_blank" class="text-teal-400 hover:underline font-medium">Buy on Amazon →</a>`;
 
     calculate();
   });
