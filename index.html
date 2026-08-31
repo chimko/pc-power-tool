@@ -22,7 +22,7 @@
     background-size: 40px 40px;
     mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
   }
-  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; cursor: pointer; padding-right: 36px; }
+  .search-input { background-color: var(--bg-raised); border: 1px solid var(--line); color: var(--text-1); width: 100%; transition: all 0.2s; cursor: pointer; padding-right: 90px; }
   .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(89,230,200,0.14); cursor: text; }
   .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 14px; }
   .dropdown-results { background: var(--bg-raised); border: 1px solid var(--line); border-top: none; max-height: 240px; overflow-y: auto; position: absolute; width: 100%; border-radius: 0 0 8px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; }
@@ -58,11 +58,13 @@
     color: #FBBF24;
     text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
   }
-  .search-icon-btn {
-    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; color: var(--text-2); cursor: pointer; font-size: 14px; padding: 4px; z-index: 10;
+  .search-action-btn {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    background: #1A2230; border: 1px solid var(--accent-dim); color: var(--accent); 
+    cursor: pointer; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 6px; z-index: 10;
+    transition: all 0.2s;
   }
-  .search-icon-btn:hover { color: var(--accent); }
+  .search-action-btn:hover { background: var(--accent); color: #000; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -100,7 +102,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Processor (CPU)</label>
         <div class="relative">
           <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select CPU..." readonly data-default="Select CPU...">
-          <button type="button" class="search-icon-btn" title="Click to search" data-target="cpuSearch">🔍</button>
+          <button type="button" class="search-action-btn" title="Click to type and search" data-target="cpuSearch">🔍 Search</button>
           <div id="cpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="cpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -112,7 +114,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Motherboard & Chipset</label>
         <div class="relative">
           <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Motherboard..." readonly data-default="Select Motherboard...">
-          <button type="button" class="search-icon-btn" title="Click to search" data-target="mbSearch">🔍</button>
+          <button type="button" class="search-action-btn" title="Click to type and search" data-target="mbSearch">🔍 Search</button>
           <div id="mbDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="mbInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -124,7 +126,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Graphics Card (GPU)</label>
         <div class="relative">
           <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select GPU..." readonly data-default="Select GPU...">
-          <button type="button" class="search-icon-btn" title="Click to search" data-target="gpuSearch">🔍</button>
+          <button type="button" class="search-action-btn" title="Click to type and search" data-target="gpuSearch">🔍 Search</button>
           <div id="gpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="gpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -137,7 +139,7 @@
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Memory</label>
           <div class="relative">
             <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select RAM..." readonly data-default="Select RAM...">
-            <button type="button" class="search-icon-btn" title="Click to search" data-target="ramSearch">🔍</button>
+            <button type="button" class="search-action-btn" title="Click to type and search" data-target="ramSearch">🔍 Search</button>
             <div id="ramDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="ramInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -148,7 +150,7 @@
           <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Cooling</label>
           <div class="relative">
             <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Cooler..." readonly data-default="Select Cooler...">
-            <button type="button" class="search-icon-btn" title="Click to search" data-target="coolingSearch">🔍</button>
+            <button type="button" class="search-action-btn" title="Click to type and search" data-target="coolingSearch">🔍 Search</button>
             <div id="coolingDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="coolingInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -161,7 +163,7 @@
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Storage Drive</label>
         <div class="relative">
           <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Storage..." readonly data-default="Select Storage...">
-          <button type="button" class="search-icon-btn" title="Click to search" data-target="storageSearch">🔍</button>
+          <button type="button" class="search-action-btn" title="Click to type and search" data-target="storageSearch">🔍 Search</button>
           <div id="storageDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="storageInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -589,7 +591,7 @@ function setupDropdown(id, data, key) {
   const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
   const searchBtn = input.nextElementSibling;
   
-  // 1st click: Opens menu without opening keyboard. Changes placeholder to "Click to search..."
+  // 1st click: Opens menu without opening keyboard. Changes placeholder text to guide user.
   input.addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelectorAll('.dropdown-results').forEach(el => { if(el !== dropdown) el.classList.add('hidden'); });
@@ -603,15 +605,16 @@ function setupDropdown(id, data, key) {
     }
 
     input.setAttribute('readonly', 'true');
-    input.placeholder = "Click to search component...";
+    input.placeholder = "Select from list below...";
     dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
     dropdown.classList.toggle('hidden');
   });
 
-  // Clicking the magnifying glass icon unlocks keyboard and focuses input for searching
+  // Explicit '🔍 Search' button click unlocks the keyboard immediately
   searchBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     input.removeAttribute('readonly');
+    input.placeholder = "Type to search...";
     input.focus();
     dropdown.innerHTML = data.map(m => `<div class="dropdown-item" data-name="${m.name}">${m.name}</div>`).join('');
     dropdown.classList.remove('hidden');
