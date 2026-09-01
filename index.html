@@ -5,6 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator</title>
 <meta name="description" content="Accurate PC power supply calculator, ATX 3.1 transient spike analyzer, hardware bottleneck detector, and real-time gaming FPS calculator for modern custom rigs." />
+<link rel="canonical" href="https://www.example.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator" />
+<meta property="og:description" content="Accurate PC power supply calculator, ATX 3.1 transient spike analyzer, hardware bottleneck detector, and real-time gaming FPS calculator for modern custom rigs." />
+<meta property="og:url" content="https://www.example.com/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator" />
+<meta name="twitter:description" content="Accurate PC power supply calculator, ATX 3.1 transient spike analyzer, hardware bottleneck detector, and real-time gaming FPS calculator for modern custom rigs." />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://www.example.com/#webapp",
+      "name": "Wattbench Ultra — PC Power Supply, Bottleneck & FPS Estimator",
+      "url": "https://www.example.com/",
+      "description": "A free browser-based calculator that estimates recommended PSU wattage, peak system power draw, CPU/GPU bottleneck percentage, and gaming FPS tier based on your selected components.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (Web Browser)",
+      "browserRequirements": "Requires JavaScript",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.example.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does Wattbench calculate recommended PSU wattage?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We aggregate the peak boost power draw (PL2/MTP for Intel, PPT for AMD) of your processor, graphics card transients, motherboard rails, RAM kits, and cooling pumps, incorporating a safe headroom buffer with ATX 3.1 transient excursion standards."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do GPU transient spikes matter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Modern high-end graphics cards can draw double their rated power for microseconds during intensive gaming scenes. Our ATX 3.1 guard ensures your power supply unit can handle these rapid spikes without tripping system protections."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -29,7 +77,6 @@
   .dropdown-item { padding: 11px 14px; font-size: 13px; cursor: pointer; color: var(--text-2); border-bottom: 1px solid var(--line-soft); border-radius: 6px; }
   .dropdown-item:hover { background: var(--line); color: var(--text-1); }
   
-  /* Unique Glowing Border for Search Option to stand out from normal list items */
   .dropdown-search-trigger {
     padding: 12px 14px;
     font-size: 13px;
@@ -53,21 +100,6 @@
     background: linear-gradient(135deg, #182C38 0%, #1F3748 100%);
     box-shadow: 0 0 16px rgba(89, 230, 200, 0.4);
     transform: translateY(-1px);
-  }
-  
-  .isometric-chip {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--line-soft) 0%, var(--bg-raised) 100%);
-    border: 2px solid var(--accent-dim);
-    border-radius: 6px;
-    transform: rotateX(45deg) rotateZ(45deg);
-    box-shadow: -3px 3px 10px rgba(89,230,200,0.2), inset 0 0 6px rgba(0,0,0,0.5);
-    position: relative;
-    display: inline-block;
-  }
-  .isometric-chip::after {
-    content: ''; position: absolute; inset: 3px;
-    border: 1px dashed var(--accent); border-radius: 3px; opacity: 0.6;
   }
 
   .conversion-card {
@@ -95,7 +127,18 @@
   <div class="absolute inset-0 bg-grid pointer-events-none"></div>
   <div class="relative max-w-7xl mx-auto px-6 pt-10 pb-8">
     <div class="flex items-center gap-4 mb-4">
-      <div class="isometric-chip shrink-0"></div>
+      
+      <!-- PSYCHOLOGY-OPTIMIZED LOGO -->
+      <div class="relative shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#1A2230] to-[#10151D] border border-[var(--accent)]/50 shadow-[0_0_20px_rgba(89,230,200,0.2)] group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(89,230,200,0.4)]">
+        <svg class="absolute w-full h-full text-[var(--accent)]/30 animate-[spin_12s_linear_infinite]" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="6 6" />
+        </svg>
+        <div class="absolute inset-2 rounded-lg bg-gradient-to-t from-[var(--accent)]/10 to-transparent blur-[2px]"></div>
+        <svg class="relative w-6 h-6 text-[var(--accent)] drop-shadow-[0_0_8px_rgba(89,230,200,0.8)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+        </svg>
+      </div>
+
       <div>
         <div class="flex items-center gap-2 mb-2">
           <div class="w-2 h-2 rounded-full animate-pulse bg-teal-400"></div>
@@ -113,7 +156,10 @@
   <section class="lg:col-span-4 space-y-5">
     <div class="card p-5 space-y-4">
       <div class="flex justify-between items-center mb-2">
-        <h2 class="text-sm font-semibold flex items-center gap-2"><span class="isometric-chip" style="width:20px;height:20px;transform:none;"></span> Hardware Selection</h2>
+        <h2 class="text-sm font-semibold flex items-center gap-2">
+          <svg class="w-4 h-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Hardware Selection
+        </h2>
         <label class="flex items-center gap-2 text-[11px] cursor-pointer" title="Calculates peak boost (PL2/MTP) instead of base TDP">
           <input type="checkbox" id="transientToggle" checked class="accent-teal-500 rounded">
           <span style="color:var(--text-2)">ATX 3.1 Guard</span>
@@ -122,7 +168,10 @@
 
       <!-- CPU -->
       <div class="space-y-1.5">
-        <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Processor (CPU)</label>
+        <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)">
+          <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Processor (CPU)
+        </label>
         <div class="relative">
           <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select CPU..." readonly data-default="Select CPU...">
           <span class="select-arrow">▼</span>
@@ -134,7 +183,10 @@
       
       <!-- Motherboard -->
       <div class="space-y-1.5">
-        <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Motherboard & Chipset</label>
+        <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)">
+          <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Motherboard & Chipset
+        </label>
         <div class="relative">
           <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Motherboard..." readonly data-default="Select Motherboard...">
           <span class="select-arrow">▼</span>
@@ -146,7 +198,10 @@
 
       <!-- GPU -->
       <div class="space-y-1.5">
-        <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Graphics Card (GPU)</label>
+        <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)">
+          <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Graphics Card (GPU)
+        </label>
         <div class="relative">
           <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select GPU..." readonly data-default="Select GPU...">
           <span class="select-arrow">▼</span>
@@ -159,7 +214,10 @@
       <div class="grid grid-cols-2 gap-3">
         <!-- RAM -->
         <div class="space-y-1.5">
-          <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Memory</label>
+          <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)">
+            <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Memory
+          </label>
           <div class="relative">
             <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select RAM..." readonly data-default="Select RAM...">
             <span class="select-arrow">▼</span>
@@ -170,7 +228,10 @@
         </div>
         <!-- Cooling -->
         <div class="space-y-1.5">
-          <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)"><span class="isometric-chip" style="width:14px;height:14px;transform:none;"></span> Cooling</label>
+          <label class="text-xs block flex items-center gap-1" style="color:var(--text-2)">
+            <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Cooling
+          </label>
           <div class="relative">
             <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Cooler..." readonly data-default="Select Cooler...">
             <span class="select-arrow">▼</span>
@@ -183,7 +244,10 @@
 
       <!-- Storage -->
       <div class="space-y-1.5">
-        <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)"><span class="isometric-chip" style="width:16px;height:16px;transform:none;"></span> Storage Drive</label>
+        <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)">
+          <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Storage Drive
+        </label>
         <div class="relative">
           <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Storage..." readonly data-default="Select Storage...">
           <span class="select-arrow">▼</span>
@@ -279,7 +343,7 @@
         <p class="text-gray-400 mb-4">We aggregate the peak boost power draw (PL2/MTP for Intel, PPT for AMD) of your processor, graphics card transients, motherboard rails, RAM kits, and cooling pumps, incorporating a safe headroom buffer with ATX 3.1 transient excursion standards.</p>
         
         <h3 class="font-semibold text-sm text-white mb-1">Why do GPU transient spikes matter?</h3>
-        <p class="text-gray-400 mb-4">Modern high-end graphics cards can draw double their rated power for micro-seconds during intensive gaming scenes. Our ATX 3.1 guard ensures your power supply unit can handle these rapid spikes without tripping system protections.</p>
+        <p class="text-gray-400 mb-4">Modern high-end graphics cards can draw double their rated power for microseconds during intensive gaming scenes. Our ATX 3.1 guard ensures your power supply unit can handle these rapid spikes without tripping system protections.</p>
       </div>
       <div>
         <h3 class="font-semibold text-sm text-white mb-1">How accurate are the real-time gaming FPS projections?</h3>
@@ -290,7 +354,7 @@
       </div>
     </div>
   </div>
-</section>
+</main>
 
 <script>
 const CPUS = [
@@ -621,7 +685,6 @@ function setupDropdown(id, data, key) {
   const insight = document.getElementById(id.replace('Search', 'Insight'));
   const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
   
-  // 1st click: Opens the full selection list without opening the mobile keyboard
   input.addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelectorAll('.dropdown-results').forEach(el => { if(el !== dropdown) el.classList.add('hidden'); });
@@ -639,7 +702,6 @@ function setupDropdown(id, data, key) {
     dropdown.classList.toggle('hidden');
   });
 
-  // Handle clicks inside the dropdown menu (either selecting an item or clicking the distinct glowing search box)
   dropdown.addEventListener('click', (e) => {
     e.stopPropagation();
     
