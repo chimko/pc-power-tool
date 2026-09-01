@@ -6,7 +6,7 @@
 <title>Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator</title>
 <meta name="description" content="Accurate PC power supply calculator, ATX 3.1 transient spike analyzer, hardware bottleneck detector, and real-time gaming FPS calculator for modern custom rigs." />
 <link rel="canonical" href="https://www.example.com/" />
-<!-- Favicon to fix Google Search & Browser logo display -->
+<!-- Favicon for custom lightning logo display -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2359E6C8%22 stroke-width=%222.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M13 2L3 14h9l-1 8 10-12h-9l1-8z%22/></svg>">
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator" />
@@ -130,7 +130,7 @@
   <div class="relative max-w-7xl mx-auto px-6 pt-10 pb-8">
     <div class="flex items-center gap-4 mb-4">
       
-      <!-- PSYCHOLOGY-OPTIMIZED LOGO -->
+      <!-- LOGO -->
       <div class="relative shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#1A2230] to-[#10151D] border border-[var(--accent)]/50 shadow-[0_0_20px_rgba(89,230,200,0.2)] group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(89,230,200,0.4)]">
         <svg class="absolute w-full h-full text-[var(--accent)]/30 animate-[spin_12s_linear_infinite]" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="6 6" />
@@ -771,17 +771,17 @@ setupDropdown('ramSearch', RAM_OPTS, 'ram');
 setupDropdown('coolingSearch', COOLING_OPTS, 'cooling');
 setupDropdown('storageSearch', STORAGE_OPTS, 'storage');
 
-// Reviews Management with LocalStorage Persistence
+// Reviews Management (Starts empty, populates only with real user submissions)
 function loadReviews() {
   const feed = document.getElementById('reviewsFeed');
   const savedReviews = JSON.parse(localStorage.getItem('wattbench_reviews') || '[]');
   
-  const defaultReviews = savedReviews.length ? savedReviews : [
-    { name: "Alex K.", rating: "★★★★★", text: "Calculator predicted my RTX 4070 peak draw down to the watt. The ATX 3.1 guard is a lifesaver." },
-    { name: "Marcus R.", rating: "★★★★☆", text: "Very accurate bottleneck detector. Helped me balance my CPU and GPU upgrade perfectly." }
-  ];
+  if (savedReviews.length === 0) {
+    feed.innerHTML = `<div class="text-sm text-gray-500 italic col-span-2">No field reports yet. Be the first to share your experience above!</div>`;
+    return;
+  }
 
-  feed.innerHTML = defaultReviews.map(r => `
+  feed.innerHTML = savedReviews.map(r => `
     <div class="p-4 rounded-xl bg-[#10151D] border border-[#212438] flex flex-col justify-between">
       <div>
         <div class="font-bold text-white text-sm mb-1">${escapeHtml(r.name)}</div>
