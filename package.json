@@ -1,0 +1,23 @@
+{
+  "name": "pc-power-tool",
+  "version": "1.0.0",
+  "description": "Wattbench Ultra - PC Power Supply Calculator, Bottleneck & FPS Estimator",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chimko/pc-power-tool.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chimko/pc-power-tool/issues"
+  },
+  "homepage": "https://github.com/chimko/pc-power-tool#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
