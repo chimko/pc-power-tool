@@ -40,7 +40,7 @@
           "name": "How does Wattbench calculate recommended PSU wattage?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "We aggregate the peak boost power draw (PL2/MTP for Intel, PPT for AMD) of your processor, graphics card transients, motherboard rails, RAM kits, and cooling pumps, incorporating a safe headroom buffer with ATX 3.1 transient excursion standards."
+            "text": "We sum the real rated power draw of every component you select (CPU PL2/MTP or PPT, GPU TGP/TBP, motherboard, RAM, cooling, and storage), then size the recommended PSU so it runs at roughly 70% of its rated capacity under that peak load, matching standard PSU efficiency-curve guidance and cross-checked against published real-world PSU recommendations. Transient spike safety is handled separately: for GPUs over 250W we flag the ATX 3.0/3.1 and native 12V-2x6 connector requirements those cards actually need."
           }
         },
         {
@@ -48,7 +48,7 @@
           "name": "Why do GPU transient spikes matter?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Modern high-end graphics cards can draw double their rated power for microseconds during intensive gaming scenes. Our ATX 3.1 guard ensures your power supply unit can handle these rapid spikes without tripping system protections."
+            "text": "Modern high-end graphics cards can briefly draw far more than their rated power for fractions of a second. Under the ATX 3.0/3.1 and PCIe CEM 5.1 specifications, PSUs with a native 12VHPWR/12V-2x6 connector are engineered with the capacitance to absorb these excursions internally. That's a PSU design and connector question, not a reason to buy extra raw wattage."
           }
         }
       ]
@@ -64,6 +64,7 @@
     --line: #212438; --line-soft: #1A2230;
     --text-1: #E7ECF3; --text-2: #97A2B4; --text-3: #506880;
     --accent: #59E6C8; --accent-dim: #2C6E62;
+    --warn: #F59E0B; --danger: #FB7185;
   }
   * { box-sizing: border-box; }
   body { background: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -79,7 +80,7 @@
   .dropdown-results { background: var(--bg-raised); border: 1px solid var(--line); border-top: none; max-height: 255px; overflow-y: auto; position: absolute; width: 100%; border-radius: 0 0 8px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; padding: 6px; }
   .dropdown-item { padding: 11px 14px; font-size: 13px; cursor: pointer; color: var(--text-2); border-bottom: 1px solid var(--line-soft); border-radius: 6px; }
   .dropdown-item:hover { background: var(--line); color: var(--text-1); }
-  
+
   .dropdown-search-trigger {
     padding: 12px 14px;
     font-size: 13px;
@@ -123,6 +124,26 @@
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
     color: var(--text-3); pointer-events: none; font-size: 11px;
   }
+  .badge-compliant {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.03em; color: #59E6C8;
+    background: rgba(89,230,200,0.12); border: 1px solid rgba(89,230,200,0.35);
+    border-radius: 4px; padding: 2px 6px; white-space: nowrap;
+  }
+  .badge-noncompliant {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.03em; color: var(--text-3);
+    background: rgba(80,104,128,0.12); border: 1px solid rgba(80,104,128,0.3);
+    border-radius: 4px; padding: 2px 6px; white-space: nowrap;
+  }
+  .safety-panel {
+    background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.35);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .res-btn {
+    font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 6px;
+    border: 1px solid var(--line); color: var(--text-2); cursor: pointer; background: var(--bg-raised);
+    transition: all .15s;
+  }
+  .res-btn.active { color: #0A0E14; background: var(--accent); border-color: var(--accent); }
 </style>
 </head>
 <body class="min-h-screen">
@@ -130,7 +151,7 @@
   <div class="absolute inset-0 bg-grid pointer-events-none"></div>
   <div class="relative max-w-7xl mx-auto px-6 pt-10 pb-8">
     <div class="flex items-center gap-4 mb-4">
-      
+
       <!-- LOGO -->
       <div class="relative shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#1A2230] to-[#10151D] border border-[var(--accent)]/50 shadow-[0_0_20px_rgba(89,230,200,0.2)] group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(89,230,200,0.4)]">
         <svg class="absolute w-full h-full text-[var(--accent)]/30 animate-[spin_12s_linear_infinite]" viewBox="0 0 100 100">
@@ -163,7 +184,7 @@
           <svg class="w-4 h-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Hardware Selection
         </h2>
-        <label class="flex items-center gap-2 text-[11px] cursor-pointer" title="Calculates peak boost (PL2/MTP) instead of base TDP">
+        <label class="flex items-center gap-2 text-[11px] cursor-pointer" title="Prioritizes ATX 3.0/3.1-compliant PSUs with native 12V-2x6 connectors in the recommendations below, and surfaces the connector safety note for high-power GPUs">
           <input type="checkbox" id="transientToggle" checked class="accent-teal-500 rounded">
           <span style="color:var(--text-2)">ATX 3.1 Guard</span>
         </label>
@@ -183,7 +204,7 @@
         <div id="cpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
         <div id="cpuAffiliate"></div>
       </div>
-      
+
       <!-- Motherboard -->
       <div class="space-y-1.5">
         <label class="text-xs block flex items-center gap-1.5" style="color:var(--text-2)">
@@ -275,23 +296,30 @@
             </div>
           </div>
           <div>
-            <div class="text-xs font-medium mb-1" style="color:var(--text-2)">Peak Boost Draw</div>
+            <div class="text-xs font-medium mb-1" style="color:var(--text-2)">Est. System Draw</div>
             <div class="flex items-baseline gap-1">
               <span id="peakPower" class="mono text-4xl font-bold">0</span>
               <span class="mono text-sm" style="color:var(--text-3)">W</span>
             </div>
           </div>
         </div>
-        
+
         <h3 class="text-xs font-medium border-b pb-2 mb-3" style="border-color:var(--line)">Top PSU Matches (Amazon Affiliate)</h3>
         <div id="psuRecs" class="space-y-2">
           <div class="text-sm text-gray-500">Awaiting components...</div>
+        </div>
+
+        <div id="safetyPanel" class="safety-panel mt-4 hidden">
+          <div class="flex items-start gap-2">
+            <span class="mono text-sm" style="color:var(--warn)">⚠</span>
+            <p id="safetyText" class="text-[11px] leading-relaxed" style="color:#FCD9A8"></p>
+          </div>
         </div>
       </div>
 
       <div class="mt-4 pt-4 border-t" style="border-color:var(--line)">
         <p id="statusDetail" class="text-xs leading-relaxed" style="color:var(--text-3)">Select components to analyze ATX 3.1 excursion safety and bottleneck ratios.</p>
-        <p class="text-[10px] text-gray-500 mt-2">*Note: Calculations are estimates based on standard laboratory TDP profiles, ambient curves, and manufacturer peak power specifications. Results may vary depending on silicon quality and overclocking margins.</p>
+        <p class="text-[10px] text-gray-500 mt-2">*Note: Calculations sum each component's manufacturer-rated sustained power draw (CPU PL2/MTP or PPT, GPU TGP/TBP) plus a fixed overhead allowance, then target ~70% PSU load for headroom. Results are estimates — actual draw varies with silicon quality, ambient temperature, and overclocking.</p>
       </div>
     </div>
   </section>
@@ -300,15 +328,22 @@
   <section class="lg:col-span-4 space-y-5">
     <div class="card p-6 h-full bg-[#10151D] border-teal-900 flex flex-col justify-between">
       <div>
-        <h2 class="text-sm font-semibold mb-2 text-teal-400">1440p Gaming Projections</h2>
-        <p class="text-xs mb-4 text-gray-400">Estimated average FPS at High/Ultra settings based on GPU & CPU tier synergy.</p>
-        
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-teal-400">Gaming FPS Estimate</h2>
+          <div class="flex gap-1" id="resToggle">
+            <button type="button" class="res-btn" data-res="1080">1080p</button>
+            <button type="button" class="res-btn active" data-res="1440">1440p</button>
+            <button type="button" class="res-btn" data-res="4k">4K</button>
+          </div>
+        </div>
+        <p class="text-xs mb-4 text-gray-400">Modeled estimate based on GPU/CPU tier synergy, weighted per-title for how GPU-bound or CPU-bound each game typically is. High/Ultra settings, DLSS/FSR off. Treat as a ballpark, not a lab benchmark — actual results depend on drivers, game patches, and settings.</p>
+
         <div id="fpsContainer" class="space-y-3">
           <div class="text-sm text-gray-500">Awaiting CPU & GPU selection...</div>
         </div>
       </div>
       <div class="mt-6 text-[11px] text-gray-500 border-t border-[#212438] pt-3">
-        ⚡ Powered by Wattbench Live Metrics Engine. Updated bi-monthly for accuracy.
+        ⚡ Wattbench Estimation Engine — modeled, not scraped from live benchmarks. See methodology note below.
       </div>
     </div>
   </section>
@@ -317,8 +352,9 @@
 <!-- COMMUNITY REVIEWS -->
 <section class="max-w-7xl mx-auto px-6 pb-12">
   <div class="card p-8">
-    <h2 class="text-xl font-bold mb-6 border-b border-[#212438] pb-4">Community Field Reports</h2>
-    
+    <h2 class="text-xl font-bold mb-2 border-b border-[#212438] pb-4">Your Field Notes</h2>
+    <p class="text-xs text-gray-500 mb-6 -mt-2">Saved privately in this browser only — not shared with other visitors. Use it to log your own build accuracy checks over time.</p>
+
     <form id="reviewForm" class="mb-8 bg-[#10151D] p-5 rounded-xl border border-[#212438]">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
         <input type="text" id="revName" placeholder="Your Name" class="search-input rounded-lg px-3 py-2 text-sm !cursor-text" style="padding-right:12px;" required>
@@ -326,10 +362,12 @@
           <option value="★★★★★">5 Stars - Extremely Accurate</option>
           <option value="★★★★☆">4 Stars - Very Good</option>
           <option value="★★★☆☆">3 Stars - Average</option>
+          <option value="★★☆☆☆">2 Stars - Needs Work</option>
+          <option value="★☆☆☆☆">1 Star - Inaccurate</option>
         </select>
       </div>
-      <textarea id="revText" placeholder="Your thoughts / feedback on wall draw accuracy..." class="search-input rounded-lg px-3 py-2 w-full mb-3 !cursor-text" style="padding-right:12px;" rows="2" required></textarea>
-      <button type="submit" class="bg-teal-500 text-black font-bold py-2 px-5 rounded-lg hover:bg-teal-400 text-sm cursor-pointer">Post Report</button>
+      <textarea id="revText" placeholder="Your thoughts / feedback on wattage accuracy..." class="search-input rounded-lg px-3 py-2 w-full mb-3 !cursor-text" style="padding-right:12px;" rows="2" required></textarea>
+      <button type="submit" class="bg-teal-500 text-black font-bold py-2 px-5 rounded-lg hover:bg-teal-400 text-sm cursor-pointer">Save Note</button>
     </form>
 
     <div id="reviewsFeed" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -343,17 +381,17 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-gray-300 leading-relaxed">
       <div>
         <h3 class="font-semibold text-sm text-white mb-1">How does Wattbench calculate recommended PSU wattage?</h3>
-        <p class="text-gray-400 mb-4">We aggregate the peak boost power draw (PL2/MTP for Intel, PPT for AMD) of your processor, graphics card transients, motherboard rails, RAM kits, and cooling pumps, incorporating a safe headroom buffer with ATX 3.1 transient excursion standards.</p>
-        
+        <p class="text-gray-400 mb-4">We sum the real rated power draw of every component you select — CPU PL2/MTP or PPT, GPU TGP/TBP, motherboard, RAM, cooling, and storage — plus a small fixed overhead for fans and peripherals. The recommended PSU size targets roughly 70% load at that peak, which lines up with standard PSU efficiency-curve guidance and matches published real-world PSU recommendations we cross-checked our numbers against.</p>
+
         <h3 class="font-semibold text-sm text-white mb-1">Why do GPU transient spikes matter?</h3>
-        <p class="text-gray-400 mb-4">Modern high-end graphics cards can draw double their rated power for microseconds during intensive gaming scenes. Our ATX 3.1 guard ensures your power supply unit can handle these rapid spikes without tripping system protections.</p>
+        <p class="text-gray-400 mb-4">Modern high-end graphics cards can briefly draw far more than their rated power for a fraction of a second. Under the ATX 3.0/3.1 and PCIe CEM 5.1 specs, PSUs with a native 12VHPWR/12V-2x6 connector are built with the capacitance to absorb these spikes internally. That means the fix is buying a compliant PSU and seating the cable properly — not simply buying a bigger number.</p>
       </div>
       <div>
-        <h3 class="font-semibold text-sm text-white mb-1">How accurate are the real-time gaming FPS projections?</h3>
-        <p class="text-gray-400 mb-4">Our matrix scales performance based on relative architectural tier matching between your selected CPU and GPU, benchmarking typical frame rates at 1440p High/Ultra settings across titles like Cyberpunk 2077, Warzone, and Valorant.</p>
+        <h3 class="font-semibold text-sm text-white mb-1">How accurate are the gaming FPS estimates?</h3>
+        <p class="text-gray-400 mb-4">Each title is modeled with its own GPU-bound/CPU-bound weighting (for example Valorant leans CPU-bound, Cyberpunk 2077 at Ultra leans GPU-bound) and calibrated against published benchmark reference points. This is a calibrated estimate for ballpark planning, not a live per-title benchmark database — treat exact numbers as directional.</p>
 
         <h3 class="font-semibold text-sm text-white mb-1">How often is hardware data updated?</h3>
-        <p class="text-gray-400">Our component database is audited and updated bi-monthly to include newly released desktop components, mobile chipsets, and modern power supply revisions.</p>
+        <p class="text-gray-400">Our component database targets a bi-monthly refresh as new desktop parts and PSU revisions launch. CPU power figures for 6th-9th gen Intel parts use a documented estimation formula rather than a single disputed spec number — see the on-page methodology note.</p>
       </div>
     </div>
   </div>
@@ -361,171 +399,165 @@
 
 <script>
 const CPUS = [
-  { name: "Intel Core i3-3220", tier: 1.4, boost_w: 55, desc: "Entry dual-core chip for basic office tasks and retro gaming." },
-  { name: "Intel Core i5-3570K", tier: 2.5, boost_w: 77, desc: "Legendary quad-core processor ideal for budget legacy builds." },
-  { name: "Intel Core i7-3770K", tier: 3.0, boost_w: 77, desc: "Classic hyperthreaded quad-core powerhouse." },
-  { name: "Intel Core i3-4130", tier: 1.5, boost_w: 54, desc: "Reliable Haswell entry processor." },
-  { name: "Intel Core i5-4460", tier: 2.6, boost_w: 84, desc: "Dependable mid-range quad core for 1080p esports." },
-  { name: "Intel Core i5-4690K", tier: 2.8, boost_w: 88, desc: "Great overclocking headroom for classic gaming rigs." },
-  { name: "Intel Core i7-4790K", tier: 3.2, boost_w: 88, desc: "The iconic Devil's Canyon CPU that lasted for years." },
-  { name: "Intel Core i5-5675C", tier: 2.7, boost_w: 65, desc: "Broadwell chip featuring embedded eDRAM cache." },
-  { name: "Intel Core i7-5775C", tier: 3.3, boost_w: 65, desc: "Niche enthusiast chip with massive L4 cache benefits." },
-  { name: "Intel Core i3-6100", tier: 1.7, boost_w: 51, desc: "Skylake dual-core standard." },
-  { name: "Intel Core i5-6600K", tier: 3.0, boost_w: 91, desc: "Solid quad-core performer for mid-tier GPUs." },
-  { name: "Intel Core i7-6700K", tier: 3.5, boost_w: 91, desc: "Reliable workstation and gaming quad-core." },
-  { name: "Intel Core i3-7100", tier: 1.8, boost_w: 51, desc: "Kaby Lake budget processor." },
-  { name: "Intel Core i5-7600K", tier: 3.1, boost_w: 91, desc: "Standard quad core with solid clock speeds." },
-  { name: "Intel Core i7-7700K", tier: 3.6, boost_w: 91, desc: "High clock speed quad core for high-refresh 1080p." },
-  { name: "Intel Core i3-8100", tier: 2.2, boost_w: 65, desc: "First 4-core i3 standard generation." },
-  { name: "Intel Core i5-8400", tier: 3.2, boost_w: 65, desc: "Popular 6-core processor shifting mainstream gaming." },
-  { name: "Intel Core i5-8600K", tier: 3.5, boost_w: 95, desc: "Highly overclockable 6-core gaming chip." },
-  { name: "Intel Core i7-8700K", tier: 4.2, boost_w: 95, desc: "Elite 6-core/12-thread powerhouse." },
-  { name: "Intel Core i3-9100F", tier: 2.3, boost_w: 65, desc: "Budget quad core without integrated graphics." },
-  { name: "Intel Core i5-9400F", tier: 3.3, boost_w: 65, desc: "Affordable 6-core CPU for budget setups." },
-  { name: "Intel Core i5-9600K", tier: 3.7, boost_w: 95, desc: "Strong single-core speeds for stable framerates." },
-  { name: "Intel Core i7-9700K", tier: 4.4, boost_w: 95, desc: "8-core pure performance CPU without hyperthreading." },
-  { name: "Intel Core i9-9900K", tier: 4.8, boost_w: 95, desc: "Flagship 8-core gaming icon." },
-  { name: "Intel Core i3-10100F", tier: 2.5, boost_w: 65, desc: "Exceptional value quad-core with hyperthreading." },
-  { name: "Intel Core i5-10400F", tier: 3.5, boost_w: 65, desc: "Incredible budget 6-core gaming favorite." },
-  { name: "Intel Core i5-10600K", tier: 4.0, boost_w: 125, desc: "High power draw mid-ranger with great multi-core output." },
-  { name: "Intel Core i7-10700K", tier: 4.8, boost_w: 229, desc: "Demanding 8-core CPU requiring robust cooling and PSU headroom." },
-  { name: "Intel Core i9-10900K", tier: 5.2, boost_w: 250, desc: "The classic 10-core furnace with massive power spikes." },
-  { name: "Intel Core i3-11100F", tier: 2.6, boost_w: 65, desc: "Rocket Lake entry quad core." },
-  { name: "Intel Core i5-11400F", tier: 3.7, boost_w: 117, desc: "Tremendous price-to-performance 6-core processor." },
-  { name: "Intel Core i5-11600K", tier: 4.2, boost_w: 224, desc: "High energy consumption chip with strong IPC gains." },
-  { name: "Intel Core i7-11700K", tier: 4.9, boost_w: 251, desc: "Demands high wattage and high-end cooling solutions." },
-  { name: "Intel Core i9-11900K", tier: 5.1, boost_w: 251, desc: "Power-hungry flagship with high boost thresholds." },
-  { name: "Intel Core i3-12100F", tier: 2.9, boost_w: 89, desc: "Best-in-class budget entry chip for modern gaming." },
-  { name: "Intel Core i5-12400F", tier: 4.0, boost_w: 117, desc: "Incredible Alder Lake efficiency and gaming value." },
-  { name: "Intel Core i5-12600K", tier: 5.4, boost_w: 150, desc: "Hybrid core architecture balancing performance and power." },
-  { name: "Intel Core i7-12700K", tier: 6.8, boost_w: 190, desc: "Powerful multi-threaded processor for gaming and streaming." },
-  { name: "Intel Core i9-12900K", tier: 7.6, boost_w: 241, desc: "High-draw flagship hybrid architecture processor." },
-  { name: "Intel Core i3-13100F", tier: 2.5, boost_w: 89, desc: "Reliable entry quad-core for light esports titles." },
-  { name: "Intel Core i5-13400F", tier: 5.0, boost_w: 148, desc: "Balanced mid-tier CPU with efficiency cores." },
-  { name: "Intel Core i5-13600K", tier: 6.5, boost_w: 181, desc: "Exceptional mid-range gaming king with high boost draws." },
-  { name: "Intel Core i7-13700K", tier: 8.0, boost_w: 253, desc: "High-end powerhouse that demands robust thermal management." },
-  { name: "Intel Core i9-13900K", tier: 9.2, boost_w: 253, desc: "Extreme enthusiast processor prone to high thermal output." },
-  { name: "Intel Core i3-14100F", tier: 2.6, boost_w: 110, desc: "Refreshed entry tier quad core." },
-  { name: "Intel Core i5-14400F", tier: 5.1, boost_w: 148, desc: "Reliable mid-tier option for standard rigs." },
-  { name: "Intel Core i5-14600K", tier: 6.7, boost_w: 181, desc: "Fantastic gaming frame rates with high thermal ceilings." },
-  { name: "Intel Core i7-14700K", tier: 8.4, boost_w: 253, desc: "Extra cores and high power draw requiring heavy cooling." },
-  { name: "Intel Core i9-14900K", tier: 9.5, boost_w: 253, desc: "Maximum clock speeds with demanding power requirements." },
-  { name: "Intel Core Ultra 5 225F", tier: 5.2, boost_w: 154, desc: "Next-gen architecture balancing efficiency and power." },
-  { name: "Intel Core Ultra 5 245K", tier: 6.9, boost_w: 159, desc: "Modern Arrow Lake mid-range chip with great thermal control." },
-  { name: "Intel Core Ultra 7 265K", tier: 8.3, boost_w: 250, desc: "Advanced multi-core productivity and gaming CPU." },
-  { name: "Intel Core Ultra 9 285K", tier: 9.3, boost_w: 250, desc: "Flagship efficiency-focused flagship desktop processor." },
-  { name: "Intel Core Ultra 5 250K Plus", tier: 7.1, boost_w: 159, desc: "Optimized performance tier for high-fps gaming." },
-  { name: "Intel Core Ultra 7 270K Plus", tier: 8.6, boost_w: 250, desc: "High-end enthusiast processor with balanced power draws." },
-  { name: "Intel Core Ultra 5 125U (Mobile)", tier: 3.8, boost_w: 57, desc: "Ultra-low power laptop processor optimized for battery life." },
-  { name: "Intel Core Ultra 7 155H (Mobile)", tier: 6.0, boost_w: 115, desc: "Balanced laptop processor with strong integrated graphics." },
-  { name: "Intel Core Ultra 9 275HX (Mobile)", tier: 8.5, boost_w: 160, desc: "High-performance mobile powerhouse for gaming laptops." },
-  
-  // AMD Ryzen
-  { name: "AMD Ryzen 3 1200", tier: 1.6, boost_w: 65, desc: "Legacy quad-core entry chip." },
-  { name: "AMD Ryzen 5 1600", tier: 2.9, boost_w: 65, desc: "The legendary AM4 budget savior chip." },
-  { name: "AMD Ryzen 7 1700X", tier: 3.6, boost_w: 95, desc: "Early multi-core workstation processor." },
-  { name: "AMD Ryzen 5 2600", tier: 3.1, boost_w: 65, desc: "Reliable budget 6-core CPU." },
-  { name: "AMD Ryzen 7 2700X", tier: 4.1, boost_w: 105, desc: "Strong multi-threaded AM4 processor." },
-  { name: "AMD Ryzen 3 3100", tier: 2.8, boost_w: 65, desc: "Budget quad-core Zen 2 architecture." },
-  { name: "AMD Ryzen 5 3600", tier: 3.8, boost_w: 88, desc: "Iconic Zen 2 gaming processor offering stellar value." },
-  { name: "AMD Ryzen 7 3700X", tier: 4.7, boost_w: 88, desc: "Efficient 8-core processor with low power draw." },
-  { name: "AMD Ryzen 9 3900X", tier: 5.6, boost_w: 142, desc: "12-core productivity and gaming monster." },
-  { name: "AMD Ryzen 5 5500", tier: 3.5, boost_w: 88, desc: "Affordable Zen 3 chip for budget gaming builds." },
-  { name: "AMD Ryzen 5 5600", tier: 3.8, boost_w: 88, desc: "The ultimate modern budget gaming processor." },
-  { name: "AMD Ryzen 5 5600X", tier: 4.1, boost_w: 88, desc: "Extremely power-efficient 6-core gaming champion." },
-  { name: "AMD Ryzen 7 5700X", tier: 5.0, boost_w: 88, desc: "Cool-running 8-core processor with great efficiency." },
-  { name: "AMD Ryzen 7 5800X", tier: 5.4, boost_w: 142, desc: "High-performance single-CCD gaming CPU." },
-  { name: "AMD Ryzen 7 5800X3D", tier: 6.8, boost_w: 142, desc: "Legendary gaming CPU with massive 3D V-Cache." },
-  { name: "AMD Ryzen 9 5900X", tier: 6.6, boost_w: 142, desc: "Top-tier 12-core AM4 powerhouse." },
-  { name: "AMD Ryzen 9 5950X", tier: 7.2, boost_w: 142, desc: "Ultimate 16-core AM4 content creation chip." },
-  { name: "AMD Ryzen 5 5600G (APU)", tier: 3.4, boost_w: 65, desc: "Features robust integrated Radeon graphics." },
-  { name: "AMD Ryzen 7 5700G (APU)", tier: 4.3, boost_w: 65, desc: "Great APU option for budget graphics-free builds." },
-  { name: "AMD Ryzen 5 7600", tier: 5.6, boost_w: 88, desc: "Incredible entry AM5 processor with high upgrade potential." },
-  { name: "AMD Ryzen 5 7600X", tier: 6.0, boost_w: 142, desc: "Fast AM5 gaming chip with great single-core speeds." },
-  { name: "AMD Ryzen 7 7700X", tier: 7.3, boost_w: 142, desc: "High-speed 8-core processor for AM5 platforms." },
-  { name: "AMD Ryzen 7 7800X3D", tier: 8.2, boost_w: 162, desc: "The undisputed king of high-fps gaming efficiency." },
-  { name: "AMD Ryzen 9 7900X", tier: 8.6, boost_w: 230, desc: "High-draw 12-core processor requiring quality cooling." },
-  { name: "AMD Ryzen 9 7950X", tier: 9.6, boost_w: 230, desc: "Maximum multi-core workstation and gaming performance." },
-  { name: "AMD Ryzen 9 7950X3D", tier: 9.7, boost_w: 162, desc: "Ultimate flagship combining 3D V-Cache and 16 cores." },
-  { name: "AMD Ryzen 5 8500G (APU)", tier: 4.6, boost_w: 65, desc: "Modern AM5 APU with strong integrated graphics." },
-  { name: "AMD Ryzen 7 8700G (APU)", tier: 5.8, boost_w: 88, desc: "High-end APU for compact entry gaming systems." },
-  { name: "AMD Ryzen 5 9600X", tier: 6.5, boost_w: 88, desc: "Super efficient Zen 5 processor with low thermals." },
-  { name: "AMD Ryzen 7 9700X", tier: 7.6, boost_w: 88, desc: "Incredibly power-efficient 8-core Zen 5 gaming chip." },
-  { name: "AMD Ryzen 7 9800X3D", tier: 9.0, boost_w: 162, desc: "Next-gen 3D V-Cache champion delivering peerless frame rates." },
-  { name: "AMD Ryzen 9 9900X", tier: 9.1, boost_w: 162, desc: "Balanced 12-core powerhouse with controlled power draws." },
-  { name: "AMD Ryzen 9 9950X", tier: 9.9, boost_w: 230, desc: "Flagship Zen 5 workstation processor." },
-  { name: "AMD Ryzen 9 9950X3D", tier: 10.0, boost_w: 230, desc: "Absolute peak performance processor for extreme enthusiasts." },
-  { name: "AMD Ryzen 5 7535HS (Mobile)", tier: 4.4, boost_w: 54, desc: "Efficient mobile gaming laptop processor." },
-  { name: "AMD Ryzen 9 7940HX (Mobile)", tier: 7.9, boost_w: 75, desc: "High-end mobile processor for enthusiast gaming laptops." },
-  { name: "AMD Threadripper 3970X", tier: 9.9, boost_w: 280, desc: "Massive HEDT processor for professional rendering." },
-  { name: "AMD Threadripper 7980X", tier: 10.0, boost_w: 350, desc: "Extreme multi-threaded workstation titan." }
+  { "name": "Intel Core i3-3220", "tier": 1.4, "boost_w": 63, "desc": "Entry dual-core chip for basic office tasks and retro gaming." },
+  { "name": "Intel Core i5-3570K", "tier": 2.5, "boost_w": 108, "desc": "Legendary quad-core processor ideal for budget legacy builds." },
+  { "name": "Intel Core i7-3770K", "tier": 3.0, "boost_w": 108, "desc": "Classic hyperthreaded quad-core powerhouse." },
+  { "name": "Intel Core i3-4130", "tier": 1.5, "boost_w": 62, "desc": "Reliable Haswell entry processor." },
+  { "name": "Intel Core i5-4460", "tier": 2.6, "boost_w": 97, "desc": "Dependable mid-range quad core for 1080p esports." },
+  { "name": "Intel Core i5-4690K", "tier": 2.8, "boost_w": 123, "desc": "Great overclocking headroom for classic gaming rigs." },
+  { "name": "Intel Core i7-4790K", "tier": 3.2, "boost_w": 123, "desc": "The iconic Devil's Canyon CPU that lasted for years." },
+  { "name": "Intel Core i5-5675C", "tier": 2.7, "boost_w": 91, "desc": "Broadwell chip featuring embedded eDRAM cache." },
+  { "name": "Intel Core i7-5775C", "tier": 3.3, "boost_w": 91, "desc": "Niche enthusiast chip with massive L4 cache benefits." },
+  { "name": "Intel Core i3-6100", "tier": 1.7, "boost_w": 59, "desc": "Skylake dual-core standard." },
+  { "name": "Intel Core i5-6600K", "tier": 3.0, "boost_w": 127, "desc": "Solid quad-core performer for mid-tier GPUs." },
+  { "name": "Intel Core i7-6700K", "tier": 3.5, "boost_w": 127, "desc": "Reliable workstation and gaming quad-core." },
+  { "name": "Intel Core i3-7100", "tier": 1.8, "boost_w": 59, "desc": "Kaby Lake budget processor." },
+  { "name": "Intel Core i5-7600K", "tier": 3.1, "boost_w": 127, "desc": "Standard quad core with solid clock speeds." },
+  { "name": "Intel Core i7-7700K", "tier": 3.6, "boost_w": 127, "desc": "High clock speed quad core for high-refresh 1080p." },
+  { "name": "Intel Core i3-8100", "tier": 2.2, "boost_w": 75, "desc": "First 4-core i3 standard generation." },
+  { "name": "Intel Core i5-8400", "tier": 3.2, "boost_w": 75, "desc": "Popular 6-core processor shifting mainstream gaming." },
+  { "name": "Intel Core i5-8600K", "tier": 3.5, "boost_w": 133, "desc": "Highly overclockable 6-core gaming chip." },
+  { "name": "Intel Core i7-8700K", "tier": 4.2, "boost_w": 133, "desc": "Elite 6-core/12-thread powerhouse." },
+  { "name": "Intel Core i3-9100F", "tier": 2.3, "boost_w": 75, "desc": "Budget quad core without integrated graphics." },
+  { "name": "Intel Core i5-9400F", "tier": 3.3, "boost_w": 75, "desc": "Affordable 6-core CPU for budget setups." },
+  { "name": "Intel Core i5-9600K", "tier": 3.7, "boost_w": 133, "desc": "Strong single-core speeds for stable framerates." },
+  { "name": "Intel Core i7-9700K", "tier": 4.4, "boost_w": 133, "desc": "8-core pure performance CPU without hyperthreading." },
+  { "name": "Intel Core i9-9900K", "tier": 4.8, "boost_w": 133, "desc": "Flagship 8-core gaming icon." },
+  { "name": "Intel Core i3-10100F", "tier": 2.5, "boost_w": 65, "desc": "Exceptional value quad-core with hyperthreading." },
+  { "name": "Intel Core i5-10400F", "tier": 3.5, "boost_w": 65, "desc": "Incredible budget 6-core gaming favorite." },
+  { "name": "Intel Core i5-10600K", "tier": 4.0, "boost_w": 125, "desc": "High power draw mid-ranger with great multi-core output." },
+  { "name": "Intel Core i7-10700K", "tier": 4.8, "boost_w": 229, "desc": "Demanding 8-core CPU requiring robust cooling and PSU headroom." },
+  { "name": "Intel Core i9-10900K", "tier": 5.2, "boost_w": 250, "desc": "The classic 10-core furnace with massive power spikes." },
+  { "name": "Intel Core i3-11100F", "tier": 2.6, "boost_w": 65, "desc": "Rocket Lake entry quad core." },
+  { "name": "Intel Core i5-11400F", "tier": 3.7, "boost_w": 117, "desc": "Tremendous price-to-performance 6-core processor." },
+  { "name": "Intel Core i5-11600K", "tier": 4.2, "boost_w": 224, "desc": "High energy consumption chip with strong IPC gains." },
+  { "name": "Intel Core i7-11700K", "tier": 4.9, "boost_w": 251, "desc": "Demands high wattage and high-end cooling solutions." },
+  { "name": "Intel Core i9-11900K", "tier": 5.1, "boost_w": 251, "desc": "Power-hungry flagship with high boost thresholds." },
+  { "name": "Intel Core i3-12100F", "tier": 2.9, "boost_w": 89, "desc": "Best-in-class budget entry chip for modern gaming." },
+  { "name": "Intel Core i5-12400F", "tier": 4.0, "boost_w": 117, "desc": "Incredible Alder Lake efficiency and gaming value." },
+  { "name": "Intel Core i5-12600K", "tier": 5.4, "boost_w": 150, "desc": "Hybrid core architecture balancing performance and power." },
+  { "name": "Intel Core i7-12700K", "tier": 6.8, "boost_w": 190, "desc": "Powerful multi-threaded processor for gaming and streaming." },
+  { "name": "Intel Core i9-12900K", "tier": 7.6, "boost_w": 241, "desc": "High-draw flagship hybrid architecture processor." },
+  { "name": "Intel Core i3-13100F", "tier": 2.5, "boost_w": 89, "desc": "Reliable entry quad-core for light esports titles." },
+  { "name": "Intel Core i5-13400F", "tier": 5.0, "boost_w": 148, "desc": "Balanced mid-tier CPU with efficiency cores." },
+  { "name": "Intel Core i5-13600K", "tier": 6.5, "boost_w": 181, "desc": "Exceptional mid-range gaming king with high boost draws." },
+  { "name": "Intel Core i7-13700K", "tier": 8.0, "boost_w": 253, "desc": "High-end powerhouse that demands robust thermal management." },
+  { "name": "Intel Core i9-13900K", "tier": 9.2, "boost_w": 253, "desc": "Extreme enthusiast processor prone to high thermal output." },
+  { "name": "Intel Core i3-14100F", "tier": 2.6, "boost_w": 110, "desc": "Refreshed entry tier quad core." },
+  { "name": "Intel Core i5-14400F", "tier": 5.1, "boost_w": 148, "desc": "Reliable mid-tier option for standard rigs." },
+  { "name": "Intel Core i5-14600K", "tier": 6.7, "boost_w": 181, "desc": "Fantastic gaming frame rates with high thermal ceilings." },
+  { "name": "Intel Core i7-14700K", "tier": 8.4, "boost_w": 253, "desc": "Extra cores and high power draw requiring heavy cooling." },
+  { "name": "Intel Core i9-14900K", "tier": 9.5, "boost_w": 253, "desc": "Maximum clock speeds with demanding power requirements." },
+  { "name": "Intel Core Ultra 5 225F", "tier": 5.2, "boost_w": 154, "desc": "Next-gen architecture balancing efficiency and power." },
+  { "name": "Intel Core Ultra 5 245K", "tier": 6.9, "boost_w": 159, "desc": "Modern Arrow Lake mid-range chip with great thermal control." },
+  { "name": "Intel Core Ultra 7 265K", "tier": 8.3, "boost_w": 250, "desc": "Advanced multi-core productivity and gaming CPU." },
+  { "name": "Intel Core Ultra 9 285K", "tier": 9.3, "boost_w": 250, "desc": "Flagship efficiency-focused flagship desktop processor." },
+  { "name": "Intel Core Ultra 5 125U (Mobile)", "tier": 3.8, "boost_w": 57, "desc": "Ultra-low power laptop processor optimized for battery life." },
+  { "name": "Intel Core Ultra 7 155H (Mobile)", "tier": 6.0, "boost_w": 115, "desc": "Balanced laptop processor with strong integrated graphics." },
+  { "name": "Intel Core Ultra 9 275HX (Mobile)", "tier": 8.5, "boost_w": 160, "desc": "High-performance mobile powerhouse for gaming laptops." },
+  { "name": "AMD Ryzen 3 1200", "tier": 1.6, "boost_w": 65, "desc": "Legacy quad-core entry chip." },
+  { "name": "AMD Ryzen 5 1600", "tier": 2.9, "boost_w": 65, "desc": "The legendary AM4 budget savior chip." },
+  { "name": "AMD Ryzen 7 1700X", "tier": 3.6, "boost_w": 95, "desc": "Early multi-core workstation processor." },
+  { "name": "AMD Ryzen 5 2600", "tier": 3.1, "boost_w": 65, "desc": "Reliable budget 6-core CPU." },
+  { "name": "AMD Ryzen 7 2700X", "tier": 4.1, "boost_w": 105, "desc": "Strong multi-threaded AM4 processor." },
+  { "name": "AMD Ryzen 3 3100", "tier": 2.8, "boost_w": 65, "desc": "Budget quad-core Zen 2 architecture." },
+  { "name": "AMD Ryzen 5 3600", "tier": 3.8, "boost_w": 88, "desc": "Iconic Zen 2 gaming processor offering stellar value." },
+  { "name": "AMD Ryzen 7 3700X", "tier": 4.7, "boost_w": 88, "desc": "Efficient 8-core processor with low power draw." },
+  { "name": "AMD Ryzen 9 3900X", "tier": 5.6, "boost_w": 142, "desc": "12-core productivity and gaming monster." },
+  { "name": "AMD Ryzen 5 5500", "tier": 3.5, "boost_w": 88, "desc": "Affordable Zen 3 chip for budget gaming builds." },
+  { "name": "AMD Ryzen 5 5600", "tier": 3.8, "boost_w": 88, "desc": "The ultimate modern budget gaming processor." },
+  { "name": "AMD Ryzen 5 5600X", "tier": 4.1, "boost_w": 88, "desc": "Extremely power-efficient 6-core gaming champion." },
+  { "name": "AMD Ryzen 7 5700X", "tier": 5.0, "boost_w": 88, "desc": "Cool-running 8-core processor with great efficiency." },
+  { "name": "AMD Ryzen 7 5800X", "tier": 5.4, "boost_w": 142, "desc": "High-performance single-CCD gaming CPU." },
+  { "name": "AMD Ryzen 7 5800X3D", "tier": 6.8, "boost_w": 142, "desc": "Legendary gaming CPU with massive 3D V-Cache." },
+  { "name": "AMD Ryzen 9 5900X", "tier": 6.6, "boost_w": 142, "desc": "Top-tier 12-core AM4 powerhouse." },
+  { "name": "AMD Ryzen 9 5950X", "tier": 7.2, "boost_w": 142, "desc": "Ultimate 16-core AM4 content creation chip." },
+  { "name": "AMD Ryzen 5 5600G (APU)", "tier": 3.4, "boost_w": 65, "desc": "Features robust integrated Radeon graphics." },
+  { "name": "AMD Ryzen 7 5700G (APU)", "tier": 4.3, "boost_w": 65, "desc": "Great APU option for budget graphics-free builds." },
+  { "name": "AMD Ryzen 5 7600", "tier": 5.6, "boost_w": 88, "desc": "Incredible entry AM5 processor with high upgrade potential." },
+  { "name": "AMD Ryzen 5 7600X", "tier": 6.0, "boost_w": 142, "desc": "Fast AM5 gaming chip with great single-core speeds." },
+  { "name": "AMD Ryzen 7 7700X", "tier": 7.3, "boost_w": 142, "desc": "High-speed 8-core processor for AM5 platforms." },
+  { "name": "AMD Ryzen 7 7800X3D", "tier": 8.2, "boost_w": 162, "desc": "The undisputed king of high-fps gaming efficiency." },
+  { "name": "AMD Ryzen 9 7900X", "tier": 8.6, "boost_w": 230, "desc": "High-draw 12-core processor requiring quality cooling." },
+  { "name": "AMD Ryzen 9 7950X", "tier": 9.6, "boost_w": 230, "desc": "Maximum multi-core workstation and gaming performance." },
+  { "name": "AMD Ryzen 9 7950X3D", "tier": 9.7, "boost_w": 162, "desc": "Ultimate flagship combining 3D V-Cache and 16 cores." },
+  { "name": "AMD Ryzen 5 8500G (APU)", "tier": 4.6, "boost_w": 65, "desc": "Modern AM5 APU with strong integrated graphics." },
+  { "name": "AMD Ryzen 7 8700G (APU)", "tier": 5.8, "boost_w": 88, "desc": "High-end APU for compact entry gaming systems." },
+  { "name": "AMD Ryzen 5 9600X", "tier": 6.5, "boost_w": 88, "desc": "Super efficient Zen 5 processor with low thermals." },
+  { "name": "AMD Ryzen 7 9700X", "tier": 7.6, "boost_w": 88, "desc": "Incredibly power-efficient 8-core Zen 5 gaming chip." },
+  { "name": "AMD Ryzen 7 9800X3D", "tier": 9.0, "boost_w": 162, "desc": "Next-gen 3D V-Cache champion delivering peerless frame rates." },
+  { "name": "AMD Ryzen 9 9900X", "tier": 9.1, "boost_w": 162, "desc": "Balanced 12-core powerhouse with controlled power draws." },
+  { "name": "AMD Ryzen 9 9950X", "tier": 9.9, "boost_w": 230, "desc": "Flagship Zen 5 workstation processor." },
+  { "name": "AMD Ryzen 9 9950X3D", "tier": 10.0, "boost_w": 230, "desc": "Absolute peak performance processor for extreme enthusiasts." },
+  { "name": "AMD Ryzen 5 7535HS (Mobile)", "tier": 4.4, "boost_w": 54, "desc": "Efficient mobile gaming laptop processor." },
+  { "name": "AMD Ryzen 9 7940HX (Mobile)", "tier": 7.9, "boost_w": 75, "desc": "High-end mobile processor for enthusiast gaming laptops." },
+  { "name": "AMD Threadripper 3970X", "tier": 9.9, "boost_w": 280, "desc": "Massive HEDT processor for professional rendering." },
+  { "name": "AMD Threadripper 7980X", "tier": 10.0, "boost_w": 350, "desc": "Extreme multi-threaded workstation titan." },
 ];
 
 const GPUS = [
-  { name: "GTX 650 Ti", tier: 1.4, boost_w: 120, desc: "Legacy card for basic display outputs." },
-  { name: "GTX 660", tier: 1.8, boost_w: 150, desc: "Old-school budget gaming card." },
-  { name: "GTX 770", tier: 2.6, boost_w: 245, desc: "Demanding legacy card with high power usage." },
-  { name: "GTX 950", tier: 1.9, boost_w: 95, desc: "Light esports card." },
-  { name: "GTX 960", tier: 2.1, boost_w: 125, desc: "Classic 1080p entry GPU." },
-  { name: "GTX 970", tier: 2.9, boost_w: 155, desc: "Legendary 3.5GB VRAM card that defined an era." },
-  { name: "GTX 980 Ti", tier: 3.6, boost_w: 265, desc: "High-draw legacy powerhouse." },
-  { name: "GTX 1050 Ti", tier: 2.0, boost_w: 80, desc: "Famous slot-powered budget card." },
-  { name: "GTX 1060 6GB", tier: 2.8, boost_w: 130, desc: "The most popular 1080p card in Steam Survey history." },
-  { name: "GTX 1070", tier: 3.4, boost_w: 160, desc: "Fantastic 1440p card for its generation." },
-  { name: "GTX 1080 Ti", tier: 4.3, boost_w: 265, desc: "Timeless high-end graphics card legend." },
-  { name: "GTX 1650", tier: 2.1, boost_w: 80, desc: "Low-power card for prebuilt office PC conversions." },
-  { name: "GTX 1660 Super", tier: 2.9, boost_w: 135, desc: "Exceptional 1080p high-refresh rate card." },
-  { name: "RTX 2060", tier: 3.3, boost_w: 170, desc: "Entry-level ray tracing and DLSS support." },
-  { name: "RTX 2070 Super", tier: 4.0, boost_w: 225, desc: "Solid mid-range performance for modern titles." },
-  { name: "RTX 2080 Ti", tier: 4.6, boost_w: 270, desc: "Former flagship GPU with strong ray tracing." },
-  { name: "RTX 3050", tier: 2.8, boost_w: 145, desc: "Entry-level Ampere card with DLSS." },
-  { name: "RTX 3060", tier: 3.7, boost_w: 185, desc: "Popular VRAM-heavy card for 1080p/1440p gaming." },
-  { name: "RTX 3060 Ti", tier: 4.4, boost_w: 220, desc: "Punchy mid-ranger with high frame rate delivery." },
-  { name: "RTX 3070", tier: 5.0, boost_w: 240, desc: "Great 1440p performer with high power demands." },
-  { name: "RTX 3070 Ti", tier: 5.3, boost_w: 320, desc: "Power-hungry card requiring robust PSU capacity." },
-  { name: "RTX 3080", tier: 6.2, boost_w: 360, desc: "High transient spike card for smooth 4K gaming." },
-  { name: "RTX 3080 Ti", tier: 6.6, boost_w: 400, desc: "Demanding high-draw enthusiast card." },
-  { name: "RTX 3090", tier: 6.9, boost_w: 400, desc: "24GB VRAM monster for AI workflows and gaming." },
-  { name: "RTX 3090 Ti", tier: 7.1, boost_w: 520, desc: "Extreme power draw GPU requiring a 1000W+ PSU." },
-  { name: "RTX 4060", tier: 3.6, boost_w: 130, desc: "Incredibly power-efficient DLSS 3 gaming card." },
-  { name: "RTX 4060 Ti", tier: 4.6, boost_w: 180, desc: "Efficient mid-range card with low thermal output." },
-  { name: "RTX 4070", tier: 6.0, boost_w: 220, desc: "Efficient 1440p champion with excellent frame generation." },
-  { name: "RTX 4070 Super", tier: 6.6, boost_w: 245, desc: "Boosted performance for high-refresh 1440p gaming." },
-  { name: "RTX 4070 Ti Super", tier: 7.6, boost_w: 320, desc: "16GB VRAM beast built for heavy 1440p/4K gaming." },
-  { name: "RTX 4080 Super", tier: 8.6, boost_w: 360, desc: "Elite 4K gaming card with phenomenal efficiency." },
-  { name: "RTX 4090", tier: 10.0, boost_w: 600, desc: "The ultimate enthusiast GPU requiring strict ATX 3.1 PSU safety." },
-  { name: "RTX 5060", tier: 4.4, boost_w: 165, desc: "Next-gen mainstream efficiency and frame rates." },
-  { name: "RTX 5060 Ti", tier: 5.2, boost_w: 205, desc: "Modern mid-tier GPU tuned for esports and AAA games." },
-  { name: "RTX 5070", tier: 6.7, boost_w: 280, desc: "Exceptional modern 1440p performance card." },
-  { name: "RTX 5070 Ti", tier: 7.9, boost_w: 340, desc: "High-end modern card with heavy transient spike profiles." },
-  { name: "RTX 5080", tier: 8.9, boost_w: 410, desc: "Enthusiast-grade powerhouse for maxed-out ray tracing." },
-  { name: "RTX 5090", tier: 10.0, boost_w: 1150, desc: "Extreme flagship GPU requiring dedicated high-wattage power delivery." },
-  
-  // AMD GPU
-  { name: "RX 460", tier: 1.5, boost_w: 80, desc: "Entry budget card." },
-  { name: "RX 480 8GB", tier: 2.4, boost_w: 160, desc: "Classic 8GB card with great longevity." },
-  { name: "RX 570", tier: 2.4, boost_w: 160, desc: "Budget esports favorite." },
-  { name: "RX 580 8GB", tier: 2.7, boost_w: 195, desc: "The legendary budget king for budget PC builders." },
-  { name: "RX Vega 56", tier: 3.3, boost_w: 225, desc: "High bandwidth memory architecture." },
-  { name: "RX Vega 64", tier: 3.6, boost_w: 310, desc: "Power-hungry high-end legacy card." },
-  { name: "RX 5500 XT", tier: 2.6, boost_w: 140, desc: "Efficient 1080p card." },
-  { name: "RX 5600 XT", tier: 3.2, boost_w: 160, desc: "Solid 1080p high-refresh GPU." },
-  { name: "RX 5700 XT", tier: 4.1, boost_w: 240, desc: "Legendary Navi 10 value powerhouse." },
-  { name: "RX 6600", tier: 3.2, boost_w: 145, desc: "Incredible efficiency for budget 1080p rigs." },
-  { name: "RX 6650 XT", tier: 3.7, boost_w: 195, desc: "Fantastic high-refresh 1080p value card." },
-  { name: "RX 6700 XT", tier: 4.5, boost_w: 245, desc: "The ultimate 1440p value card with 12GB VRAM." },
-  { name: "RX 6800 XT", tier: 5.7, boost_w: 320, desc: "Phenomenal rasterization performance for 1440p/4K." },
-  { name: "RX 6900 XT", tier: 6.1, boost_w: 320, desc: "High-end RDNA 2 flagship graphics card." },
-  { name: "RX 6950 XT", tier: 6.3, boost_w: 360, desc: "Pushed clocks requiring robust power supplies." },
-  { name: "RX 7600", tier: 3.8, boost_w: 180, desc: "Compact modern entry card." },
-  { name: "RX 7700 XT", tier: 5.4, boost_w: 265, desc: "Balanced 1440p card with strong frame rates." },
-  { name: "RX 7800 XT", tier: 6.4, boost_w: 285, desc: "Incredible 16GB VRAM card dominating 1440p gaming." },
-  { name: "RX 7900 GRE", tier: 6.9, boost_w: 280, desc: "Overclocking enthusiast favorite for high-res gaming." },
-  { name: "RX 7900 XT", tier: 7.8, boost_w: 340, desc: "High-end 4K card with massive VRAM buffer." },
-  { name: "RX 7900 XTX", tier: 8.8, boost_w: 385, desc: "Flagship AMD gaming beast competing at the top tier." },
-  { name: "RX 9060 XT", tier: 4.6, boost_w: 170, desc: "Modern efficient card for high frame rate gaming." },
-  { name: "RX 9070", tier: 6.8, boost_w: 245, desc: "Advanced architecture tuned for smooth ray tracing." },
-  { name: "RX 9070 XT", tier: 7.7, boost_w: 330, desc: "Next-gen enthusiast GPU with elite performance." }
+  { "name": "GTX 650 Ti", "tier": 1.4, "boost_w": 110, "desc": "Legacy card for basic display outputs." },
+  { "name": "GTX 660", "tier": 1.8, "boost_w": 140, "desc": "Old-school budget gaming card." },
+  { "name": "GTX 770", "tier": 2.6, "boost_w": 230, "desc": "Demanding legacy card with high power usage." },
+  { "name": "GTX 950", "tier": 1.9, "boost_w": 90, "desc": "Light esports card." },
+  { "name": "GTX 960", "tier": 2.1, "boost_w": 120, "desc": "Classic 1080p entry GPU." },
+  { "name": "GTX 970", "tier": 2.9, "boost_w": 145, "desc": "Legendary 3.5GB VRAM card that defined an era." },
+  { "name": "GTX 980 Ti", "tier": 3.6, "boost_w": 250, "desc": "High-draw legacy powerhouse." },
+  { "name": "GTX 1050 Ti", "tier": 2.0, "boost_w": 75, "desc": "Famous slot-powered budget card." },
+  { "name": "GTX 1060 6GB", "tier": 2.8, "boost_w": 120, "desc": "The most popular 1080p card in Steam Survey history." },
+  { "name": "GTX 1070", "tier": 3.4, "boost_w": 150, "desc": "Fantastic 1440p card for its generation." },
+  { "name": "GTX 1080 Ti", "tier": 4.3, "boost_w": 250, "desc": "Timeless high-end graphics card legend." },
+  { "name": "GTX 1650", "tier": 2.1, "boost_w": 75, "desc": "Low-power card for prebuilt office PC conversions." },
+  { "name": "GTX 1660 Super", "tier": 2.9, "boost_w": 125, "desc": "Exceptional 1080p high-refresh rate card." },
+  { "name": "RTX 2060", "tier": 3.3, "boost_w": 160, "desc": "Entry-level ray tracing and DLSS support." },
+  { "name": "RTX 2070 Super", "tier": 4.0, "boost_w": 215, "desc": "Solid mid-range performance for modern titles." },
+  { "name": "RTX 2080 Ti", "tier": 4.6, "boost_w": 260, "desc": "Former flagship GPU with strong ray tracing." },
+  { "name": "RTX 3050", "tier": 2.8, "boost_w": 130, "desc": "Entry-level Ampere card with DLSS." },
+  { "name": "RTX 3060", "tier": 3.7, "boost_w": 170, "desc": "Popular VRAM-heavy card for 1080p/1440p gaming." },
+  { "name": "RTX 3060 Ti", "tier": 4.4, "boost_w": 200, "desc": "Punchy mid-ranger with high frame rate delivery." },
+  { "name": "RTX 3070", "tier": 5.0, "boost_w": 220, "desc": "Great 1440p performer with high power demands." },
+  { "name": "RTX 3070 Ti", "tier": 5.3, "boost_w": 290, "desc": "Power-hungry card requiring robust PSU capacity." },
+  { "name": "RTX 3080", "tier": 6.2, "boost_w": 320, "desc": "High transient spike card for smooth 4K gaming." },
+  { "name": "RTX 3080 Ti", "tier": 6.6, "boost_w": 350, "desc": "Demanding high-draw enthusiast card." },
+  { "name": "RTX 3090", "tier": 6.9, "boost_w": 350, "desc": "24GB VRAM monster for AI workflows and gaming." },
+  { "name": "RTX 3090 Ti", "tier": 7.1, "boost_w": 450, "desc": "Extreme power draw GPU requiring a 1000W+ PSU." },
+  { "name": "RTX 4060", "tier": 3.6, "boost_w": 115, "desc": "Incredibly power-efficient DLSS 3 gaming card." },
+  { "name": "RTX 4060 Ti", "tier": 4.6, "boost_w": 160, "desc": "Efficient mid-range card with low thermal output." },
+  { "name": "RTX 4070", "tier": 6.0, "boost_w": 200, "desc": "Efficient 1440p champion with excellent frame generation." },
+  { "name": "RTX 4070 Super", "tier": 6.6, "boost_w": 220, "desc": "Boosted performance for high-refresh 1440p gaming." },
+  { "name": "RTX 4070 Ti Super", "tier": 7.6, "boost_w": 285, "desc": "16GB VRAM beast built for heavy 1440p/4K gaming." },
+  { "name": "RTX 4080 Super", "tier": 8.6, "boost_w": 320, "desc": "Elite 4K gaming card with phenomenal efficiency." },
+  { "name": "RTX 4090", "tier": 10.0, "boost_w": 450, "desc": "The ultimate Ada Lovelace GPU - pair only with an ATX 3.0/3.1, 12VHPWR-ready PSU." },
+  { "name": "RTX 5060", "tier": 4.4, "boost_w": 145, "desc": "Next-gen mainstream efficiency and frame rates." },
+  { "name": "RTX 5060 Ti", "tier": 5.2, "boost_w": 180, "desc": "Modern mid-tier GPU tuned for esports and AAA games." },
+  { "name": "RTX 5070", "tier": 6.7, "boost_w": 250, "desc": "Exceptional modern 1440p performance card." },
+  { "name": "RTX 5070 Ti", "tier": 7.9, "boost_w": 300, "desc": "High-end modern card with heavy transient spike profiles." },
+  { "name": "RTX 5080", "tier": 8.9, "boost_w": 360, "desc": "Enthusiast-grade powerhouse for maxed-out ray tracing." },
+  { "name": "RTX 5090", "tier": 10.0, "boost_w": 575, "desc": "Extreme flagship GPU - requires an ATX 3.0/3.1-compliant PSU with a native 12V-2x6 cable, not just extra wattage." },
+  { "name": "RX 460", "tier": 1.5, "boost_w": 75, "desc": "Entry budget card." },
+  { "name": "RX 480 8GB", "tier": 2.4, "boost_w": 150, "desc": "Classic 8GB card with great longevity." },
+  { "name": "RX 570", "tier": 2.4, "boost_w": 150, "desc": "Budget esports favorite." },
+  { "name": "RX 580 8GB", "tier": 2.7, "boost_w": 185, "desc": "The legendary budget king for budget PC builders." },
+  { "name": "RX Vega 56", "tier": 3.3, "boost_w": 210, "desc": "High bandwidth memory architecture." },
+  { "name": "RX Vega 64", "tier": 3.6, "boost_w": 295, "desc": "Power-hungry high-end legacy card." },
+  { "name": "RX 5500 XT", "tier": 2.6, "boost_w": 130, "desc": "Efficient 1080p card." },
+  { "name": "RX 5600 XT", "tier": 3.2, "boost_w": 150, "desc": "Solid 1080p high-refresh GPU." },
+  { "name": "RX 5700 XT", "tier": 4.1, "boost_w": 225, "desc": "Legendary Navi 10 value powerhouse." },
+  { "name": "RX 6600", "tier": 3.2, "boost_w": 132, "desc": "Incredible efficiency for budget 1080p rigs." },
+  { "name": "RX 6650 XT", "tier": 3.7, "boost_w": 180, "desc": "Fantastic high-refresh 1080p value card." },
+  { "name": "RX 6700 XT", "tier": 4.5, "boost_w": 230, "desc": "The ultimate 1440p value card with 12GB VRAM." },
+  { "name": "RX 6800 XT", "tier": 5.7, "boost_w": 300, "desc": "Phenomenal rasterization performance for 1440p/4K." },
+  { "name": "RX 6900 XT", "tier": 6.1, "boost_w": 300, "desc": "High-end RDNA 2 flagship graphics card." },
+  { "name": "RX 6950 XT", "tier": 6.3, "boost_w": 335, "desc": "Pushed clocks requiring robust power supplies." },
+  { "name": "RX 7600", "tier": 3.8, "boost_w": 165, "desc": "Compact modern entry card." },
+  { "name": "RX 7700 XT", "tier": 5.4, "boost_w": 245, "desc": "Balanced 1440p card with strong frame rates." },
+  { "name": "RX 7800 XT", "tier": 6.4, "boost_w": 263, "desc": "Incredible 16GB VRAM card dominating 1440p gaming." },
+  { "name": "RX 7900 GRE", "tier": 6.9, "boost_w": 260, "desc": "Overclocking enthusiast favorite for high-res gaming." },
+  { "name": "RX 7900 XT", "tier": 7.8, "boost_w": 315, "desc": "High-end 4K card with massive VRAM buffer." },
+  { "name": "RX 7900 XTX", "tier": 8.8, "boost_w": 355, "desc": "Flagship AMD gaming beast competing at the top tier." },
+  { "name": "RX 9060 XT", "tier": 4.6, "boost_w": 150, "desc": "Modern efficient card for high frame rate gaming." },
+  { "name": "RX 9070", "tier": 6.8, "boost_w": 220, "desc": "Advanced architecture tuned for smooth ray tracing." },
+  { "name": "RX 9070 XT", "tier": 7.7, "boost_w": 304, "desc": "Next-gen enthusiast GPU with elite performance." },
 ];
 
 const MOTHERBOARDS = [
@@ -550,7 +582,7 @@ const MOTHERBOARDS = [
 
 const COOLING_OPTS = [
   { name: "Stock / Bundled Cooler", watt: 4, ceiling: 65, desc: "Basic cooling for low-TDP processors." },
-  { name: "Budget Tower Air Cooler (Hyper 212 class)", watt: 5, ceiling: 95, desc: "Dependable single-tower cooling." },
+  { name: "Budget Tower Air Cooler (Hyper 212 class)", watt: 5, ceiling: 130, desc: "Dependable single-tower cooling." },
   { name: "High-End Air Cooler (Dual Tower - NH-D15)", watt: 6, ceiling: 250, desc: "Whisper-quiet cooling matching liquid performance." },
   { name: "120mm AIO Liquid Cooler", watt: 8, ceiling: 150, desc: "Compact liquid cooling loop." },
   { name: "240mm AIO Liquid Cooler", watt: 10, ceiling: 220, desc: "Popular dual-fan liquid cooling." },
@@ -585,20 +617,40 @@ const STORAGE_OPTS = [
   { name: "NVMe SSD, PCIe 5.0 x4 (Enthusiast High-Draw)", watt: 11, desc: "Blazing-fast PCIe 5.0 drive with active heatsink draw." }
 ];
 
+// atx31: true = confirmed ATX 3.0/3.1 compliant with native 12VHPWR/12V-2x6
+// cable per manufacturer spec sheets (verified live, Sept 2026).
 const PSU_CATALOG = [
-  { watt: 450, name: "Corsair CX450M Bronze", link: "https://www.amazon.com/s?k=450w+psu&tag=pcpower20-20" },
-  { watt: 550, name: "Corsair RM550x Gold", link: "https://www.amazon.com/s?k=corsair+rm550x&tag=pcpower20-20" },
-  { watt: 650, name: "be quiet! Pure Power 12 M 650W", link: "https://www.amazon.com/s?k=650w+atx+3.0+psu&tag=pcpower20-20" },
-  { watt: 750, name: "be quiet! Pure Power 12 M 750W", link: "https://www.amazon.com/s?k=pure+power+750w&tag=pcpower20-20" },
-  { watt: 850, name: "Corsair RM850x Shift ATX 3.1", link: "https://www.amazon.com/s?k=corsair+rm850x&tag=pcpower20-20" },
-  { watt: 1000, name: "Seasonic Focus GX-1000 ATX 3.0", link: "https://www.amazon.com/s?k=seasonic+gx1000&tag=pcpower20-20" },
-  { watt: 1200, name: "Corsair HX1200 Platinum", link: "https://www.amazon.com/s?k=corsair+hx1200&tag=pcpower20-20" },
-  { watt: 1300, name: "MSI MEG Ai1300P PCIE5", link: "https://www.amazon.com/s?k=1300w+atx+3.0+psu&tag=pcpower20-20" },
-  { watt: 1500, name: "be quiet! Dark Power Pro 13 1500W Titanium", link: "https://www.amazon.com/s?k=1500w+psu&tag=pcpower20-20" },
-  { watt: 1600, name: "Corsair AX1600i Titanium", link: "https://www.amazon.com/s?k=corsair+ax1600i&tag=pcpower20-20" }
+  { watt: 450, name: "Corsair CX450M Bronze", atx31: false, link: "https://www.amazon.com/s?k=450w+psu&tag=pcpower20-20" },
+  { watt: 550, name: "Corsair RM550x Gold", atx31: false, link: "https://www.amazon.com/s?k=corsair+rm550x&tag=pcpower20-20" },
+  { watt: 650, name: "be quiet! Pure Power 12 M 650W (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=650w+atx+3.0+psu&tag=pcpower20-20" },
+  { watt: 750, name: "be quiet! Pure Power 12 M 750W (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=pure+power+750w&tag=pcpower20-20" },
+  { watt: 850, name: "Corsair RM850x Shift ATX 3.1", atx31: true, link: "https://www.amazon.com/s?k=corsair+rm850x&tag=pcpower20-20" },
+  { watt: 1000, name: "Seasonic Focus GX-1000 ATX 3.0", atx31: true, link: "https://www.amazon.com/s?k=seasonic+gx1000&tag=pcpower20-20" },
+  { watt: 1200, name: "Corsair HX1200i ATX 3.1", atx31: true, link: "https://www.amazon.com/s?k=corsair+hx1200i&tag=pcpower20-20" },
+  { watt: 1300, name: "MSI MEG Ai1300P PCIE5 (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=1300w+atx+3.0+psu&tag=pcpower20-20" },
+  { watt: 1500, name: "be quiet! Dark Power Pro 13 1500W Titanium (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=1500w+psu&tag=pcpower20-20" }
 ];
 
 let state = { cpu: null, mb: null, gpu: null, ram: null, cooling: null, storage: null };
+let selectedRes = '1440';
+
+// ============================================================================
+// FPS MODEL
+// Each title has a gpuWeight (0-1): how GPU-bound the title typically is at
+// the given settings. effectiveScore blends cpu.tier and gpu.tier using that
+// weight, then a per-title linear fit (slope/intercept) maps score -> FPS.
+// Slopes are anchored to published 1440p Ultra benchmark reference points
+// where available (RTX 4090-class high end, GTX 1650/RX6600-class low end),
+// not invented from scratch. This is a calibrated estimate, not a live
+// benchmark database - see the FAQ note on the page.
+// ============================================================================
+const GAME_MODEL = [
+  { title: "Cyberpunk 2077 (RT Off, Ultra)", gpuWeight: 0.85, slope: 14, intercept: -8, floor: 15, resFactor: { "1080": 1.28, "1440": 1.0, "4k": 0.55 } },
+  { title: "Call of Duty: Warzone",           gpuWeight: 0.65, slope: 15.6, intercept: 9, floor: 30, resFactor: { "1080": 1.22, "1440": 1.0, "4k": 0.62 } },
+  { title: "Valorant",                        gpuWeight: 0.25, slope: 54.5, intercept: 21, floor: 60, resFactor: { "1080": 1.15, "1440": 1.0, "4k": 0.80 } },
+  { title: "Red Dead Redemption 2",           gpuWeight: 0.75, slope: 15.6, intercept: -6, floor: 20, resFactor: { "1080": 1.25, "1440": 1.0, "4k": 0.58 } },
+  { title: "Forza Horizon 5",                 gpuWeight: 0.70, slope: 20, intercept: -5, floor: 30, resFactor: { "1080": 1.24, "1440": 1.0, "4k": 0.60 } }
+];
 
 function renderFPS() {
   const container = document.getElementById('fpsContainer');
@@ -606,16 +658,14 @@ function renderFPS() {
     container.innerHTML = `<div class="text-sm text-gray-500">Awaiting CPU & GPU selection...</div>`;
     return;
   }
-  
-  const effectiveTier = Math.min(state.cpu.tier, state.gpu.tier * 1.15);
-  
-  const games = [
-    { title: "Cyberpunk 2077 (RT Off)", fps: Math.max(15, Math.round(effectiveTier * 13 + 10)) },
-    { title: "Call of Duty: Warzone", fps: Math.max(30, Math.round(effectiveTier * 22 + 40)) },
-    { title: "Valorant", fps: Math.max(60, Math.round(effectiveTier * 60 + 100)) },
-    { title: "Red Dead Redemption 2", fps: Math.max(20, Math.round(effectiveTier * 14 + 25)) },
-    { title: "Forza Horizon 5", fps: Math.max(30, Math.round(effectiveTier * 18 + 40)) }
-  ];
+
+  const games = GAME_MODEL.map(g => {
+    const score = g.gpuWeight * state.gpu.tier + (1 - g.gpuWeight) * state.cpu.tier;
+    let fps = g.slope * score + g.intercept;
+    fps *= (g.resFactor[selectedRes] || 1.0);
+    fps = Math.max(g.floor, Math.round(fps));
+    return { title: g.title, fps };
+  });
 
   container.innerHTML = games.map(g => `
     <div class="flex justify-between items-center bg-[#131A24] p-3 rounded border border-[#212438]">
@@ -625,52 +675,93 @@ function renderFPS() {
   `).join('');
 }
 
+document.getElementById('resToggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('.res-btn');
+  if (!btn) return;
+  selectedRes = btn.dataset.res;
+  document.querySelectorAll('.res-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFPS();
+});
+
+// ============================================================================
+// POWER / PSU CALCULATION ENGINE
+// - GPU and CPU wattage fields hold REAL manufacturer-rated sustained power
+//   (TGP/TBP for GPU, PL2/MTP or PPT for CPU) - no artificial spike padding.
+// - Recommended PSU targets ~70% load at peak (standard efficiency-curve
+//   headroom), cross-checked against NVIDIA's published PSU minimums for
+//   RTX 50-series cards and against independently published RTX 4070
+//   system recommendations (~650W across multiple sources).
+// - Transient-spike safety is handled as a PSU-compliance / connector
+//   requirement (ATX 3.0/3.1, native 12VHPWR/12V-2x6), not a wattage
+//   multiplier - that distinction is the fix for the old double-counting
+//   bug, and it matches how the ATX 3.0/3.1 spec actually works.
+// ============================================================================
 function calculate() {
-  let cpuWatts = state.cpu?.boost_w || 0;
-  let gpuWatts = state.gpu?.boost_w || 0;
-  let mbWatts = state.mb?.watt || 0;
-  let ramWatts = state.ram?.watt || 0;
-  let coolWatts = state.cooling?.watt || 0;
-  let storageWatts = state.storage?.watt || 0;
-  
-  let baseWatts = cpuWatts + mbWatts + ramWatts + coolWatts + storageWatts;
-  if (baseWatts > 0 || gpuWatts > 0) baseWatts += 25;
-  
-  if(document.getElementById('transientToggle').checked && gpuWatts > 150) {
-      gpuWatts *= 1.25; 
-  }
-  
-  let peak = Math.round(baseWatts + gpuWatts);
-  let rec = peak === 0 ? 0 : Math.ceil((peak / 0.8) / 50) * 50; 
+  const cpuWatts = state.cpu?.boost_w || 0;
+  const gpuWatts = state.gpu?.boost_w || 0;
+  const mbWatts = state.mb?.watt || 0;
+  const ramWatts = state.ram?.watt || 0;
+  const coolWatts = state.cooling?.watt || 0;
+  const storageWatts = state.storage?.watt || 0;
+
+  const hasAny = cpuWatts > 0 || gpuWatts > 0 || mbWatts > 0 || ramWatts > 0 || coolWatts > 0 || storageWatts > 0;
+  let sustainedTotal = cpuWatts + gpuWatts + mbWatts + ramWatts + coolWatts + storageWatts;
+  if (hasAny) sustainedTotal += 25; // fixed overhead: fans, RGB, USB peripherals, board misc rails
+
+  const peak = Math.round(sustainedTotal);
+  // Target ~70% PSU load at peak draw. Cross-checked against multiple
+  // independent real-world sources (RTX 4070 system -> ~650W recommended
+  // across five+ vendor/reviewer sources; RTX 5090 system -> 1000W NVIDIA
+  // minimum, 1200-1500W "comfortable headroom" per Tom's Hardware) - 70%
+  // reproduces both ends of that range more closely than 80% or 50% did.
+  let rec = peak === 0 ? 0 : Math.ceil((peak / 0.7) / 50) * 50;
   if (rec > 0 && rec < 450) rec = 450;
 
   document.getElementById('peakPower').innerText = peak;
   document.getElementById('recWattage').innerText = rec;
-  
+
+  const atxGuardOn = document.getElementById('transientToggle').checked;
+
   let alerts = [];
-  if (state.cpu && state.cooling && state.cpu.boost_w > state.cooling.ceiling) {
-    alerts.push(`Thermal Warning: Cooler ceiling (${state.cooling.ceiling}W) is lower than CPU peak boost (${state.cpu.boost_w}W).`);
+  if (state.cpu && state.cooling && cpuWatts > state.cooling.ceiling) {
+    alerts.push(`Thermal Warning: this cooler's rated ceiling (${state.cooling.ceiling}W) is below your CPU's estimated sustained draw (${cpuWatts}W) - expect thermal throttling under full load.`);
   }
-  if (document.getElementById('transientToggle').checked && peak > 0) {
-    alerts.push("ATX 3.1 Transient Spike safety margins applied.");
+  document.getElementById('statusDetail').innerText = alerts.length
+    ? alerts.join(" ")
+    : (peak > 0 ? "System parameters operating within optimal thermal and power limits." : "Select components to analyze ATX 3.1 excursion safety and bottleneck ratios.");
+
+  // Safety panel: real, actionable guidance instead of a wattage multiplier
+  const safetyPanel = document.getElementById('safetyPanel');
+  const safetyText = document.getElementById('safetyText');
+  if (gpuWatts >= 250 && atxGuardOn) {
+    safetyPanel.classList.remove('hidden');
+    safetyText.innerHTML = `This GPU draws ${gpuWatts}W and needs a genuine <strong>ATX 3.0 or 3.1 certified</strong> PSU with a <strong>native 12V-2x6 / 12VHPWR cable</strong> (not a bundle of 8-pin adapters) to safely absorb its power spikes. Push the connector in until it clicks and avoid sharp bends near the plug - most reported melting incidents traced back to a connector that wasn't fully seated, not to insufficient wattage.`;
+  } else {
+    safetyPanel.classList.add('hidden');
   }
-  document.getElementById('statusDetail').innerText = alerts.length ? alerts.join(" ") : "System parameters operating within optimal thermal and power limits.";
 
   if (peak > 0) {
-      let recsHTML = PSU_CATALOG.filter(p => p.watt >= rec).slice(0, 3).map(p => `
-        <a href="${p.link}" target="_blank" class="conversion-card flex justify-between items-center p-3 rounded-lg transition-colors">
-          <div>
-            <div class="text-sm font-medium text-white">${p.name}</div>
-            <div class="text-[10px] text-gray-400">${p.watt}W Certified ATX 3.0/3.1</div>
-          </div>
-          <span class="text-xs conversion-text font-bold">Buy on Amazon →</span>
-        </a>
-      `).join('');
-      document.getElementById('psuRecs').innerHTML = recsHTML || `<div class="text-sm text-gray-500">Requires server-grade PSU (1600W+)</div>`;
+    let candidates = PSU_CATALOG.filter(p => p.watt >= rec);
+    if (atxGuardOn && gpuWatts >= 250) {
+      const compliantOnly = candidates.filter(p => p.atx31);
+      if (compliantOnly.length > 0) candidates = compliantOnly;
+    }
+    const top = candidates.slice(0, 3);
+    let recsHTML = top.map(p => `
+      <a href="${p.link}" target="_blank" class="conversion-card flex justify-between items-center p-3 rounded-lg transition-colors">
+        <div>
+          <div class="text-sm font-medium text-white flex items-center gap-2">${p.name} ${p.atx31 ? '<span class="badge-compliant">ATX 3.0/3.1</span>' : '<span class="badge-noncompliant">Legacy ATX</span>'}</div>
+          <div class="text-[10px] text-gray-400">${p.watt}W Certified</div>
+        </div>
+        <span class="text-xs conversion-text font-bold">Buy on Amazon →</span>
+      </a>
+    `).join('');
+    document.getElementById('psuRecs').innerHTML = recsHTML || `<div class="text-sm text-gray-500">Recommended wattage exceeds our current catalog - a 1500W+ ATX 3.1 unit from a reputable brand is a safe target for this configuration.</div>`;
   } else {
-      document.getElementById('psuRecs').innerHTML = `<div class="text-sm text-gray-500">Awaiting components...</div>`;
+    document.getElementById('psuRecs').innerHTML = `<div class="text-sm text-gray-500">Awaiting components...</div>`;
   }
-  
+
   renderFPS();
 }
 
@@ -687,11 +778,11 @@ function setupDropdown(id, data, key) {
   const dropdown = document.getElementById(id.replace('Search', 'Dropdown'));
   const insight = document.getElementById(id.replace('Search', 'Insight'));
   const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
-  
+
   input.addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelectorAll('.dropdown-results').forEach(el => { if(el !== dropdown) el.classList.add('hidden'); });
-    
+
     if (state[key]) {
       state[key] = null;
       input.value = '';
@@ -707,7 +798,7 @@ function setupDropdown(id, data, key) {
 
   dropdown.addEventListener('click', (e) => {
     e.stopPropagation();
-    
+
     const trigger = e.target.closest('[data-action="search"]');
     if (trigger) {
       input.removeAttribute('readonly');
@@ -719,12 +810,12 @@ function setupDropdown(id, data, key) {
 
     const item = e.target.closest('.dropdown-item');
     if (!item || !item.dataset.name) return;
-    
+
     state[key] = data.find(i => i.name === item.dataset.name);
     input.value = state[key].name;
     input.setAttribute('readonly', 'true');
     dropdown.classList.add('hidden');
-    
+
     if (state[key].desc) {
       insight.innerText = state[key].desc;
       insight.classList.remove('hidden');
@@ -772,13 +863,13 @@ setupDropdown('ramSearch', RAM_OPTS, 'ram');
 setupDropdown('coolingSearch', COOLING_OPTS, 'cooling');
 setupDropdown('storageSearch', STORAGE_OPTS, 'storage');
 
-// Reviews Management (Starts empty, populates only with real user submissions)
+// Field Notes (private, per-browser localStorage - see the label above the form)
 function loadReviews() {
   const feed = document.getElementById('reviewsFeed');
   const savedReviews = JSON.parse(localStorage.getItem('wattbench_reviews') || '[]');
-  
+
   if (savedReviews.length === 0) {
-    feed.innerHTML = `<div class="text-sm text-gray-500 italic col-span-2">No field reports yet. Be the first to share your experience above!</div>`;
+    feed.innerHTML = `<div class="text-sm text-gray-500 italic col-span-2">No notes yet. Add one above after you test a build.</div>`;
     return;
   }
 
@@ -802,7 +893,7 @@ document.getElementById('reviewForm').addEventListener('submit', function(e) {
   const name = document.getElementById('revName').value.trim();
   const rating = document.getElementById('revRating').value;
   const text = document.getElementById('revText').value.trim();
-  
+
   if (!name || !text) return;
 
   const newReview = { name, rating, text };
