@@ -3,28 +3,32 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator</title>
+<title>Wattbench Ultra | PC Power, Bottleneck & Gaming FPS Calculator</title>
 <script defer src="/_vercel/insights/script.js"></script>
-<meta name="description" content="Accurate PC power supply calculator, ATX 3.1 transient spike analyzer, hardware bottleneck detector, and real-time gaming FPS calculator for modern custom rigs." />
-<link rel="canonical" href="https://www.example.com/" />
+<meta name="description" content="PC power supply calculator, ATX 3.1 connector safety guide, hardware bottleneck estimator, and modeled gaming FPS calculator for custom rigs." />
+<link rel="canonical" href="https://wattbench.online/" />
 <!-- Favicon for custom lightning logo display -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2359E6C8%22 stroke-width=%222.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M13 2L3 14h9l-1 8 10-12h-9l1-8z%22/></svg>">
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator" />
-<meta property="og:description" content="Accurate PC power supply calculator, ATX 3.1 transient spike analyzer, hardware bottleneck detector, and real-time gaming FPS calculator for modern custom rigs." />
-<meta property="og:url" content="https://www.example.com/" />
+<meta property="og:title" content="Wattbench Ultra | PC Power, Bottleneck & Gaming FPS Calculator" />
+<meta property="og:description" content="PC power supply calculator, ATX 3.1 connector safety guide, hardware bottleneck estimator, and modeled gaming FPS calculator for custom rigs." />
+<meta property="og:image" content="https://wattbench.online/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://wattbench.online/" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Wattbench Ultra | PC Power, Bottleneck & Real-Time FPS Calculator" />
-<meta name="twitter:description" content="Accurate PC power supply calculator, ATX 3.1 transient spike analyzer, hardware bottleneck detector, and real-time gaming FPS calculator for modern custom rigs." />
+<meta name="twitter:title" content="Wattbench Ultra | PC Power, Bottleneck & Gaming FPS Calculator" />
+<meta name="twitter:description" content="PC power supply calculator, ATX 3.1 connector safety guide, hardware bottleneck estimator, and modeled gaming FPS calculator for custom rigs." />
+<meta name="twitter:image" content="https://wattbench.online/og-image.png" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebApplication",
-      "@id": "https://www.example.com/#webapp",
+      "@id": "https://wattbench.online/#webapp",
       "name": "Wattbench Ultra — PC Power Supply, Bottleneck & FPS Estimator",
-      "url": "https://www.example.com/",
+      "url": "https://wattbench.online/",
       "description": "A free browser-based calculator that estimates recommended PSU wattage, peak system power draw, CPU/GPU bottleneck percentage, and gaming FPS tier based on your selected components.",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Any (Web Browser)",
@@ -33,14 +37,14 @@
     },
     {
       "@type": "FAQPage",
-      "@id": "https://www.example.com/#faq",
+      "@id": "https://wattbench.online/#faq",
       "mainEntity": [
         {
           "@type": "Question",
           "name": "How does Wattbench calculate recommended PSU wattage?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "We sum the real rated power draw of every component you select (CPU PL2/MTP or PPT, GPU TGP/TBP, motherboard, RAM, cooling, and storage), then size the recommended PSU so it runs at roughly 70% of its rated capacity under that peak load, matching standard PSU efficiency-curve guidance and cross-checked against published real-world PSU recommendations. Transient spike safety is handled separately: for GPUs over 250W we flag the ATX 3.0/3.1 and native 12V-2x6 connector requirements those cards actually need."
+            "text": "We sum the real rated power draw of every component you select (CPU PL2/MTP or PPT, GPU TGP/TBP, motherboard, RAM, cooling, and storage), then size the recommended PSU so it runs at roughly 70% of its rated capacity under that peak load, matching standard PSU efficiency-curve guidance and cross-checked against published real-world PSU recommendations. By default the CPU is counted at a realistic gaming load rather than its full synthetic boost ceiling (a Worst-Case mode is available for sustained multi-threaded workloads). Transient spike safety is handled separately: GPUs that use a native 12V-2x6/12VHPWR connector get a connector-specific safety note, and other high-power GPUs get an 8-pin connector-count caution."
           }
         },
         {
@@ -50,15 +54,31 @@
             "@type": "Answer",
             "text": "Modern high-end graphics cards can briefly draw far more than their rated power for fractions of a second. Under the ATX 3.0/3.1 and PCIe CEM 5.1 specifications, PSUs with a native 12VHPWR/12V-2x6 connector are engineered with the capacitance to absorb these excursions internally. That's a PSU design and connector question, not a reason to buy extra raw wattage."
           }
+        },
+        {
+          "@type": "Question",
+          "name": "How accurate are the gaming FPS estimates?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Each title is modeled with its own GPU-bound/CPU-bound weighting and calibrated against published benchmark reference points. This is a calibrated estimate for ballpark planning, not a live per-title benchmark database - treat exact numbers as directional."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How often is hardware data updated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Our component database targets a bi-monthly refresh as new desktop parts and PSU revisions launch. CPU power figures for 6th-9th gen Intel parts are derived from a documented methodology (explained in the codebase) rather than a single disputed spec number, since independent testing sources disagree on real PL2 values for that era."
+          }
         }
       ]
     }
   ]
 }
 </script>
-<script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.pointer-events-none{pointer-events:none}.visible{visibility:visible}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0}.inset-2{inset:.5rem}.col-span-2{grid-column:span 2/span 2}.mx-auto{margin-left:auto;margin-right:auto}.-mt-2{margin-top:-.5rem}.mb-1{margin-bottom:.25rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mt-2{margin-top:.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-12{height:3rem}.h-2{height:.5rem}.h-3{height:.75rem}.h-3\.5{height:.875rem}.h-4{height:1rem}.h-6{height:1.5rem}.h-full{height:100%}.min-h-screen{min-height:100vh}.w-12{width:3rem}.w-2{width:.5rem}.w-3{width:.75rem}.w-3\.5{width:.875rem}.w-4{width:1rem}.w-6{width:1.5rem}.w-full{width:100%}.max-w-7xl{max-width:80rem}.max-w-\[170px\]{max-width:170px}.shrink-0{flex-shrink:0}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes spin{to{transform:rotate(1turn)}}.animate-\[spin_12s_linear_infinite\]{animation:spin 12s linear infinite}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}.\!cursor-text{cursor:text!important}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-center{align-items:center}.items-baseline{align-items:baseline}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-1>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.25rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.25rem*var(--tw-space-y-reverse))}.space-y-1\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.375rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.375rem*var(--tw-space-y-reverse))}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.5rem*var(--tw-space-y-reverse))}.space-y-3>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.75rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.75rem*var(--tw-space-y-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem*var(--tw-space-y-reverse))}.space-y-5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem*var(--tw-space-y-reverse))}.overflow-hidden,.truncate{overflow:hidden}.truncate{text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-md{border-radius:.375rem}.rounded-xl{border-radius:.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-\[\#212438\]{--tw-border-opacity:1;border-color:rgb(33 36 56/var(--tw-border-opacity,1))}.border-teal-900{--tw-border-opacity:1;border-color:rgb(19 78 74/var(--tw-border-opacity,1))}.bg-\[\#10151D\]{--tw-bg-opacity:1;background-color:rgb(16 21 29/var(--tw-bg-opacity,1))}.bg-\[\#131A24\]{--tw-bg-opacity:1;background-color:rgb(19 26 36/var(--tw-bg-opacity,1))}.bg-teal-400{--tw-bg-opacity:1;background-color:rgb(45 212 191/var(--tw-bg-opacity,1))}.bg-teal-500{--tw-bg-opacity:1;background-color:rgb(20 184 166/var(--tw-bg-opacity,1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right,var(--tw-gradient-stops))}.bg-gradient-to-t{background-image:linear-gradient(to top,var(--tw-gradient-stops))}.from-\[\#1A2230\]{--tw-gradient-from:#1a2230 var(--tw-gradient-from-position);--tw-gradient-to:rgba(26,34,48,0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.to-\[\#10151D\]{--tw-gradient-to:#10151d var(--tw-gradient-to-position)}.to-transparent{--tw-gradient-to:transparent var(--tw-gradient-to-position)}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-10{padding-top:2.5rem;padding-bottom:2.5rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.pb-10{padding-bottom:2.5rem}.pb-12{padding-bottom:3rem}.pb-16{padding-bottom:4rem}.pb-2{padding-bottom:.5rem}.pb-4{padding-bottom:1rem}.pb-8{padding-bottom:2rem}.pt-10{padding-top:2.5rem}.pt-3{padding-top:.75rem}.pt-4{padding-top:1rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-\[15px\]{font-size:15px}.text-\[9px\]{font-size:9px}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-\[1\.05\]{line-height:1.05}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-.025em}.tracking-wide{letter-spacing:.025em}.text-\[\#97A2B4\]{--tw-text-opacity:1;color:rgb(151 162 180/var(--tw-text-opacity,1))}.text-\[\#E7ECF3\]{--tw-text-opacity:1;color:rgb(231 236 243/var(--tw-text-opacity,1))}.text-\[var\(--accent\)\]{color:var(--accent)}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36/var(--tw-text-opacity,1))}.text-black{--tw-text-opacity:1;color:rgb(0 0 0/var(--tw-text-opacity,1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219/var(--tw-text-opacity,1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175/var(--tw-text-opacity,1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128/var(--tw-text-opacity,1))}.text-rose-400{--tw-text-opacity:1;color:rgb(251 113 133/var(--tw-text-opacity,1))}.text-teal-400{--tw-text-opacity:1;color:rgb(45 212 191/var(--tw-text-opacity,1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.accent-teal-500{accent-color:#14b8a6}.shadow-\[0_0_20px_rgba\(89\2c 230\2c 200\2c 0\.2\)\]{--tw-shadow:0 0 20px rgba(89,230,200,.2);--tw-shadow-colored:0 0 20px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.outline{outline-style:solid}.blur-\[2px\]{--tw-blur:blur(2px)}.blur-\[2px\],.drop-shadow-\[0_0_8px_rgba\(89\2c 230\2c 200\2c 0\.8\)\]{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.drop-shadow-\[0_0_8px_rgba\(89\2c 230\2c 200\2c 0\.8\)\]{--tw-drop-shadow:drop-shadow(0 0 8px rgba(89,230,200,.8))}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.duration-300{transition-duration:.3s}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-teal-400:hover{--tw-bg-opacity:1;background-color:rgb(45 212 191/var(--tw-bg-opacity,1))}.hover\:shadow-\[0_0_30px_rgba\(89\2c 230\2c 200\2c 0\.4\)\]:hover{--tw-shadow:0 0 30px rgba(89,230,200,.4);--tw-shadow-colored:0 0 30px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}@media (min-width:640px){.sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (min-width:768px){.md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (min-width:1024px){.lg\:col-span-4{grid-column:span 4/span 4}.lg\:grid-cols-12{grid-template-columns:repeat(12,minmax(0,1fr))}}
   :root {
     --bg: #0A0E14; --bg-raised: #10151D; --bg-card: #131A24;
     --line: #212438; --line-soft: #1A2230;
@@ -124,6 +144,13 @@
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
     color: var(--text-3); pointer-events: none; font-size: 11px;
   }
+  .clear-btn {
+    position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+    color: var(--text-3); background: none; border: none; cursor: pointer;
+    font-size: 15px; line-height: 1; padding: 2px 4px; z-index: 2;
+  }
+  .clear-btn:hover { color: var(--danger); }
+  .clear-btn.hidden { display: none; }
   .badge-compliant {
     font-size: 9px; font-weight: 700; letter-spacing: 0.03em; color: #59E6C8;
     background: rgba(89,230,200,0.12); border: 1px solid rgba(89,230,200,0.35);
@@ -168,7 +195,7 @@
           <div class="w-2 h-2 rounded-full animate-pulse bg-teal-400"></div>
           <span class="mono text-xs tracking-wide" style="color:var(--accent)">ULTRA ENGINE ACTIVE • ATX 3.1 READY</span>
         </div>
-        <h1 class="text-3xl font-extrabold leading-[1.05] tracking-tight">The Complete Power & FPS Matrix.</h1>
+        <h1 class="text-3xl font-extrabold leading-[1.05] tracking-tight">PC PSU Calculator, Bottleneck & Gaming FPS Estimator.</h1>
         <p class="mt-2 text-[15px]" style="color:var(--text-2)">Loaded with official component parameters for precise PSU sizing, bottleneck analysis, and gaming frames.</p>
       </div>
     </div>
@@ -184,10 +211,25 @@
           <svg class="w-4 h-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Hardware Selection
         </h2>
+        <button type="button" id="copyLinkBtn" class="flex items-center gap-1 text-[11px] px-2 py-1 rounded-md border" style="color:var(--text-2); border-color:var(--line);" title="Copy a link to this exact build">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5"/></svg>
+          <span id="copyLinkLabel">Copy Build Link</span>
+        </button>
+      </div>
+
+      <div class="flex justify-between items-center mb-2">
         <label class="flex items-center gap-2 text-[11px] cursor-pointer" title="When on: PSU recommendations always prefer ATX 3.0/3.1-certified units, and a connector-specific safety note appears for GPUs that need it (12V-2x6/12VHPWR for RTX 40/50-series, or a multi 8-pin caution for other high-power cards)">
           <input type="checkbox" id="transientToggle" checked class="accent-teal-500 rounded">
           <span style="color:var(--text-2)">ATX 3.1 Guard</span>
         </label>
+      </div>
+
+      <div class="flex items-center gap-1 text-[11px] mb-1" style="color:var(--text-3)">
+        <span>Size for:</span>
+        <div class="flex gap-1" id="sizingModeToggle">
+          <button type="button" class="res-btn active" data-mode="gaming" title="CPU counted at a realistic gaming load (~70% of its rated boost power) - GPU is still counted at full rated power, since GPUs do run near their max while gaming.">Gaming</button>
+          <button type="button" class="res-btn" data-mode="worstcase" title="CPU and GPU both counted at their full rated peak power simultaneously - the safe assumption for heavy multi-threaded workloads (rendering, encoding, compiling) alongside GPU load.">Worst-Case</button>
+        </div>
       </div>
 
       <!-- CPU -->
@@ -196,9 +238,10 @@
           <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Processor (CPU)
         </label>
-        <div class="relative">
+        <div class="relative hw-select">
           <input type="text" id="cpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select CPU..." readonly data-default="Select CPU...">
           <span class="select-arrow">▼</span>
+          <button type="button" class="clear-btn hidden" aria-label="Clear selection">&times;</button>
           <div id="cpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="cpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -211,9 +254,10 @@
           <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Motherboard & Chipset
         </label>
-        <div class="relative">
+        <div class="relative hw-select">
           <input type="text" id="mbSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Motherboard..." readonly data-default="Select Motherboard...">
           <span class="select-arrow">▼</span>
+          <button type="button" class="clear-btn hidden" aria-label="Clear selection">&times;</button>
           <div id="mbDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="mbInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -226,9 +270,10 @@
           <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Graphics Card (GPU)
         </label>
-        <div class="relative">
+        <div class="relative hw-select">
           <input type="text" id="gpuSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select GPU..." readonly data-default="Select GPU...">
           <span class="select-arrow">▼</span>
+          <button type="button" class="clear-btn hidden" aria-label="Clear selection">&times;</button>
           <div id="gpuDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="gpuInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -242,9 +287,10 @@
             <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             Memory
           </label>
-          <div class="relative">
+          <div class="relative hw-select">
             <input type="text" id="ramSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select RAM..." readonly data-default="Select RAM...">
             <span class="select-arrow">▼</span>
+            <button type="button" class="clear-btn hidden" aria-label="Clear selection">&times;</button>
             <div id="ramDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="ramInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -256,9 +302,10 @@
             <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             Cooling
           </label>
-          <div class="relative">
+          <div class="relative hw-select">
             <input type="text" id="coolingSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Cooler..." readonly data-default="Select Cooler...">
             <span class="select-arrow">▼</span>
+            <button type="button" class="clear-btn hidden" aria-label="Clear selection">&times;</button>
             <div id="coolingDropdown" class="dropdown-results hidden"></div>
           </div>
           <div id="coolingInsight" class="text-[10px] text-teal-400 italic hidden"></div>
@@ -272,9 +319,10 @@
           <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Storage Drive
         </label>
-        <div class="relative">
+        <div class="relative hw-select">
           <input type="text" id="storageSearch" class="search-input rounded-lg px-3 py-2 text-sm" placeholder="Select Storage..." readonly data-default="Select Storage...">
           <span class="select-arrow">▼</span>
+          <button type="button" class="clear-btn hidden" aria-label="Clear selection">&times;</button>
           <div id="storageDropdown" class="dropdown-results hidden"></div>
         </div>
         <div id="storageInsight" class="text-[11px] text-teal-400 italic hidden"></div>
@@ -289,7 +337,7 @@
       <div>
         <div class="grid grid-cols-2 gap-4 mb-6">
           <div>
-            <div class="text-xs font-medium mb-1" style="color:var(--text-2)">Recommended PSU</div>
+            <div class="text-xs font-medium mb-1" style="color:var(--text-2)">Recommended PSU <span id="modeIndicator" class="text-[9px] font-normal" style="color:var(--text-3)">(Gaming)</span></div>
             <div class="flex items-baseline gap-1">
               <span id="recWattage" class="mono text-4xl font-bold" style="color:var(--accent)">0</span>
               <span class="mono text-sm" style="color:var(--text-3)">W</span>
@@ -309,6 +357,11 @@
           <div class="text-sm text-gray-500">Awaiting components...</div>
         </div>
 
+        <div id="wattageBreakdown" class="hidden mt-4 pt-3 border-t" style="border-color:var(--line-soft);">
+          <h4 class="text-[10px] font-medium uppercase tracking-wide mb-2" style="color:var(--text-3)">Where the watts go</h4>
+          <div id="breakdownList" class="space-y-1"></div>
+        </div>
+
         <div id="safetyPanel" class="safety-panel mt-4 hidden">
           <div class="flex items-start gap-2">
             <span class="mono text-sm" style="color:var(--warn)">⚠</span>
@@ -319,7 +372,7 @@
 
       <div class="mt-4 pt-4 border-t" style="border-color:var(--line)">
         <p id="statusDetail" class="text-xs leading-relaxed" style="color:var(--text-3)">Select components to analyze ATX 3.1 excursion safety and bottleneck ratios.</p>
-        <p class="text-[10px] text-gray-500 mt-2">*Note: Calculations sum each component's manufacturer-rated sustained power draw (CPU PL2/MTP or PPT, GPU TGP/TBP) plus a fixed overhead allowance, then target ~70% PSU load for headroom. Results are estimates — actual draw varies with silicon quality, ambient temperature, and overclocking.</p>
+        <p class="text-[10px] text-gray-500 mt-2">*Note: Calculations sum each component's manufacturer-rated sustained power draw (GPU TGP/TBP always at full rating; CPU PL2/MTP/PPT scaled to ~70% in Gaming mode, full in Worst-Case mode) plus a fixed overhead allowance, then target ~70% PSU load for headroom. Results are estimates — actual draw varies with silicon quality, ambient temperature, and overclocking.</p>
       </div>
     </div>
   </section>
@@ -393,108 +446,108 @@
         <p class="text-gray-400 mb-4">Each title is modeled with its own GPU-bound/CPU-bound weighting (for example Valorant leans CPU-bound, Cyberpunk 2077 at Ultra leans GPU-bound) and calibrated against published benchmark reference points. This is a calibrated estimate for ballpark planning, not a live per-title benchmark database — treat exact numbers as directional.</p>
 
         <h3 class="font-semibold text-sm text-white mb-1">How often is hardware data updated?</h3>
-        <p class="text-gray-400">Our component database targets a bi-monthly refresh as new desktop parts and PSU revisions launch. CPU power figures for 6th-9th gen Intel parts use a documented estimation formula rather than a single disputed spec number — see the on-page methodology note.</p>
+        <p class="text-gray-400">Our component database targets a bi-monthly refresh as new desktop parts and PSU revisions launch. CPU power figures for 6th-9th gen Intel parts are derived from a documented methodology (a TDP-based multiplier, explained in the codebase) rather than a single disputed spec number, since independent testing sources disagree on real PL2 values for that era.</p>
       </div>
     </div>
   </div>
 </section>
 
+<footer class="max-w-7xl mx-auto px-6 pb-10 text-[11px] leading-relaxed" style="color:var(--text-3)">
+  <p>As an Amazon Associate, Wattbench earns from qualifying purchases made through the "Buy on Amazon" links on this page. This doesn't change the price you pay.</p>
+  <p class="mt-2">This page uses Vercel Analytics for anonymous traffic metrics and browser localStorage (only, for the private Field Notes feature above) — no personal data is collected or sold.</p>
+</footer>
+
 <script>
 const CPUS = [
-  { "name": "Intel Core i3-3220", "tier": 1.4, "boost_w": 63, "desc": "Entry dual-core chip for basic office tasks and retro gaming." },
-  { "name": "Intel Core i5-3570K", "tier": 2.5, "boost_w": 108, "desc": "Legendary quad-core processor ideal for budget legacy builds." },
-  { "name": "Intel Core i7-3770K", "tier": 3.0, "boost_w": 108, "desc": "Classic hyperthreaded quad-core powerhouse." },
-  { "name": "Intel Core i3-4130", "tier": 1.5, "boost_w": 62, "desc": "Reliable Haswell entry processor." },
-  { "name": "Intel Core i5-4460", "tier": 2.6, "boost_w": 97, "desc": "Dependable mid-range quad core for 1080p esports." },
-  { "name": "Intel Core i5-4690K", "tier": 2.8, "boost_w": 123, "desc": "Great overclocking headroom for classic gaming rigs." },
-  { "name": "Intel Core i7-4790K", "tier": 3.2, "boost_w": 123, "desc": "The iconic Devil's Canyon CPU that lasted for years." },
-  { "name": "Intel Core i5-5675C", "tier": 2.7, "boost_w": 91, "desc": "Broadwell chip featuring embedded eDRAM cache." },
-  { "name": "Intel Core i7-5775C", "tier": 3.3, "boost_w": 91, "desc": "Niche enthusiast chip with massive L4 cache benefits." },
-  { "name": "Intel Core i3-6100", "tier": 1.7, "boost_w": 59, "desc": "Skylake dual-core standard." },
-  { "name": "Intel Core i5-6600K", "tier": 3.0, "boost_w": 127, "desc": "Solid quad-core performer for mid-tier GPUs." },
-  { "name": "Intel Core i7-6700K", "tier": 3.5, "boost_w": 127, "desc": "Reliable workstation and gaming quad-core." },
-  { "name": "Intel Core i3-7100", "tier": 1.8, "boost_w": 59, "desc": "Kaby Lake budget processor." },
-  { "name": "Intel Core i5-7600K", "tier": 3.1, "boost_w": 127, "desc": "Standard quad core with solid clock speeds." },
-  { "name": "Intel Core i7-7700K", "tier": 3.6, "boost_w": 127, "desc": "High clock speed quad core for high-refresh 1080p." },
-  { "name": "Intel Core i3-8100", "tier": 2.2, "boost_w": 75, "desc": "First 4-core i3 standard generation." },
-  { "name": "Intel Core i5-8400", "tier": 3.2, "boost_w": 75, "desc": "Popular 6-core processor shifting mainstream gaming." },
-  { "name": "Intel Core i5-8600K", "tier": 3.5, "boost_w": 133, "desc": "Highly overclockable 6-core gaming chip." },
-  { "name": "Intel Core i7-8700K", "tier": 4.2, "boost_w": 140, "desc": "Elite 6-core/12-thread powerhouse." },
-  { "name": "Intel Core i3-9100F", "tier": 2.3, "boost_w": 75, "desc": "Budget quad core without integrated graphics." },
-  { "name": "Intel Core i5-9400F", "tier": 3.3, "boost_w": 75, "desc": "Affordable 6-core CPU for budget setups." },
-  { "name": "Intel Core i5-9600K", "tier": 3.7, "boost_w": 133, "desc": "Strong single-core speeds for stable framerates." },
-  { "name": "Intel Core i7-9700K", "tier": 4.4, "boost_w": 145, "desc": "8-core pure performance CPU without hyperthreading." },
-  { "name": "Intel Core i9-9900K", "tier": 4.8, "boost_w": 155, "desc": "Flagship 8-core gaming icon." },
-  { "name": "Intel Core i3-10100F", "tier": 2.5, "boost_w": 65, "desc": "Exceptional value quad-core with hyperthreading." },
-  { "name": "Intel Core i5-10400F", "tier": 3.5, "boost_w": 65, "desc": "Incredible budget 6-core gaming favorite." },
-  { "name": "Intel Core i5-10600K", "tier": 4.0, "boost_w": 125, "desc": "High power draw mid-ranger with great multi-core output." },
-  { "name": "Intel Core i7-10700K", "tier": 4.8, "boost_w": 229, "desc": "Demanding 8-core CPU requiring robust cooling and PSU headroom." },
-  { "name": "Intel Core i9-10900K", "tier": 5.2, "boost_w": 250, "desc": "The classic 10-core furnace with massive power spikes." },
-  { "name": "Intel Core i3-11100F", "tier": 2.6, "boost_w": 65, "desc": "Rocket Lake entry quad core." },
-  { "name": "Intel Core i5-11400F", "tier": 3.7, "boost_w": 117, "desc": "Tremendous price-to-performance 6-core processor." },
-  { "name": "Intel Core i5-11600K", "tier": 4.2, "boost_w": 224, "desc": "High energy consumption chip with strong IPC gains." },
-  { "name": "Intel Core i7-11700K", "tier": 4.9, "boost_w": 251, "desc": "Demands high wattage and high-end cooling solutions." },
-  { "name": "Intel Core i9-11900K", "tier": 5.1, "boost_w": 251, "desc": "Power-hungry flagship with high boost thresholds." },
-  { "name": "Intel Core i3-12100F", "tier": 2.9, "boost_w": 89, "desc": "Best-in-class budget entry chip for modern gaming." },
-  { "name": "Intel Core i5-12400F", "tier": 4.0, "boost_w": 117, "desc": "Incredible Alder Lake efficiency and gaming value." },
-  { "name": "Intel Core i5-12600K", "tier": 5.4, "boost_w": 150, "desc": "Hybrid core architecture balancing performance and power." },
-  { "name": "Intel Core i7-12700K", "tier": 6.8, "boost_w": 190, "desc": "Powerful multi-threaded processor for gaming and streaming." },
-  { "name": "Intel Core i9-12900K", "tier": 7.6, "boost_w": 241, "desc": "High-draw flagship hybrid architecture processor." },
-  { "name": "Intel Core i3-13100F", "tier": 2.5, "boost_w": 89, "desc": "Reliable entry quad-core for light esports titles." },
-  { "name": "Intel Core i5-13400F", "tier": 5.0, "boost_w": 148, "desc": "Balanced mid-tier CPU with efficiency cores." },
-  { "name": "Intel Core i5-13600K", "tier": 6.5, "boost_w": 181, "desc": "Exceptional mid-range gaming king with high boost draws." },
-  { "name": "Intel Core i7-13700K", "tier": 8.0, "boost_w": 253, "desc": "High-end powerhouse that demands robust thermal management." },
-  { "name": "Intel Core i9-13900K", "tier": 9.2, "boost_w": 253, "desc": "Extreme enthusiast processor prone to high thermal output." },
-  { "name": "Intel Core i3-14100F", "tier": 2.6, "boost_w": 110, "desc": "Refreshed entry tier quad core." },
-  { "name": "Intel Core i5-14400F", "tier": 5.1, "boost_w": 148, "desc": "Reliable mid-tier option for standard rigs." },
-  { "name": "Intel Core i5-14600K", "tier": 6.7, "boost_w": 181, "desc": "Fantastic gaming frame rates with high thermal ceilings." },
-  { "name": "Intel Core i7-14700K", "tier": 8.4, "boost_w": 253, "desc": "Extra cores and high power draw requiring heavy cooling." },
-  { "name": "Intel Core i9-14900K", "tier": 9.5, "boost_w": 253, "desc": "Maximum clock speeds with demanding power requirements." },
-  { "name": "Intel Core Ultra 5 225F", "tier": 5.2, "boost_w": 154, "desc": "Next-gen architecture balancing efficiency and power." },
-  { "name": "Intel Core Ultra 5 245K", "tier": 6.9, "boost_w": 159, "desc": "Modern Arrow Lake mid-range chip with great thermal control." },
-  { "name": "Intel Core Ultra 7 265K", "tier": 8.3, "boost_w": 250, "desc": "Advanced multi-core productivity and gaming CPU." },
-  { "name": "Intel Core Ultra 9 285K", "tier": 9.3, "boost_w": 250, "desc": "Flagship efficiency-focused flagship desktop processor." },
-  { "name": "Intel Core Ultra 5 125U (Mobile)", "tier": 3.8, "boost_w": 57, "desc": "Ultra-low power laptop processor optimized for battery life." },
-  { "name": "Intel Core Ultra 7 155H (Mobile)", "tier": 6.0, "boost_w": 115, "desc": "Balanced laptop processor with strong integrated graphics." },
-  { "name": "Intel Core Ultra 9 275HX (Mobile)", "tier": 8.5, "boost_w": 160, "desc": "High-performance mobile powerhouse for gaming laptops." },
-  { "name": "AMD Ryzen 3 1200", "tier": 1.6, "boost_w": 65, "desc": "Legacy quad-core entry chip." },
-  { "name": "AMD Ryzen 5 1600", "tier": 2.9, "boost_w": 65, "desc": "The legendary AM4 budget savior chip." },
-  { "name": "AMD Ryzen 7 1700X", "tier": 3.6, "boost_w": 95, "desc": "Early multi-core workstation processor." },
-  { "name": "AMD Ryzen 5 2600", "tier": 3.1, "boost_w": 65, "desc": "Reliable budget 6-core CPU." },
-  { "name": "AMD Ryzen 7 2700X", "tier": 4.1, "boost_w": 105, "desc": "Strong multi-threaded AM4 processor." },
-  { "name": "AMD Ryzen 3 3100", "tier": 2.8, "boost_w": 65, "desc": "Budget quad-core Zen 2 architecture." },
-  { "name": "AMD Ryzen 5 3600", "tier": 3.8, "boost_w": 88, "desc": "Iconic Zen 2 gaming processor offering stellar value." },
-  { "name": "AMD Ryzen 7 3700X", "tier": 4.7, "boost_w": 88, "desc": "Efficient 8-core processor with low power draw." },
-  { "name": "AMD Ryzen 9 3900X", "tier": 5.6, "boost_w": 142, "desc": "12-core productivity and gaming monster." },
-  { "name": "AMD Ryzen 5 5500", "tier": 3.5, "boost_w": 88, "desc": "Affordable Zen 3 chip for budget gaming builds." },
-  { "name": "AMD Ryzen 5 5600", "tier": 3.8, "boost_w": 88, "desc": "The ultimate modern budget gaming processor." },
-  { "name": "AMD Ryzen 5 5600X", "tier": 4.1, "boost_w": 88, "desc": "Extremely power-efficient 6-core gaming champion." },
-  { "name": "AMD Ryzen 7 5700X", "tier": 5.0, "boost_w": 88, "desc": "Cool-running 8-core processor with great efficiency." },
-  { "name": "AMD Ryzen 7 5800X", "tier": 5.4, "boost_w": 142, "desc": "High-performance single-CCD gaming CPU." },
-  { "name": "AMD Ryzen 7 5800X3D", "tier": 6.8, "boost_w": 142, "desc": "Legendary gaming CPU with massive 3D V-Cache." },
-  { "name": "AMD Ryzen 9 5900X", "tier": 6.6, "boost_w": 142, "desc": "Top-tier 12-core AM4 powerhouse." },
-  { "name": "AMD Ryzen 9 5950X", "tier": 7.2, "boost_w": 142, "desc": "Ultimate 16-core AM4 content creation chip." },
-  { "name": "AMD Ryzen 5 5600G (APU)", "tier": 3.4, "boost_w": 65, "desc": "Features robust integrated Radeon graphics." },
-  { "name": "AMD Ryzen 7 5700G (APU)", "tier": 4.3, "boost_w": 65, "desc": "Great APU option for budget graphics-free builds." },
-  { "name": "AMD Ryzen 5 7600", "tier": 5.6, "boost_w": 88, "desc": "Incredible entry AM5 processor with high upgrade potential." },
-  { "name": "AMD Ryzen 5 7600X", "tier": 6.0, "boost_w": 142, "desc": "Fast AM5 gaming chip with great single-core speeds." },
-  { "name": "AMD Ryzen 7 7700X", "tier": 7.3, "boost_w": 142, "desc": "High-speed 8-core processor for AM5 platforms." },
-  { "name": "AMD Ryzen 7 7800X3D", "tier": 8.2, "boost_w": 162, "desc": "The undisputed king of high-fps gaming efficiency." },
-  { "name": "AMD Ryzen 9 7900X", "tier": 8.6, "boost_w": 230, "desc": "High-draw 12-core processor requiring quality cooling." },
-  { "name": "AMD Ryzen 9 7950X", "tier": 9.6, "boost_w": 230, "desc": "Maximum multi-core workstation and gaming performance." },
-  { "name": "AMD Ryzen 9 7950X3D", "tier": 9.7, "boost_w": 162, "desc": "Ultimate flagship combining 3D V-Cache and 16 cores." },
-  { "name": "AMD Ryzen 5 8500G (APU)", "tier": 4.6, "boost_w": 65, "desc": "Modern AM5 APU with strong integrated graphics." },
-  { "name": "AMD Ryzen 7 8700G (APU)", "tier": 5.8, "boost_w": 88, "desc": "High-end APU for compact entry gaming systems." },
-  { "name": "AMD Ryzen 5 9600X", "tier": 6.5, "boost_w": 88, "desc": "Super efficient Zen 5 processor with low thermals." },
-  { "name": "AMD Ryzen 7 9700X", "tier": 7.6, "boost_w": 88, "desc": "Incredibly power-efficient 8-core Zen 5 gaming chip." },
-  { "name": "AMD Ryzen 7 9800X3D", "tier": 9.0, "boost_w": 162, "desc": "Next-gen 3D V-Cache champion delivering peerless frame rates." },
-  { "name": "AMD Ryzen 9 9900X", "tier": 9.1, "boost_w": 162, "desc": "Balanced 12-core powerhouse with controlled power draws." },
-  { "name": "AMD Ryzen 9 9950X", "tier": 9.9, "boost_w": 230, "desc": "Flagship Zen 5 workstation processor." },
-  { "name": "AMD Ryzen 9 9950X3D", "tier": 10.0, "boost_w": 230, "desc": "Absolute peak performance processor for extreme enthusiasts." },
-  { "name": "AMD Ryzen 5 7535HS (Mobile)", "tier": 4.4, "boost_w": 54, "desc": "Efficient mobile gaming laptop processor." },
-  { "name": "AMD Ryzen 9 7940HX (Mobile)", "tier": 7.9, "boost_w": 75, "desc": "High-end mobile processor for enthusiast gaming laptops." },
-  { "name": "AMD Threadripper 3970X", "tier": 6.8, "boost_w": 280, "desc": "Massive HEDT processor for professional rendering." },
-  { "name": "AMD Threadripper 7980X", "tier": 7.2, "boost_w": 350, "desc": "Extreme multi-threaded workstation titan." },
+  { "name": "Intel Core i3-3220", "tier": 1.4, "boost_w": 63, "socket": "LGA1155", "desc": "Entry dual-core chip for basic office tasks and retro gaming." },
+  { "name": "Intel Core i5-3570K", "tier": 2.5, "boost_w": 108, "socket": "LGA1155", "desc": "Legendary quad-core processor ideal for budget legacy builds." },
+  { "name": "Intel Core i7-3770K", "tier": 3.0, "boost_w": 108, "socket": "LGA1155", "desc": "Classic hyperthreaded quad-core powerhouse." },
+  { "name": "Intel Core i3-4130", "tier": 1.5, "boost_w": 62, "socket": "LGA1150", "desc": "Reliable Haswell entry processor." },
+  { "name": "Intel Core i5-4460", "tier": 2.6, "boost_w": 97, "socket": "LGA1150", "desc": "Dependable mid-range quad core for 1080p esports." },
+  { "name": "Intel Core i5-4690K", "tier": 2.8, "boost_w": 123, "socket": "LGA1150", "desc": "Great overclocking headroom for classic gaming rigs." },
+  { "name": "Intel Core i7-4790K", "tier": 3.2, "boost_w": 123, "socket": "LGA1150", "desc": "The iconic Devil's Canyon CPU that lasted for years." },
+  { "name": "Intel Core i5-5675C", "tier": 2.7, "boost_w": 91, "socket": "LGA1150", "desc": "Broadwell chip featuring embedded eDRAM cache." },
+  { "name": "Intel Core i7-5775C", "tier": 3.3, "boost_w": 91, "socket": "LGA1150", "desc": "Niche enthusiast chip with massive L4 cache benefits." },
+  { "name": "Intel Core i3-6100", "tier": 1.7, "boost_w": 59, "socket": "LGA1151", "desc": "Skylake dual-core standard." },
+  { "name": "Intel Core i5-6600K", "tier": 3.0, "boost_w": 127, "socket": "LGA1151", "desc": "Solid quad-core performer for mid-tier GPUs." },
+  { "name": "Intel Core i7-6700K", "tier": 3.5, "boost_w": 127, "socket": "LGA1151", "desc": "Reliable workstation and gaming quad-core." },
+  { "name": "Intel Core i3-7100", "tier": 1.8, "boost_w": 59, "socket": "LGA1151", "desc": "Kaby Lake budget processor." },
+  { "name": "Intel Core i5-7600K", "tier": 3.1, "boost_w": 127, "socket": "LGA1151", "desc": "Standard quad core with solid clock speeds." },
+  { "name": "Intel Core i7-7700K", "tier": 3.6, "boost_w": 127, "socket": "LGA1151", "desc": "High clock speed quad core for high-refresh 1080p." },
+  { "name": "Intel Core i3-8100", "tier": 2.2, "boost_w": 75, "socket": "LGA1151v2", "desc": "First 4-core i3 standard generation." },
+  { "name": "Intel Core i5-8400", "tier": 3.2, "boost_w": 75, "socket": "LGA1151v2", "desc": "Popular 6-core processor shifting mainstream gaming." },
+  { "name": "Intel Core i5-8600K", "tier": 3.5, "boost_w": 133, "socket": "LGA1151v2", "desc": "Highly overclockable 6-core gaming chip." },
+  { "name": "Intel Core i7-8700K", "tier": 4.2, "boost_w": 140, "socket": "LGA1151v2", "desc": "Elite 6-core/12-thread powerhouse." },
+  { "name": "Intel Core i3-9100F", "tier": 2.3, "boost_w": 75, "socket": "LGA1151v2", "desc": "Budget quad core without integrated graphics." },
+  { "name": "Intel Core i5-9400F", "tier": 3.3, "boost_w": 75, "socket": "LGA1151v2", "desc": "Affordable 6-core CPU for budget setups." },
+  { "name": "Intel Core i5-9600K", "tier": 3.7, "boost_w": 133, "socket": "LGA1151v2", "desc": "Strong single-core speeds for stable framerates." },
+  { "name": "Intel Core i7-9700K", "tier": 4.4, "boost_w": 145, "socket": "LGA1151v2", "desc": "8-core pure performance CPU without hyperthreading." },
+  { "name": "Intel Core i9-9900K", "tier": 4.8, "boost_w": 155, "socket": "LGA1151v2", "desc": "Flagship 8-core gaming icon." },
+  { "name": "Intel Core i3-10100F", "tier": 2.5, "boost_w": 65, "socket": "LGA1200", "desc": "Exceptional value quad-core with hyperthreading." },
+  { "name": "Intel Core i5-10400F", "tier": 3.5, "boost_w": 65, "socket": "LGA1200", "desc": "Incredible budget 6-core gaming favorite." },
+  { "name": "Intel Core i5-10600K", "tier": 4.0, "boost_w": 125, "socket": "LGA1200", "desc": "High power draw mid-ranger with great multi-core output." },
+  { "name": "Intel Core i7-10700K", "tier": 4.8, "boost_w": 229, "socket": "LGA1200", "desc": "Demanding 8-core CPU requiring robust cooling and PSU headroom." },
+  { "name": "Intel Core i9-10900K", "tier": 5.2, "boost_w": 250, "socket": "LGA1200", "desc": "The classic 10-core furnace with massive power spikes." },
+  { "name": "Intel Core i3-11100F", "tier": 2.6, "boost_w": 65, "socket": "LGA1200", "desc": "Rocket Lake entry quad core." },
+  { "name": "Intel Core i5-11400F", "tier": 3.7, "boost_w": 117, "socket": "LGA1200", "desc": "Tremendous price-to-performance 6-core processor." },
+  { "name": "Intel Core i5-11600K", "tier": 4.2, "boost_w": 224, "socket": "LGA1200", "desc": "High energy consumption chip with strong IPC gains." },
+  { "name": "Intel Core i7-11700K", "tier": 4.9, "boost_w": 251, "socket": "LGA1200", "desc": "Demands high wattage and high-end cooling solutions." },
+  { "name": "Intel Core i9-11900K", "tier": 5.1, "boost_w": 251, "socket": "LGA1200", "desc": "Power-hungry flagship with high boost thresholds." },
+  { "name": "Intel Core i3-12100F", "tier": 2.9, "boost_w": 89, "socket": "LGA1700", "desc": "Best-in-class budget entry chip for modern gaming." },
+  { "name": "Intel Core i5-12400F", "tier": 4.0, "boost_w": 117, "socket": "LGA1700", "desc": "Incredible Alder Lake efficiency and gaming value." },
+  { "name": "Intel Core i5-12600K", "tier": 5.4, "boost_w": 150, "socket": "LGA1700", "desc": "Hybrid core architecture balancing performance and power." },
+  { "name": "Intel Core i7-12700K", "tier": 6.8, "boost_w": 190, "socket": "LGA1700", "desc": "Powerful multi-threaded processor for gaming and streaming." },
+  { "name": "Intel Core i9-12900K", "tier": 7.6, "boost_w": 241, "socket": "LGA1700", "desc": "High-draw flagship hybrid architecture processor." },
+  { "name": "Intel Core i3-13100F", "tier": 3.0, "boost_w": 89, "socket": "LGA1700", "desc": "Reliable entry quad-core for light esports titles." },
+  { "name": "Intel Core i5-13400F", "tier": 5.0, "boost_w": 148, "socket": "LGA1700", "desc": "Balanced mid-tier CPU with efficiency cores." },
+  { "name": "Intel Core i5-13600K", "tier": 6.5, "boost_w": 181, "socket": "LGA1700", "desc": "Exceptional mid-range gaming king with high boost draws." },
+  { "name": "Intel Core i7-13700K", "tier": 8.0, "boost_w": 253, "socket": "LGA1700", "desc": "High-end powerhouse that demands robust thermal management." },
+  { "name": "Intel Core i9-13900K", "tier": 9.2, "boost_w": 253, "socket": "LGA1700", "desc": "Extreme enthusiast processor prone to high thermal output." },
+  { "name": "Intel Core i3-14100F", "tier": 2.6, "boost_w": 110, "socket": "LGA1700", "desc": "Refreshed entry tier quad core." },
+  { "name": "Intel Core i5-14400F", "tier": 5.1, "boost_w": 148, "socket": "LGA1700", "desc": "Reliable mid-tier option for standard rigs." },
+  { "name": "Intel Core i5-14600K", "tier": 6.7, "boost_w": 181, "socket": "LGA1700", "desc": "Fantastic gaming frame rates with high thermal ceilings." },
+  { "name": "Intel Core i7-14700K", "tier": 8.4, "boost_w": 253, "socket": "LGA1700", "desc": "Extra cores and high power draw requiring heavy cooling." },
+  { "name": "Intel Core i9-14900K", "tier": 9.5, "boost_w": 253, "socket": "LGA1700", "desc": "Maximum clock speeds with demanding power requirements." },
+  { "name": "Intel Core Ultra 5 225F", "tier": 5.2, "boost_w": 154, "socket": "LGA1851", "desc": "Next-gen architecture balancing efficiency and power." },
+  { "name": "Intel Core Ultra 5 245K", "tier": 6.9, "boost_w": 159, "socket": "LGA1851", "desc": "Modern Arrow Lake mid-range chip with great thermal control." },
+  { "name": "Intel Core Ultra 7 265K", "tier": 8.3, "boost_w": 250, "socket": "LGA1851", "desc": "Advanced multi-core productivity and gaming CPU." },
+  { "name": "Intel Core Ultra 9 285K", "tier": 9.3, "boost_w": 250, "socket": "LGA1851", "desc": "Flagship efficiency-focused flagship desktop processor." },
+  { "name": "AMD Ryzen 3 1200", "tier": 1.6, "boost_w": 65, "socket": "AM4", "desc": "Legacy quad-core entry chip." },
+  { "name": "AMD Ryzen 5 1600", "tier": 2.9, "boost_w": 65, "socket": "AM4", "desc": "The legendary AM4 budget savior chip." },
+  { "name": "AMD Ryzen 7 1700X", "tier": 3.6, "boost_w": 95, "socket": "AM4", "desc": "Early multi-core workstation processor." },
+  { "name": "AMD Ryzen 5 2600", "tier": 3.1, "boost_w": 65, "socket": "AM4", "desc": "Reliable budget 6-core CPU." },
+  { "name": "AMD Ryzen 7 2700X", "tier": 4.1, "boost_w": 105, "socket": "AM4", "desc": "Strong multi-threaded AM4 processor." },
+  { "name": "AMD Ryzen 3 3100", "tier": 2.8, "boost_w": 65, "socket": "AM4", "desc": "Budget quad-core Zen 2 architecture." },
+  { "name": "AMD Ryzen 5 3600", "tier": 3.8, "boost_w": 88, "socket": "AM4", "desc": "Iconic Zen 2 gaming processor offering stellar value." },
+  { "name": "AMD Ryzen 7 3700X", "tier": 4.7, "boost_w": 88, "socket": "AM4", "desc": "Efficient 8-core processor with low power draw." },
+  { "name": "AMD Ryzen 9 3900X", "tier": 5.6, "boost_w": 142, "socket": "AM4", "desc": "12-core productivity and gaming monster." },
+  { "name": "AMD Ryzen 5 5500", "tier": 3.5, "boost_w": 88, "socket": "AM4", "desc": "Affordable Zen 3 chip for budget gaming builds." },
+  { "name": "AMD Ryzen 5 5600", "tier": 3.8, "boost_w": 88, "socket": "AM4", "desc": "The ultimate modern budget gaming processor." },
+  { "name": "AMD Ryzen 5 5600X", "tier": 4.1, "boost_w": 88, "socket": "AM4", "desc": "Extremely power-efficient 6-core gaming champion." },
+  { "name": "AMD Ryzen 7 5700X", "tier": 5.0, "boost_w": 88, "socket": "AM4", "desc": "Cool-running 8-core processor with great efficiency." },
+  { "name": "AMD Ryzen 7 5800X", "tier": 5.4, "boost_w": 142, "socket": "AM4", "desc": "High-performance single-CCD gaming CPU." },
+  { "name": "AMD Ryzen 7 5800X3D", "tier": 7.4, "boost_w": 142, "socket": "AM4", "desc": "Legendary gaming CPU with massive 3D V-Cache." },
+  { "name": "AMD Ryzen 9 5900X", "tier": 6.2, "boost_w": 142, "socket": "AM4", "desc": "Top-tier 12-core AM4 powerhouse." },
+  { "name": "AMD Ryzen 9 5950X", "tier": 6.6, "boost_w": 142, "socket": "AM4", "desc": "Ultimate 16-core AM4 content creation chip." },
+  { "name": "AMD Ryzen 5 5600G (APU)", "tier": 3.4, "boost_w": 65, "socket": "AM4", "desc": "Features robust integrated Radeon graphics." },
+  { "name": "AMD Ryzen 7 5700G (APU)", "tier": 4.3, "boost_w": 65, "socket": "AM4", "desc": "Great APU option for budget graphics-free builds." },
+  { "name": "AMD Ryzen 5 7600", "tier": 5.6, "boost_w": 88, "socket": "AM5", "desc": "Incredible entry AM5 processor with high upgrade potential." },
+  { "name": "AMD Ryzen 5 7600X", "tier": 6.0, "boost_w": 142, "socket": "AM5", "desc": "Fast AM5 gaming chip with great single-core speeds." },
+  { "name": "AMD Ryzen 7 7700X", "tier": 7.3, "boost_w": 142, "socket": "AM5", "desc": "High-speed 8-core processor for AM5 platforms." },
+  { "name": "AMD Ryzen 7 7800X3D", "tier": 9.3, "boost_w": 162, "socket": "AM5", "desc": "The undisputed king of high-fps gaming efficiency." },
+  { "name": "AMD Ryzen 9 7900X", "tier": 7.6, "boost_w": 230, "socket": "AM5", "desc": "High-draw 12-core processor requiring quality cooling." },
+  { "name": "AMD Ryzen 9 7950X", "tier": 8.0, "boost_w": 230, "socket": "AM5", "desc": "Maximum multi-core workstation and gaming performance." },
+  { "name": "AMD Ryzen 9 7950X3D", "tier": 9.4, "boost_w": 162, "socket": "AM5", "desc": "Ultimate flagship combining 3D V-Cache and 16 cores." },
+  { "name": "AMD Ryzen 5 8500G (APU)", "tier": 4.6, "boost_w": 65, "socket": "AM5", "desc": "Modern AM5 APU with strong integrated graphics." },
+  { "name": "AMD Ryzen 7 8700G (APU)", "tier": 5.8, "boost_w": 88, "socket": "AM5", "desc": "High-end APU for compact entry gaming systems." },
+  { "name": "AMD Ryzen 5 9600X", "tier": 6.5, "boost_w": 88, "socket": "AM5", "desc": "Super efficient Zen 5 processor with low thermals." },
+  { "name": "AMD Ryzen 7 9700X", "tier": 7.6, "boost_w": 88, "socket": "AM5", "desc": "Incredibly power-efficient 8-core Zen 5 gaming chip." },
+  { "name": "AMD Ryzen 7 9800X3D", "tier": 9.9, "boost_w": 162, "socket": "AM5", "desc": "Next-gen 3D V-Cache champion delivering peerless frame rates." },
+  { "name": "AMD Ryzen 9 9900X", "tier": 8.3, "boost_w": 162, "socket": "AM5", "desc": "Balanced 12-core powerhouse with controlled power draws." },
+  { "name": "AMD Ryzen 9 9950X", "tier": 8.6, "boost_w": 230, "socket": "AM5", "desc": "Flagship Zen 5 workstation processor." },
+  { "name": "AMD Ryzen 9 9950X3D", "tier": 10.0, "boost_w": 230, "socket": "AM5", "desc": "Absolute peak performance processor for extreme enthusiasts." },
+  { "name": "AMD Threadripper 3970X", "tier": 6.8, "boost_w": 280, "socket": "sTRX4/sTR5", "desc": "Massive HEDT processor for professional rendering." },
+  { "name": "AMD Threadripper 7980X", "tier": 7.2, "boost_w": 350, "socket": "sTRX4/sTR5", "desc": "Extreme multi-threaded workstation titan." },
 ];
 
 const GPUS = [
@@ -523,8 +576,8 @@ const GPUS = [
   { "name": "RTX 3080 Ti", "tier": 6.6, "boost_w": 350, "needs12vhpwr": false, "desc": "Demanding high-draw enthusiast card." },
   { "name": "RTX 3090", "tier": 6.9, "boost_w": 350, "needs12vhpwr": false, "desc": "24GB VRAM monster for AI workflows and gaming." },
   { "name": "RTX 3090 Ti", "tier": 7.1, "boost_w": 450, "needs12vhpwr": false, "desc": "Extreme power draw GPU requiring a 1000W+ PSU." },
-  { "name": "RTX 4060", "tier": 3.6, "boost_w": 115, "needs12vhpwr": true, "desc": "Incredibly power-efficient DLSS 3 gaming card." },
-  { "name": "RTX 4060 Ti", "tier": 4.6, "boost_w": 160, "needs12vhpwr": true, "desc": "Efficient mid-range card with low thermal output." },
+  { "name": "RTX 4060", "tier": 3.6, "boost_w": 115, "needs12vhpwr": false, "desc": "Incredibly power-efficient DLSS 3 gaming card." },
+  { "name": "RTX 4060 Ti", "tier": 4.6, "boost_w": 160, "needs12vhpwr": false, "desc": "Efficient mid-range card with low thermal output." },
   { "name": "RTX 4070", "tier": 6.0, "boost_w": 200, "needs12vhpwr": true, "desc": "Efficient 1440p champion with excellent frame generation." },
   { "name": "RTX 4070 Super", "tier": 6.6, "boost_w": 220, "needs12vhpwr": true, "desc": "Boosted performance for high-refresh 1440p gaming." },
   { "name": "RTX 4070 Ti Super", "tier": 7.6, "boost_w": 285, "needs12vhpwr": true, "desc": "16GB VRAM beast built for heavy 1440p/4K gaming." },
@@ -562,24 +615,39 @@ const GPUS = [
   { "name": "RX 9070 XT", "tier": 7.7, "boost_w": 304, "needs12vhpwr": false, "desc": "Next-gen enthusiast GPU with elite performance." },
 ];
 
+// socket / ramGen let calculate() warn on CPU-board and RAM-board
+// mismatches instead of silently producing a wattage number for a build
+// that couldn't physically exist. Named boards (ASUS/MSI/Gigabyte/ASRock)
+// are real current product lines; wattage scales modestly by tier
+// (budget -> flagship VRM/IO overhead), not just by chipset family.
 const MOTHERBOARDS = [
-  { name: "Intel Z77 / H77 / B75 (LGA1155)", watt: 15, desc: "Legacy DDR3 platform." },
-  { name: "Intel Z97 / H97 (LGA1150)", watt: 15, desc: "Classic Devil's Canyon board." },
-  { name: "Intel Z170 / H170 / B150 (LGA1151)", watt: 20, desc: "Skylake baseline chipset." },
-  { name: "Intel Z270 / H270 / B250 (LGA1151)", watt: 20, desc: "Kaby Lake platform." },
-  { name: "Intel Z370 / Z390 / B360 (LGA1151 v2)", watt: 25, desc: "Coffee Lake 6/8 core board." },
-  { name: "Intel Z490 / H470 / B460 (LGA1200)", watt: 25, desc: "10th Gen Comet Lake support." },
-  { name: "Intel Z590 / H570 / B560 (LGA1200)", watt: 25, desc: "Rocket Lake PCI-e 4.0 support." },
-  { name: "Intel Z690 / H670 / B660 (LGA1700)", watt: 30, desc: "Alder Lake DDR4/DDR5 hybrid platform." },
-  { name: "Intel Z790 / H770 / B760 (LGA1700)", watt: 35, desc: "Robust power delivery for 13th/14th Gen CPUs." },
-  { name: "Intel Z890 (LGA1851)", watt: 45, desc: "Next-gen enthusiast board with high I/O draw." },
-  { name: "AMD A320 / B350 / X370 (AM4)", watt: 15, desc: "First-gen AM4 baseline chipset." },
-  { name: "AMD B450 / X470 (AM4)", watt: 20, desc: "Most popular budget upgrade platform." },
-  { name: "AMD B550 / X570 (AM4)", watt: 25, desc: "PCIe 4.0 ready AM4 motherboard." },
-  { name: "AMD A620 / B650 / X670 (AM5)", watt: 30, desc: "Modern DDR5 AM5 platform." },
-  { name: "AMD B850 / X870 (AM5)", watt: 35, desc: "Advanced AM5 connectivity board." },
-  { name: "AMD sTRX4 (Threadripper 3000)", watt: 50, desc: "HEDT workstation board." },
-  { name: "AMD sTR5 WRX90 / TRX50 (Threadripper 7000)", watt: 75, desc: "Enterprise workstation motherboard." }
+  { name: "Intel Z77 / H77 / B75 (LGA1155)", watt: 15, socket: "LGA1155", ramGen: "DDR3", desc: "Legacy DDR3 platform." },
+  { name: "Intel Z97 / H97 (LGA1150)", watt: 15, socket: "LGA1150", ramGen: "DDR3", desc: "Classic Devil's Canyon board." },
+  { name: "Intel Z170 / H170 / B150 (LGA1151)", watt: 20, socket: "LGA1151", ramGen: "DDR4", desc: "Skylake baseline chipset." },
+  { name: "Intel Z270 / H270 / B250 (LGA1151)", watt: 20, socket: "LGA1151", ramGen: "DDR4", desc: "Kaby Lake platform." },
+  { name: "Intel Z370 / Z390 / B360 (LGA1151 v2)", watt: 25, socket: "LGA1151v2", ramGen: "DDR4", desc: "Coffee Lake 6/8 core board." },
+  { name: "Intel Z490 / H470 / B460 (LGA1200)", watt: 25, socket: "LGA1200", ramGen: "DDR4", desc: "10th Gen Comet Lake support." },
+  { name: "Intel Z590 / H570 / B560 (LGA1200)", watt: 25, socket: "LGA1200", ramGen: "DDR4", desc: "Rocket Lake PCI-e 4.0 support." },
+  { name: "Intel Z690 / H670 / B660 (LGA1700)", watt: 30, socket: "LGA1700", ramGen: "DDR4/DDR5", desc: "Alder Lake DDR4/DDR5 hybrid platform." },
+  { name: "Intel Z790 / H770 / B760 (LGA1700)", watt: 35, socket: "LGA1700", ramGen: "DDR5", desc: "Robust power delivery for 13th/14th Gen CPUs." },
+  { name: "Intel Z890 (LGA1851)", watt: 45, socket: "LGA1851", ramGen: "DDR5", desc: "Next-gen enthusiast board with high I/O draw." },
+  { name: "ASUS Prime Z890-P (LGA1851)", watt: 38, socket: "LGA1851", ramGen: "DDR5", desc: "Budget-tier Z890 board, basic VRM for non-extreme overclocking." },
+  { name: "MSI PRO Z890-A (LGA1851)", watt: 40, socket: "LGA1851", ramGen: "DDR5", desc: "Value-focused Z890 board with solid core VRM." },
+  { name: "Gigabyte AORUS Elite Z890 (LGA1851)", watt: 45, socket: "LGA1851", ramGen: "DDR5", desc: "Mid-tier Z890 board with stronger power delivery." },
+  { name: "ASUS ROG Strix Z890-E Gaming (LGA1851)", watt: 55, socket: "LGA1851", ramGen: "DDR5", desc: "High-end Z890 board, heavy VRM and I/O for enthusiast builds." },
+  { name: "MSI MEG Z890 ACE (LGA1851)", watt: 60, socket: "LGA1851", ramGen: "DDR5", desc: "Flagship Z890 board with maximum power delivery headroom." },
+  { name: "AMD A320 / B350 / X370 (AM4)", watt: 15, socket: "AM4", ramGen: "DDR4", desc: "First-gen AM4 baseline chipset." },
+  { name: "AMD B450 / X470 (AM4)", watt: 20, socket: "AM4", ramGen: "DDR4", desc: "Most popular budget upgrade platform." },
+  { name: "AMD B550 / X570 (AM4)", watt: 25, socket: "AM4", ramGen: "DDR4", desc: "PCIe 4.0 ready AM4 motherboard." },
+  { name: "AMD A620 / B650 / X670 (AM5)", watt: 30, socket: "AM5", ramGen: "DDR5", desc: "Modern DDR5 AM5 platform." },
+  { name: "AMD B850 / X870 (AM5)", watt: 35, socket: "AM5", ramGen: "DDR5", desc: "Advanced AM5 connectivity board." },
+  { name: "ASRock B850 Steel Legend (AM5)", watt: 32, socket: "AM5", ramGen: "DDR5", desc: "Budget-tier B850 board with solid basic VRM." },
+  { name: "MSI MAG B850 Tomahawk (AM5)", watt: 35, socket: "AM5", ramGen: "DDR5", desc: "Popular mid-tier B850 board, good VRM for the price." },
+  { name: "Gigabyte AORUS Elite X870 (AM5)", watt: 40, socket: "AM5", ramGen: "DDR5", desc: "Mid-high X870 board with stronger power delivery." },
+  { name: "ASUS ROG Strix X870-E Gaming (AM5)", watt: 48, socket: "AM5", ramGen: "DDR5", desc: "High-end X870 board, heavy VRM for enthusiast AM5 builds." },
+  { name: "ASRock X870E Taichi (AM5)", watt: 52, socket: "AM5", ramGen: "DDR5", desc: "Flagship X870E board with maximum power delivery headroom." },
+  { name: "AMD sTRX4 (Threadripper 3000)", watt: 50, socket: "sTRX4/sTR5", ramGen: "DDR4", desc: "HEDT workstation board." },
+  { name: "AMD sTR5 WRX90 / TRX50 (Threadripper 7000)", watt: 75, socket: "sTRX4/sTR5", ramGen: "DDR5", desc: "Enterprise workstation motherboard." }
 ];
 
 const COOLING_OPTS = [
@@ -594,17 +662,21 @@ const COOLING_OPTS = [
   { name: "Custom Loop (Single Loop CPU+GPU)", watt: 20, ceiling: 400, desc: "Enthusiast custom water cooling loop." }
 ];
 
+// RAM wattage recalibrated to realistic per-module JEDEC-class draw
+// (previously ~2x too high across the board, worst at high capacity -
+// the old 128GB figure implied ~5.6W per 8GB of DDR5, when real DDR5
+// modules run closer to 2-3W per 8GB even at high density).
 const RAM_OPTS = [
-  { name: "8GB DDR2 Kit (1.8V)", watt: 16, desc: "Legacy memory." },
-  { name: "8GB DDR3 / DDR3L Kit (1.5V/1.35V)", watt: 12, desc: "Older desktop memory." },
-  { name: "16GB DDR3 / DDR3L Kit", watt: 24, desc: "Legacy dual-channel kit." },
-  { name: "16GB DDR4 Dual Channel (2x8GB)", watt: 14.4, desc: "Standard DDR4 gaming memory." },
-  { name: "32GB DDR4 Dual Channel (2x16GB)", watt: 28.8, desc: "Sweet spot for high-end DDR4 systems." },
-  { name: "64GB DDR4 Quad Channel (4x16GB)", watt: 57.6, desc: "Heavy workstation RAM." },
-  { name: "32GB DDR5 Dual Channel (2x16GB)", watt: 22.4, desc: "Standard high-speed modern DDR5 kit." },
-  { name: "64GB DDR5 Dual Channel (2x32GB)", watt: 44.8, desc: "High-capacity modern memory." },
-  { name: "96GB DDR5 Dual Channel (2x48GB)", watt: 67.2, desc: "Enthusiast capacity kit." },
-  { name: "128GB DDR5 Quad Channel (4x32GB)", watt: 89.6, desc: "Maximum workstation RAM capacity." }
+  { name: "8GB DDR2 Kit (1.8V)", watt: 3.5, gen: "DDR2", desc: "Legacy memory." },
+  { name: "8GB DDR3 / DDR3L Kit (1.5V/1.35V)", watt: 3, gen: "DDR3", desc: "Older desktop memory." },
+  { name: "16GB DDR3 / DDR3L Kit", watt: 6, gen: "DDR3", desc: "Legacy dual-channel kit." },
+  { name: "16GB DDR4 Dual Channel (2x8GB)", watt: 6, gen: "DDR4", desc: "Standard DDR4 gaming memory." },
+  { name: "32GB DDR4 Dual Channel (2x16GB)", watt: 12, gen: "DDR4", desc: "Sweet spot for high-end DDR4 systems." },
+  { name: "64GB DDR4 Quad Channel (4x16GB)", watt: 24, gen: "DDR4", desc: "Heavy workstation RAM." },
+  { name: "32GB DDR5 Dual Channel (2x16GB)", watt: 10, gen: "DDR5", desc: "Standard high-speed modern DDR5 kit." },
+  { name: "64GB DDR5 Dual Channel (2x32GB)", watt: 20, gen: "DDR5", desc: "High-capacity modern memory." },
+  { name: "96GB DDR5 Dual Channel (2x48GB)", watt: 30, gen: "DDR5", desc: "Enthusiast capacity kit." },
+  { name: "128GB DDR5 Quad Channel (4x32GB)", watt: 40, gen: "DDR5", desc: "Maximum workstation RAM capacity." }
 ];
 
 const STORAGE_OPTS = [
@@ -620,38 +692,49 @@ const STORAGE_OPTS = [
 ];
 
 // atx31: true = confirmed ATX 3.0/3.1 compliant with native 12VHPWR/12V-2x6
-// cable per manufacturer spec sheets (verified live, Sept 2026).
+// cable per manufacturer spec sheets (verified live, Sept 2026). 80+
+// efficiency tier added to each name per its real published rating.
 const PSU_CATALOG = [
-  { watt: 450, name: "Corsair CX450M Bronze", atx31: false, link: "https://www.amazon.com/s?k=450w+psu&tag=pcpower20-20" },
-  { watt: 550, name: "Corsair RM550x Gold", atx31: false, link: "https://www.amazon.com/s?k=corsair+rm550x&tag=pcpower20-20" },
-  { watt: 650, name: "be quiet! Pure Power 12 M 650W (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=650w+atx+3.0+psu&tag=pcpower20-20" },
-  { watt: 750, name: "be quiet! Pure Power 12 M 750W (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=pure+power+750w&tag=pcpower20-20" },
-  { watt: 850, name: "Corsair RM850x Shift ATX 3.1", atx31: true, link: "https://www.amazon.com/s?k=corsair+rm850x&tag=pcpower20-20" },
-  { watt: 1000, name: "Seasonic Focus GX-1000 ATX 3.0", atx31: true, link: "https://www.amazon.com/s?k=seasonic+gx1000&tag=pcpower20-20" },
-  { watt: 1200, name: "Corsair HX1200i ATX 3.1", atx31: true, link: "https://www.amazon.com/s?k=corsair+hx1200i&tag=pcpower20-20" },
-  { watt: 1300, name: "MSI MEG Ai1300P PCIE5 (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=1300w+atx+3.0+psu&tag=pcpower20-20" },
-  { watt: 1500, name: "be quiet! Dark Power Pro 13 1500W Titanium (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=1500w+psu&tag=pcpower20-20" }
+  { watt: 450, name: "Corsair CX450M 80+ Bronze", atx31: false, link: "https://www.amazon.com/s?k=450w+psu&tag=pcpower20-20" },
+  { watt: 550, name: "Corsair RM550x 80+ Gold", atx31: false, link: "https://www.amazon.com/s?k=corsair+rm550x&tag=pcpower20-20" },
+  { watt: 650, name: "be quiet! Pure Power 12 M 650W 80+ Gold (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=650w+atx+3.0+psu&tag=pcpower20-20" },
+  { watt: 750, name: "be quiet! Pure Power 12 M 750W 80+ Gold (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=pure+power+750w&tag=pcpower20-20" },
+  { watt: 850, name: "Corsair RM850x Shift 80+ Gold (ATX 3.1)", atx31: true, link: "https://www.amazon.com/s?k=corsair+rm850x&tag=pcpower20-20" },
+  { watt: 1000, name: "Seasonic Focus GX-1000 80+ Gold (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=seasonic+gx1000&tag=pcpower20-20" },
+  { watt: 1200, name: "Corsair HX1200i 80+ Platinum (ATX 3.1)", atx31: true, link: "https://www.amazon.com/s?k=corsair+hx1200i&tag=pcpower20-20" },
+  { watt: 1300, name: "MSI MEG Ai1300P 80+ Platinum (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=1300w+atx+3.0+psu&tag=pcpower20-20" },
+  { watt: 1500, name: "be quiet! Dark Power Pro 13 1500W 80+ Titanium (ATX 3.0)", atx31: true, link: "https://www.amazon.com/s?k=1500w+psu&tag=pcpower20-20" }
 ];
 
 let state = { cpu: null, mb: null, gpu: null, ram: null, cooling: null, storage: null };
 let selectedRes = '1440';
+let sizingMode = 'gaming';
 
 // ============================================================================
 // FPS MODEL
 // Each title has a gpuWeight (0-1): how GPU-bound the title typically is at
 // the given settings. effectiveScore blends cpu.tier and gpu.tier using that
 // weight, then a per-title linear fit (slope/intercept) maps score -> FPS.
-// Slopes are anchored to published 1440p Ultra benchmark reference points
-// where available (RTX 4090-class high end, GTX 1650/RX6600-class low end),
-// not invented from scratch. This is a calibrated estimate, not a live
-// benchmark database - see the FAQ note on the page.
+//
+// Recalibrated (round 3): the previous slope/intercept values were checked
+// against one verified reference point - a 9950X3D+RTX5090 pairing (the
+// top of both tier scales) benchmarked at ~190 FPS in Cyberpunk 2077,
+// 1440p Ultra, RT off - and came in ~30% low (132 vs 190). The other four
+// titles' slopes are scaled by the same correction ratio (~1.44x for the
+// GPU-heavy AAA titles; a more conservative ~1.15x for Valorant, since its
+// lightweight, engine-capped behavior isn't well-modeled by a AAA-title
+// correction factor). Only Cyberpunk's high end is independently verified
+// against a cited benchmark - the rest are a reasoned extrapolation, not
+// individually re-verified. 4K resFactor values were also moderated
+// (previously assumed a steeper 1440p->4K drop than modern high-end GPUs
+// actually show).
 // ============================================================================
 const GAME_MODEL = [
-  { title: "Cyberpunk 2077 (RT Off, Ultra)", gpuWeight: 0.85, slope: 14, intercept: -8, floor: 15, resFactor: { "1080": 1.28, "1440": 1.0, "4k": 0.55 } },
-  { title: "Call of Duty: Warzone",           gpuWeight: 0.65, slope: 15.6, intercept: 9, floor: 30, resFactor: { "1080": 1.22, "1440": 1.0, "4k": 0.62 } },
-  { title: "Valorant",                        gpuWeight: 0.25, slope: 54.5, intercept: 21, floor: 60, resFactor: { "1080": 1.15, "1440": 1.0, "4k": 0.80 } },
-  { title: "Red Dead Redemption 2",           gpuWeight: 0.75, slope: 15.6, intercept: -6, floor: 20, resFactor: { "1080": 1.25, "1440": 1.0, "4k": 0.58 } },
-  { title: "Forza Horizon 5",                 gpuWeight: 0.70, slope: 20, intercept: -5, floor: 30, resFactor: { "1080": 1.24, "1440": 1.0, "4k": 0.60 } }
+  { title: "Cyberpunk 2077 (RT Off, Ultra)", gpuWeight: 0.85, slope: 21, intercept: -20, floor: 15, resFactor: { "1080": 1.28, "1440": 1.0, "4k": 0.62 } },
+  { title: "Call of Duty: Warzone",           gpuWeight: 0.65, slope: 22.5, intercept: 13, floor: 30, resFactor: { "1080": 1.22, "1440": 1.0, "4k": 0.68 } },
+  { title: "Valorant",                        gpuWeight: 0.25, slope: 62.7, intercept: 24, floor: 60, resFactor: { "1080": 1.15, "1440": 1.0, "4k": 0.85 } },
+  { title: "Red Dead Redemption 2",           gpuWeight: 0.75, slope: 22.5, intercept: -9, floor: 20, resFactor: { "1080": 1.25, "1440": 1.0, "4k": 0.65 } },
+  { title: "Forza Horizon 5",                 gpuWeight: 0.70, slope: 28.8, intercept: -7, floor: 30, resFactor: { "1080": 1.24, "1440": 1.0, "4k": 0.67 } }
 ];
 
 // ============================================================================
@@ -703,10 +786,15 @@ function renderBottleneck() {
   const bn = computeBottleneck();
   if (!bn) { line.classList.add('hidden'); return; }
   line.classList.remove('hidden');
+  // Known limitation: this estimate doesn't change with the resolution
+  // toggle above, even though real bottlenecks do - the same pairing
+  // leans more GPU-bound at 4K and more CPU-bound at 1080p in practice.
+  // Treat a "CPU-bound" call especially loosely at 4K, and a "GPU-bound"
+  // call especially loosely at 1080p.
   if (bn.part === 'Balanced' || bn.gap < 8) {
-    line.innerHTML = `<span style="color:var(--accent)">⚖ Well-balanced pairing</span> <span style="color:var(--text-3)">— roughly ${bn.gap}% relative gap between your CPU and GPU tier.</span>`;
+    line.innerHTML = `<span style="color:var(--accent)">⚖ Well-balanced pairing</span> <span style="color:var(--text-3)">— roughly ${bn.gap}% relative gap between your CPU and GPU tier (this doesn't yet adjust for your resolution choice above).</span>`;
   } else {
-    line.innerHTML = `<span style="color:var(--warn)">⚖ Likely ${bn.part}-bound</span> <span style="color:var(--text-3)">— your ${bn.part} sits roughly ${bn.gap}% behind the other component's relative tier, so it will tend to cap frame rates before the ${bn.part === 'CPU' ? 'GPU' : 'CPU'} does.</span>`;
+    line.innerHTML = `<span style="color:var(--warn)">⚖ Likely ${bn.part}-bound</span> <span style="color:var(--text-3)">— your ${bn.part} sits roughly ${bn.gap}% behind the other component's relative tier. Note: real-world bottlenecks shift with resolution (more GPU-bound at 4K, more CPU-bound at 1080p) in a way this estimate doesn't yet capture.</span>`;
   }
 }
 
@@ -723,14 +811,20 @@ function renderFPS() {
     const score = (g.gpuWeight * gpuPct + (1 - g.gpuWeight) * cpuPct) * 10;
     let fps = g.slope * score + g.intercept;
     fps *= (g.resFactor[selectedRes] || 1.0);
-    fps = Math.max(g.floor, Math.round(fps));
-    return { title: g.title, fps };
+    fps = Math.max(g.floor, fps);
+    // Shown as a band, not one precise integer - a single number like
+    // "190 FPS" reads as a lab measurement even with a disclaimer next to
+    // it. This model is a calibrated estimate; +/-12%, rounded to the
+    // nearest 5, communicates that honestly without losing usefulness.
+    const low = Math.max(g.floor, Math.round((fps * 0.88) / 5) * 5);
+    const high = Math.round((fps * 1.12) / 5) * 5;
+    return { title: g.title, low, high, mid: Math.round(fps) };
   });
 
   container.innerHTML = games.map(g => `
     <div class="flex justify-between items-center bg-[#131A24] p-3 rounded border border-[#212438]">
       <span class="text-xs text-[#E7ECF3]">${g.title}</span>
-      <span class="mono text-sm font-bold ${g.fps > 144 ? 'text-teal-400' : (g.fps > 60 ? 'text-amber-400' : 'text-rose-400')}">${g.fps} FPS</span>
+      <span class="mono text-sm font-bold ${g.mid > 144 ? 'text-teal-400' : (g.mid > 60 ? 'text-amber-400' : 'text-rose-400')}">~${g.low}-${g.high} FPS</span>
     </div>
   `).join('');
 }
@@ -739,7 +833,10 @@ document.getElementById('resToggle').addEventListener('click', (e) => {
   const btn = e.target.closest('.res-btn');
   if (!btn) return;
   selectedRes = btn.dataset.res;
-  document.querySelectorAll('.res-btn').forEach(b => b.classList.remove('active'));
+  // Scoped to #resToggle only - this used to query every .res-btn on the
+  // page, which also matched the Gaming/Worst-Case sizing buttons and
+  // silently cleared their highlight whenever you changed resolution.
+  document.querySelectorAll('#resToggle .res-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderFPS();
 });
@@ -758,16 +855,51 @@ document.getElementById('resToggle').addEventListener('click', (e) => {
 //   bug, and it matches how the ATX 3.0/3.1 spec actually works.
 // ============================================================================
 function calculate() {
-  const cpuWatts = state.cpu?.boost_w || 0;
+  const rawCpuWatts = state.cpu?.boost_w || 0;
   const gpuWatts = state.gpu?.boost_w || 0;
   const mbWatts = state.mb?.watt || 0;
   const ramWatts = state.ram?.watt || 0;
   const coolWatts = state.cooling?.watt || 0;
   const storageWatts = state.storage?.watt || 0;
 
-  const hasAny = cpuWatts > 0 || gpuWatts > 0 || mbWatts > 0 || ramWatts > 0 || coolWatts > 0 || storageWatts > 0;
+  // Sizing mode: "gaming" counts the CPU at a realistic sustained gaming
+  // load rather than its full synthetic PL2/PPT ceiling - a CPU rarely
+  // holds its full multi-core boost power while a game is also loading
+  // the GPU. Using full PL2/PPT for every part unconditionally (the old
+  // behavior) systematically oversized high-end builds by 150-300W
+  // against real vendor guidance, because it summed everything at its own
+  // individual worst case simultaneously - a true worst case, but not a
+  // "recommended" figure. "Worst-case" mode keeps the old full-PL2/PPT
+  // behavior for people running sustained multi-threaded loads (render,
+  // encode, compile) alongside GPU work, where that peak is realistic.
+  const GAMING_CPU_LOAD_FACTOR = 0.7;
+  const cpuWatts = sizingMode === 'gaming' ? Math.round(rawCpuWatts * GAMING_CPU_LOAD_FACTOR) : rawCpuWatts;
+
+  const hasAny = rawCpuWatts > 0 || gpuWatts > 0 || mbWatts > 0 || ramWatts > 0 || coolWatts > 0 || storageWatts > 0;
   let sustainedTotal = cpuWatts + gpuWatts + mbWatts + ramWatts + coolWatts + storageWatts;
   if (hasAny) sustainedTotal += 25; // fixed overhead: fans, RGB, USB peripherals, board misc rails
+
+  // Per-component breakdown - a single 1250W total with no line items is
+  // hard to trust; showing what actually adds up to it is not.
+  const breakdownEl = document.getElementById('wattageBreakdown');
+  const breakdownList = document.getElementById('breakdownList');
+  if (hasAny) {
+    const rows = [
+      state.cpu ? { label: state.cpu.name, watts: cpuWatts } : null,
+      state.gpu ? { label: state.gpu.name, watts: gpuWatts } : null,
+      state.mb ? { label: 'Motherboard', watts: mbWatts } : null,
+      state.ram ? { label: 'RAM', watts: ramWatts } : null,
+      state.cooling ? { label: 'Cooling', watts: coolWatts } : null,
+      state.storage ? { label: 'Storage', watts: storageWatts } : null,
+      { label: 'Fans / RGB / USB overhead', watts: 25 },
+    ].filter(Boolean);
+    breakdownList.innerHTML = rows.map(r => `
+      <div class="flex justify-between text-[11px]"><span style="color:var(--text-2)">${r.label}</span><span class="mono" style="color:var(--text-1)">${r.watts}W</span></div>
+    `).join('');
+    breakdownEl.classList.remove('hidden');
+  } else {
+    breakdownEl.classList.add('hidden');
+  }
 
   const peak = Math.round(sustainedTotal);
   // Target ~70% PSU load at peak draw. Cross-checked against multiple
@@ -780,26 +912,48 @@ function calculate() {
 
   document.getElementById('peakPower').innerText = peak;
   document.getElementById('recWattage').innerText = rec;
+  document.getElementById('modeIndicator').innerText = sizingMode === 'gaming' ? '(Gaming)' : '(Worst-Case)';
 
   const atxGuardOn = document.getElementById('transientToggle').checked;
 
   let alerts = [];
-  if (state.cpu && state.cooling && cpuWatts > state.cooling.ceiling) {
-    alerts.push(`Thermal Warning: this cooler's rated ceiling (${state.cooling.ceiling}W) is below your CPU's estimated sustained draw (${cpuWatts}W) - expect thermal throttling under full load.`);
+  // Thermal check always uses the CPU's real full boost ceiling (not the
+  // gaming-scaled figure) - a cooler needs to handle the chip's actual
+  // peak, even if that peak isn't sustained during every workload.
+  if (state.cpu && state.cooling && rawCpuWatts > state.cooling.ceiling) {
+    alerts.push(`Thermal Warning: this cooler's rated ceiling (${state.cooling.ceiling}W) is below your CPU's peak boost draw (${rawCpuWatts}W) - expect thermal throttling under full load.`);
+  }
+  // Compatibility warnings - flag a physically impossible build instead of
+  // silently pricing a PSU for a CPU/board/RAM combination that could
+  // never actually go together.
+  if (state.cpu && state.mb && state.cpu.socket !== state.mb.socket) {
+    alerts.push(`Socket Mismatch: this CPU uses ${state.cpu.socket}, but the selected motherboard is ${state.mb.socket} - they won't physically fit together.`);
+  }
+  if (state.ram && state.mb) {
+    const boardSupportsRam = state.mb.ramGen.split('/').includes(state.ram.gen);
+    if (!boardSupportsRam) {
+      alerts.push(`RAM Mismatch: this motherboard supports ${state.mb.ramGen}, but the selected RAM is ${state.ram.gen} - it won't fit the slots.`);
+    }
   }
   document.getElementById('statusDetail').innerText = alerts.length
     ? alerts.join(" ")
     : (peak > 0 ? "System parameters operating within optimal thermal and power limits." : "Select components to analyze ATX 3.1 excursion safety and bottleneck ratios.");
 
   // Safety panel: per-SKU connector guidance, not a flat wattage gate.
-  // The 12VHPWR/12V-2x6 connector only exists on RTX 40/50-series cards
-  // (state.gpu.needs12vhpwr) - showing that specific instruction for an
-  // older 8-pin card (GTX 1080 Ti, RTX 2080 Ti, RTX 3080, RX 6800 XT, etc.)
-  // would be factually wrong, so those get a separate, connector-accurate
-  // caution instead.
+  // The 12VHPWR/12V-2x6 connector is standard on RTX 40/50-series
+  // Founders Edition cards from the 4070 tier up, but AIB (partner-brand)
+  // cards - especially at the lower end of each generation (4060/4060 Ti,
+  // 5060/5060 Ti) - often ship with a plain 8-pin connector instead, since
+  // the card doesn't draw enough to need the bigger one. Rather than
+  // assert a flat fact for that ambiguous band, the message says to check
+  // the card's own spec sheet.
+  const AMBIGUOUS_CONNECTOR_TIER = ["RTX 4070", "RTX 4070 Super", "RTX 5060", "RTX 5060 Ti"];
   const safetyPanel = document.getElementById('safetyPanel');
   const safetyText = document.getElementById('safetyText');
-  if (atxGuardOn && state.gpu && state.gpu.needs12vhpwr) {
+  if (atxGuardOn && state.gpu && state.gpu.needs12vhpwr && AMBIGUOUS_CONNECTOR_TIER.includes(state.gpu.name)) {
+    safetyPanel.classList.remove('hidden');
+    safetyText.innerHTML = `This card draws ${gpuWatts}W. The Founders Edition uses a native <strong>12V-2x6 / 12VHPWR</strong> connector, but many partner-brand (AIB) versions at this tier use a standard 8-pin instead - check your specific card's spec sheet before assuming which PSU cable you need. If it does need 12V-2x6, push the cable in until it clicks and avoid sharp bends near the plug.`;
+  } else if (atxGuardOn && state.gpu && state.gpu.needs12vhpwr) {
     safetyPanel.classList.remove('hidden');
     safetyText.innerHTML = `This GPU uses a native <strong>12V-2x6 / 12VHPWR</strong> connector and draws ${gpuWatts}W. Use a genuine <strong>ATX 3.0 or 3.1 certified</strong> PSU with that connector built in (not an 8-pin-to-16-pin adapter bundle). Push the cable in until it clicks and avoid sharp bends near the plug - most reported melting incidents traced back to a connector that wasn't fully seated, not to insufficient wattage.`;
   } else if (atxGuardOn && gpuWatts >= 300) {
@@ -810,7 +964,10 @@ function calculate() {
   }
 
   if (peak > 0) {
-    let candidates = PSU_CATALOG.filter(p => p.watt >= rec);
+    // Tolerance window instead of a hard cutoff: a computed rec of 1050W
+    // used to skip right past a real 1000W unit and jump to 1200W. This
+    // keeps a near-miss (within 50W under the target) visible too.
+    let candidates = PSU_CATALOG.filter(p => p.watt >= rec - 50);
     // ATX 3.1 Guard now affects every build, not just high-wattage ones -
     // when on, it always prefers ATX 3.0/3.1-compliant units first; when
     // off, it shows the plain wattage match including older-spec units.
@@ -836,6 +993,7 @@ function calculate() {
   }
 
   renderFPS();
+  syncStateToURL();
 }
 
 function buildDropdownContent(data) {
@@ -851,22 +1009,33 @@ function setupDropdown(id, data, key) {
   const dropdown = document.getElementById(id.replace('Search', 'Dropdown'));
   const insight = document.getElementById(id.replace('Search', 'Insight'));
   const affiliateBox = document.getElementById(id.replace('Search', 'Affiliate'));
+  const wrap = input.closest('.hw-select');
+  const clearBtn = wrap.querySelector('.clear-btn');
 
+  function clearSelection() {
+    state[key] = null;
+    input.value = '';
+    insight.classList.add('hidden');
+    affiliateBox.innerHTML = '';
+    clearBtn.classList.add('hidden');
+    calculate();
+  }
+
+  // Clicking an already-filled input used to silently wipe the selection
+  // before reopening the dropdown - easy to do by accident while just
+  // trying to look at or change your choice. Now it only opens the list;
+  // clearing is its own explicit control (the x button).
   input.addEventListener('click', (e) => {
     e.stopPropagation();
     document.querySelectorAll('.dropdown-results').forEach(el => { if(el !== dropdown) el.classList.add('hidden'); });
-
-    if (state[key]) {
-      state[key] = null;
-      input.value = '';
-      insight.classList.add('hidden');
-      affiliateBox.innerHTML = '';
-      calculate();
-    }
-
     input.setAttribute('readonly', 'true');
     dropdown.innerHTML = buildDropdownContent(data);
     dropdown.classList.toggle('hidden');
+  });
+
+  clearBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearSelection();
   });
 
   dropdown.addEventListener('click', (e) => {
@@ -888,6 +1057,7 @@ function setupDropdown(id, data, key) {
     input.value = state[key].name;
     input.setAttribute('readonly', 'true');
     dropdown.classList.add('hidden');
+    clearBtn.classList.remove('hidden');
 
     if (state[key].desc) {
       insight.innerText = state[key].desc;
@@ -915,10 +1085,20 @@ function setupDropdown(id, data, key) {
   });
 }
 
+const DROPDOWN_KEYS = { cpuSearch: 'cpu', mbSearch: 'mb', gpuSearch: 'gpu', ramSearch: 'ram', coolingSearch: 'cooling', storageSearch: 'storage' };
+
 document.addEventListener('click', (e) => {
-  if(!e.target.closest('.relative')) {
+  if(!e.target.closest('.hw-select')) {
     document.querySelectorAll('.dropdown-results').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('.search-input').forEach(input => {
+      const key = DROPDOWN_KEYS[input.id];
+      if (key) {
+        // Snap the box back to whatever is actually selected - fixes the
+        // case where someone typed to filter, then clicked away without
+        // picking an item: the box used to keep the typed text and look
+        // "selected" while state (and the math) never changed.
+        input.value = state[key]?.name || '';
+      }
       if(!input.value) {
         input.setAttribute('readonly', 'true');
         input.placeholder = input.dataset.default;
@@ -928,6 +1108,14 @@ document.addEventListener('click', (e) => {
 });
 
 document.getElementById('transientToggle').addEventListener('change', calculate);
+document.getElementById('sizingModeToggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('.res-btn');
+  if (!btn) return;
+  sizingMode = btn.dataset.mode;
+  document.querySelectorAll('#sizingModeToggle .res-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  calculate();
+});
 
 setupDropdown('cpuSearch', CPUS, 'cpu');
 setupDropdown('mbSearch', MOTHERBOARDS, 'mb');
@@ -936,10 +1124,97 @@ setupDropdown('ramSearch', RAM_OPTS, 'ram');
 setupDropdown('coolingSearch', COOLING_OPTS, 'cooling');
 setupDropdown('storageSearch', STORAGE_OPTS, 'storage');
 
+// ============================================================================
+// SHAREABLE BUILD URLS
+// Every selection updates the query string (?cpu=...&gpu=...) via
+// history.replaceState, so the address bar always reflects the exact
+// build on screen - copyable, bookmarkable, and each distinct combination
+// is a distinct URL rather than one opaque page.
+// ============================================================================
+const URL_PARAM_MAP = { cpu: 'cpu', mb: 'mb', gpu: 'gpu', ram: 'ram', cooling: 'cooling', storage: 'storage' };
+
+function syncStateToURL() {
+  const params = new URLSearchParams();
+  Object.entries(URL_PARAM_MAP).forEach(([stateKey, param]) => {
+    if (state[stateKey]) params.set(param, state[stateKey].name);
+  });
+  if (sizingMode !== 'gaming') params.set('mode', sizingMode);
+  if (selectedRes !== '1440') params.set('res', selectedRes);
+  const qs = params.toString();
+  const newUrl = window.location.pathname + (qs ? '?' + qs : '');
+  window.history.replaceState(null, '', newUrl);
+}
+
+function loadStateFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const lookups = { cpu: CPUS, mb: MOTHERBOARDS, gpu: GPUS, ram: RAM_OPTS, cooling: COOLING_OPTS, storage: STORAGE_OPTS };
+  Object.entries(URL_PARAM_MAP).forEach(([stateKey, param]) => {
+    const val = params.get(param);
+    if (!val) return;
+    const match = lookups[stateKey].find(i => i.name === val);
+    if (!match) return;
+    state[stateKey] = match;
+    const input = document.getElementById(stateKey === 'mb' ? 'mbSearch' : stateKey === 'cpu' ? 'cpuSearch' : stateKey === 'gpu' ? 'gpuSearch' : stateKey === 'ram' ? 'ramSearch' : stateKey === 'cooling' ? 'coolingSearch' : 'storageSearch');
+    const insight = document.getElementById(input.id.replace('Search', 'Insight'));
+    const affiliateBox = document.getElementById(input.id.replace('Search', 'Affiliate'));
+    const clearBtn = input.closest('.hw-select').querySelector('.clear-btn');
+    input.value = match.name;
+    input.setAttribute('readonly', 'true');
+    clearBtn.classList.remove('hidden');
+    if (match.desc) { insight.innerText = match.desc; insight.classList.remove('hidden'); }
+    const q = encodeURIComponent(match.name);
+    affiliateBox.innerHTML = `
+      <a href="https://www.amazon.com/s?k=${q}&tag=pcpower20-20" target="_blank" rel="noopener noreferrer sponsored" class="conversion-card flex justify-between items-center p-3 rounded-xl text-xs mt-2 transition-all">
+        <span class="text-gray-300 font-medium truncate max-w-[170px]">🛒 Check ${match.name.substring(0, 15)}...</span>
+        <span class="conversion-text font-bold tracking-wide">Buy on Amazon →</span>
+      </a>`;
+  });
+  const modeParam = params.get('mode');
+  if (modeParam === 'worstcase') {
+    sizingMode = 'worstcase';
+    document.querySelectorAll('#sizingModeToggle .res-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'worstcase'));
+  }
+  const resParam = params.get('res');
+  if (resParam && ['1080','1440','4k'].includes(resParam)) {
+    selectedRes = resParam;
+    document.querySelectorAll('#resToggle .res-btn').forEach(b => b.classList.toggle('active', b.dataset.res === resParam));
+  }
+}
+
+document.getElementById('copyLinkBtn').addEventListener('click', () => {
+  syncStateToURL();
+  const label = document.getElementById('copyLinkLabel');
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    label.textContent = 'Copied!';
+    setTimeout(() => { label.textContent = 'Copy Build Link'; }, 1800);
+  }).catch(() => {
+    label.textContent = 'Copy failed';
+    setTimeout(() => { label.textContent = 'Copy Build Link'; }, 1800);
+  });
+});
+
+loadStateFromURL();
+if (state.cpu || state.gpu || state.mb || state.ram || state.cooling || state.storage) {
+  calculate();
+}
+
 // Field Notes (private, per-browser localStorage - see the label above the form)
+function readStoredReviews() {
+  // Safari private browsing and a hand-edited/corrupted localStorage value
+  // both throw here - without a try/catch, that exception used to halt the
+  // rest of the init script (dropdowns, calculate) since this runs at the
+  // bottom of the file synchronously on page load.
+  try {
+    const raw = localStorage.getItem('wattbench_reviews');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
 function loadReviews() {
   const feed = document.getElementById('reviewsFeed');
-  const savedReviews = JSON.parse(localStorage.getItem('wattbench_reviews') || '[]');
+  const savedReviews = readStoredReviews();
 
   if (savedReviews.length === 0) {
     feed.innerHTML = `<div class="text-sm text-gray-500 italic col-span-2">No notes yet. Add one above after you test a build.</div>`;
@@ -949,10 +1224,10 @@ function loadReviews() {
   feed.innerHTML = savedReviews.map(r => `
     <div class="p-4 rounded-xl bg-[#10151D] border border-[#212438] flex flex-col justify-between">
       <div>
-        <div class="font-bold text-white text-sm mb-1">${escapeHtml(r.name)}</div>
-        <div class="text-amber-400 text-xs mb-2">${r.rating}</div>
+        <div class="font-bold text-white text-sm mb-1">${escapeHtml(r.name || 'Anonymous')}</div>
+        <div class="text-amber-400 text-xs mb-2">${escapeHtml(r.rating || '')}</div>
       </div>
-      <p class="text-xs text-[#97A2B4]">"${escapeHtml(r.text)}"</p>
+      <p class="text-xs text-[#97A2B4]">"${escapeHtml(r.text || '')}"</p>
     </div>
   `).join('');
 }
@@ -970,7 +1245,7 @@ document.getElementById('reviewForm').addEventListener('submit', function(e) {
   if (!name || !text) return;
 
   const newReview = { name, rating, text };
-  const savedReviews = JSON.parse(localStorage.getItem('wattbench_reviews') || '[]');
+  const savedReviews = readStoredReviews();
   savedReviews.unshift(newReview);
   localStorage.setItem('wattbench_reviews', JSON.stringify(savedReviews));
 
